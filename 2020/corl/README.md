@@ -6,10 +6,10 @@ _Last Update_: Tuesday, July 28th, 2020
 
 ## Table of Contents
 - [Setup Guide](#setup-guide)
- - [Publications Data](#publications-data)
- - [ProjectChrono](#projectchrono-and-pychrono)
- - [GymChrono](#gymchrono)
- - [Additional Requirements](#additional-requirements)
+  - [Publications Data](#publications-data)
+  - [ProjectChrono](#projectchrono-and-pychrono)
+  - [GymChrono](#gymchrono)
+  - [Additional Requirements](#additional-requirements)
 - [Running](#running)
 - [See Also](#see-also)
 - [Support](#support)
@@ -60,11 +60,11 @@ To install GymChrono, please follow the installation guide found at the bottom o
 #### Additional Requirements
 
 - __PyTorch__: [Installation Guide](https://pytorch.org/)
- - _Version_: 1.3.1
- - _Example Command_: `conda install pytorch=1.3.1 torchvision -c pytorch`
+  - _Version_: 1.3.1
+  - _Example Command_: `conda install pytorch=1.3.1 torchvision -c pytorch`
 - __Tensorflow__
- - _Version_: 1.14
- - _Example Command_: `conda install tensorflow-gpu==1.14`
+  - _Version_: 1.14
+  - _Example Command_: `conda install tensorflow-gpu==1.14`
 - __Stable Baselines__: [Installation Guide](https://github.com/hill-a/stable-baselines#installation)
 
 ## Running
