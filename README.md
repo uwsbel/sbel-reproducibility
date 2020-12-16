@@ -9,11 +9,13 @@ This repo is organized by year of when the metadata was first added to the repo.
 - Please avoid dropping large files here, particularly so if they're non-ascii. For large files that are available elsewhere, provide a link (in your readme.md) that can be used to download the file. This applies, for instance, to large pics, movies, etc.
 - When adding data, scripts, assets, models, etc., please take the long view. The metadata that you provide will likely be used for years to come. 
 - Style issue: When referencing in your manuscript this metadata repo, say for TR-2020-02, please define in SBEL's **BibFiles** repo, under **refsSBELspecific.bib**, an entry like this:
-*@misc{TR-2020-02metadata,
-author = {Hu, Wei and Serban, Radu and Negrut, Dan},
-title = {{TR-2020-02 Public Metadata}},
-note              = {{Simulation-Based Engineering Laboratory, University of Wisconsin-Madison}},
-year              = {2020},
-howpublished      = {\url{https://github.com/uwsbel/public-metadata/tree/master/2020/TR-2020-02}}
-}*
-In order to maintain consistency accross docs for all our references, please copy/paste/edit the sample above to fit your needs when dropping in **refsSBELspecific.bib**.
+
+  *@misc{TR-2020-02metadata, \
+  author = {Hu, Wei and Serban, Radu and Negrut, Dan}, \
+  title = {{TR-2020-02 Public Metadata}}, \
+  note              = {{Simulation-Based Engineering Laboratory, University of Wisconsin-Madison}}, \
+  year              = {2020}, \
+  howpublished      = {\url{https://github.com/uwsbel/public-metadata/tree/master/2020/TR-2020-02}} \
+  }*
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;To maintain consistency, please copy/paste/edit the sample above to fit your needs when dropping in **refsSBELspecific.bib**.
