@@ -1,0 +1,8 @@
+This demo is running using below repository and commit:
+chrono-dev
+sandbox/fsi-I2SPH-granular
+d4b28e45deddf015732c4c51ca1f4a8f3d8b6026
+Animation No.03 of demo Rover, add short output for csv files
+
+
+
