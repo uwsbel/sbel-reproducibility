@@ -1,0 +1,7 @@
+This demo is running using below repository and commit:
+chrono-dev (chrono-internal)
+feature/FSI
+Add detection for Ampere GPUs - A100
+8dcf0ef96ce9037a675fa8921994e6327194263c
+
+
