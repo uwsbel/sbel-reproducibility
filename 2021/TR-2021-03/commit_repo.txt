@@ -1,0 +1,6 @@
+This demo is running using below repository and commit:
+chrono-dev
+Change to only save boundary particles at the initial moment
+6709a4ab48f4391abef5c7a470aa3d1180366027
+
+
