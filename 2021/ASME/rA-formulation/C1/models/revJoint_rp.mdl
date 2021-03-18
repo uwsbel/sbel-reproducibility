@@ -1,0 +1,91 @@
+{
+    "name": "revJoint",
+
+    "bodies":
+    [
+        {
+            "name": "ground",
+            "id": 0
+        },
+        {
+            "name": "body_1",
+            "id": 1,
+            "r": [0, 1.4142135179442656, -1.4142136068019246],
+			"r_dot": [0, 0, 0],
+			"p": [0.6532814824381883, 0.2705980500730985, 0.6532814824381883, 0.2705980500730985],
+			"p_dot": [0, 0, 0, 0]
+		}
+	],
+	"constraints":
+	[
+	    {
+	    	"name": "revJoint_DP1_1",
+	    	"type": "DP1",
+	    	"body_i": 1,
+	    	"body_j": 0,
+	    	"a_bar_i": [1, 0, 0],
+	    	"a_bar_j": [1, 0, 0],
+	    	"f": "0",
+	    	"f_dot": "0",
+	    	"f_ddot": "0"
+	    },
+	    {
+	        "name": "revJoint_DP1_2",
+	    	"type": "DP1",
+	    	"body_i": 1,
+	    	"body_j": 0,
+	    	"a_bar_i": [0, 1, 0],
+	    	"a_bar_j": [1, 0, 0],
+	    	"f": "0",
+	    	"f_dot": "0",
+	    	"f_ddot": "0"
+	    },
+	    {
+	        "name": "revJoint_CD_1",
+	    	"type": "CD",
+	    	"body_i": 1,
+	    	"body_j": 0,
+	    	"c": [1, 0, 0],
+	    	"s_bar_p_i": [-2, 0, 0],
+	    	"s_bar_q_j": [0, 0, 0],
+	    	"f": "0",
+	    	"f_dot": "0",
+	    	"f_ddot": "0"
+	    },
+	    {
+	        "name": "revJoint_CD_2",
+	    	"type": "CD",
+	    	"body_i": 1,
+	    	"body_j": 0,
+	    	"c": [0, 1, 0],
+	    	"s_bar_p_i": [-2, 0, 0],
+	    	"s_bar_q_j": [0, 0, 0],
+	    	"f": "0",
+	    	"f_dot": "0",
+	    	"f_ddot": "0"
+	    },
+	    {
+	        "name": "revJoint_CD_3",
+	    	"type": "CD",
+	    	"body_i": 1,
+	    	"body_j": 0,
+	    	"c": [0, 0, 1],
+	    	"s_bar_p_i": [-2, 0, 0],
+	    	"s_bar_q_j": [0, 0, 0],
+	    	"f": "0",
+	    	"f_dot": "0",
+	    	"f_ddot": "0"
+	    },
+	    {
+	        "name": "revJoint_driver",
+	    	"type": "DP1",
+	    	"body_i": 1,
+	    	"body_j": 0,
+	    	"a_bar_i": [0, 1, 0],
+	    	"a_bar_j": [0, 0, -1],
+	    	"f": "cos(pi/4*cos(2*t) + pi/2)",
+			"f_dot": "1/2*pi*sin(2*t)*sin(1/4*pi*cos(2*t) + pi/2)",
+			"f_ddot": "pi/4*(4*cos(2*t))*cos(pi/4*cos(2*t)) + pi*sin(2*t)**2*sin(pi/4*cos(2*t))"
+	    }
+	]
+}
