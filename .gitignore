@@ -44,9 +44,10 @@
 # Matlab-related
 *.asv
 
-# Python compiled files
+# Python-related files
 *.pyc
 *.pyo
+*.pickle
 __pycache__/
 
 # Build files
