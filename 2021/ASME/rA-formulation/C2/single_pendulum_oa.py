@@ -20,9 +20,6 @@ def single_pendulum(args):
     parser = arg.ArgumentParser(description='Simulation of a single link pendulum')
     parser.add_argument('-t', '--end_time', type=float, default=3, dest='t_end')
 
-    parser.add_argument('--tracked_body', type=int, choices=[0], default=0)
-    parser.add_argument('--tracked_component', type=int, choices=[0, 1, 2], default=2)
-
     model_files = defaultdict(lambda: 'models/single_pendulum.mdl')
 
     # Call utility function to setup our system and set the running mode
@@ -59,17 +56,23 @@ def single_pendulum(args):
     t_steps = int(params.t_end/params.h)
     t_grid = np.linspace(0, params.t_end, t_steps, endpoint=True)
 
-    pos_data = np.zeros(t_steps)
-    vel_data = np.zeros(t_steps)
-    acc_data = np.zeros(t_steps)
+    # (num bodies) x (time steps) x (x, y, z)
+    pos_data = np.zeros((sys.nb, 3, t_steps))
+    vel_data = np.zeros((sys.nb, 3, t_steps))
+    acc_data = np.zeros((sys.nb, 3, t_steps))
+
+    num_iters = np.zeros(t_steps)
 
     for i, t in enumerate(t_grid):
         sys.do_step(i, t)
 
-        pos_data = sys.bodies[params.tracked_body].r[params.tracked_component].T
-        vel_data = sys.bodies[params.tracked_body].dr[params.tracked_component].T
-        acc_data = sys.bodies[params.tracked_body].ddr[params.tracked_component].T
+        num_iters[i] = sys.k
 
-    return pos_data, vel_data, acc_data
+        for j, body in enumerate(sys.bodies):
+            pos_data[j, :, i] = body.r.T
+            vel_data[j, :, i] = body.dr.T    
+            acc_data[j, :, i] = body.ddr.T
+
+    return pos_data, vel_data, acc_data, num_iters, t_grid
 
 

@@ -22,9 +22,6 @@ def slider_crank(args):
     parser = arg.ArgumentParser(description='Simulation of a Haug\'s slider-crank model')
     parser.add_argument('-t', '--end_time', type=float, default=3, dest='t_end')
 
-    parser.add_argument('--tracked_body', type=int, choices=[0, 1, 2], default=1)
-    parser.add_argument('--tracked_component', type=int, choices=[0, 1, 2], default=1)
-
     model_files = defaultdict(lambda: 'models/slider_crank_rotated.mdl')
 
     # Get system and change some settings
@@ -66,9 +63,10 @@ def slider_crank(args):
     t_grid = np.arange(0, params.t_end, params.h)
     t_steps = len(t_grid)
 
-    pos_data = np.zeros(t_steps)
-    vel_data = np.zeros(t_steps)
-    acc_data = np.zeros(t_steps)
+    # (num bodies) x (time steps) x (x, y, z)
+    pos_data = np.zeros((sys.nb, 3, t_steps))
+    vel_data = np.zeros((sys.nb, 3, t_steps))
+    acc_data = np.zeros((sys.nb, 3, t_steps))
 
     num_iters = np.zeros(t_steps)
 
@@ -84,9 +82,10 @@ def slider_crank(args):
 
         num_iters[i] = sys.k
 
-        pos_data = sys.bodies[params.tracked_body].r[params.tracked_component].T
-        vel_data = sys.bodies[params.tracked_body].dr[params.tracked_component].T
-        acc_data = sys.bodies[params.tracked_body].ddr[params.tracked_component].T
+        for j, body in enumerate(sys.bodies):
+            pos_data[j, :, i] = body.r.T
+            vel_data[j, :, i] = body.dr.T    
+            acc_data[j, :, i] = body.ddr.T
 
     return pos_data, vel_data, acc_data, num_iters, t_grid
 
