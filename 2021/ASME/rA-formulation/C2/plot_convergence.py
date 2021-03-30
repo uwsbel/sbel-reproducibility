@@ -4,11 +4,13 @@ import numpy as np
 
 from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt
+
+dir_path = './output/surf/'
     
 files = []
-for f in os.listdir('.'):
+for f in os.listdir(dir_path):
     if f == 'mesh_params.pickle':
-        with open(f, 'rb') as handle:
+        with open(dir_path + f, 'rb') as handle:
             ss, MM = pickle.load(handle)
         
         continue
@@ -18,7 +20,7 @@ for f in os.listdir('.'):
 
 for file_name in files:
     if file_name.endswith('iterations.pickle'):
-        with open(file_name, 'rb') as handle:
+        with open(dir_path + file_name, 'rb') as handle:
             info, conv_iters = pickle.load(handle)
 
         title = '{} {}'.format(*info)
@@ -31,7 +33,7 @@ for file_name in files:
 
         continue
 
-    with open(file_name, 'rb') as handle:
+    with open(dir_path + file_name, 'rb') as handle:
         info, pos_diff, vel_diff, acc_diff = pickle.load(handle)
     
     name, form, body, component = info
