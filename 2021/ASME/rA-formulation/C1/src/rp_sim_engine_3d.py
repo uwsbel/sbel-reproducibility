@@ -170,22 +170,22 @@ class rpSimEngine3D:
             if body.is_ground:
                 pass
             else:
-                body.r_dot = z[(body.body_id - 1) * 3:(body.body_id - 1) * 3 + 3, :]
-                body.p_dot = z[3 * self.nb + (body.body_id - 1) * 4:3 * self.nb + (
+                body.r_ddot = z[(body.body_id - 1) * 3:(body.body_id - 1) * 3 + 3, :]
+                body.p_ddot = z[3 * self.nb + (body.body_id - 1) * 4:3 * self.nb + (
                         body.body_id - 1) * 4 + 4, :]
-        lambda_p = z[7 * self.nb:8 * self.nb]
-        self.set_lambda_p(lambda_p)
-        lam = z[8 * self.nb:]
-        self.set_lambda(lam)
 
-        for body in self.bodies_list:
-            if body.is_ground:
-                pass
-            else:
                 # store solution in array for plotting
                 self.r_sol[0, (body.body_id - 1) * 3:(body.body_id - 1) * 3 + 3] = body.r.T
                 self.r_dot_sol[0, (body.body_id - 1) * 3:(body.body_id - 1) * 3 + 3] = body.r_dot.T
                 self.r_ddot_sol[0, (body.body_id - 1) * 3:(body.body_id - 1) * 3 + 3] = body.r_ddot.T
+
+                body.r_prev = body.r
+                body.p_prev = body.p
+                body.r_dot_prev = body.r_dot
+                body.p_dot_prev = body.p_dot
+
+        self.lam += z[8 * self.nb:]
+        self.lambda_p += z[7 * self.nb:8 * self.nb]
 
         iterations = np.zeros((self.N, 1))
         start = time.perf_counter()
@@ -201,82 +201,83 @@ class rpSimEngine3D:
                     break
                 self.constraint_list[-1], self.alternative_driver = self.alternative_driver, self.constraint_list[-1]
 
-            if order == 2 and i == 1:
-                # seed BDF 1
-                beta_0 = 1
-                c_r_dot = np.array([self.r_dot_sol[i - 1, :]]).T
-                c_p_dot = np.array([p_dot_sol[i - 1, :]]).T
-                c_r = np.array([self.r_sol[i - 1, :]]).T + beta_0 * self.h * c_r_dot
-                c_p = np.array([p_sol[i - 1, :]]).T + beta_0 * self.h * c_p_dot
+            if i == 1 or order == 1:
+                beta = 1
+                alphas = np.array([1, 0])
             else:
-                # STAGE 1 - Compute position and velocity using BDF and most recent accelerations ---------------
-                if order == 1:
-                    beta_0 = 1
-                    c_r_dot = np.array([self.r_dot_sol[i - 1, :]]).T
-                    c_p_dot = np.array([p_dot_sol[i - 1, :]]).T
-                    c_r = np.array([self.r_sol[i - 1, :]]).T + beta_0 * self.h * c_r_dot
-                    c_p = np.array([p_sol[i - 1, :]]).T + beta_0 * self.h * c_p_dot
+                beta = 2/3
+                alphas = np.array([4/3, -1/3])
 
-                elif order == 2:
-                    beta_0 = 2 / 3
-                    c_r_dot = 4 / 3 * np.array([self.r_dot_sol[i - 1, :]]).T - 1 / 3 * np.array([self.r_dot_sol[i - 2, :]]).T
-                    c_p_dot = 4 / 3 * np.array([p_dot_sol[i - 1, :]]).T - 1 / 3 * np.array([p_dot_sol[i - 2, :]]).T
-                    c_r = 4 / 3 * np.array([self.r_sol[i - 1, :]]).T - 1 / 3 * np.array([self.r_sol[i - 2, :]]).T + beta_0 * self.h * c_r_dot
-                    c_p = 4 / 3 * np.array([p_sol[i - 1, :]]).T - 1 / 3 * np.array([p_sol[i - 2, :]]).T + beta_0 * self.h * c_p_dot
+            for body in self.bodies_list:
+                if body.is_ground:
+                    pass
                 else:
-                    logging.warning("BDF of order greater than 2 not implemented yet.")
+                    body.c_r_dot = alphas[0]*body.r_dot + alphas[1]*body.r_dot_prev
+                    body.c_p_dot = alphas[0]*body.p_dot + alphas[1]*body.p_dot_prev
 
+                    body.c_r = alphas[0]*body.r + alphas[1]*body.r_prev + beta*self.h*body.c_r_dot
+                    body.c_p = alphas[0] * body.p + alphas[1] * body.p_prev + beta * self.h * body.c_p_dot
+
+            psi = self.psi()
+            psi_lu = lu_factor(psi)
+            for body in self.bodies_list:
+                if body.is_ground:
+                    pass
+                else:
+                    body.r_prev = body.r
+                    body.p_prev = body.p
+                    body.r_dot_prev = body.r_dot
+                    body.p_dot_prev = body.p_dot
+
+            # Begin Newton Iteration
             iteration = 0
             delta_norm = 2 * self.tol  # initialize larger than tolerance so loop begins
             while delta_norm > self.tol:
-                if iteration >= self.max_iters:
-                    logging.warning("Solution self.has not converged after", str(self.max_iters), "iterations. Stopping.")
-                    break
-
-                r = c_r + beta_0 ** 2 * self.h ** 2 * r_ddot
-                p = c_p + beta_0 ** 2 * self.h ** 2 * p_ddot
-                self.set_q(np.concatenate((r, p), axis=0))
-                r_dot = c_r_dot + beta_0 * self.h * r_ddot
-                p_dot = c_p_dot + beta_0 * self.h * p_ddot
-                self.set_q_dot(r_dot, p_dot)
+                for body in self.bodies_list:
+                    if body.is_ground:
+                        pass
+                    else:
+                        body.r = body.c_r + beta**2 * self.h**2 * body.r_ddot
+                        body.r_dot = body.c_r_dot + beta * self.h *body.r_ddot
+                        body.p = body.c_p + beta ** 2 * self.h ** 2 * body.p_ddot
+                        body.p_dot = body.c_p_dot + beta * self.h * body.p_ddot
 
                 if order == 2 and i == 1:
                     g = self.residual(1, t)
                 else:
                     g = self.residual(order, t)
 
-                psi = self.psi()
-                delta = np.linalg.solve(psi, -g)
+                delta = lu_solve(psi_lu, -g)
 
-                z = z + delta
+                for body in self.bodies_list:
+                    if body.is_ground:
+                        pass
+                    else:
+                        body.r_ddot = body.r_ddot + delta[(body.body_id - 1) * 3:((body.body_id - 1) * 3) + 3, :]
+                        body.p_ddot = body.p_ddot + delta[3 * self.nb + (body.body_id - 1) * 4:3 * self.nb + (
+                                body.body_id - 1) * 4 + 4, :]
 
-                r_ddot = z[0:3 * self.nb]
-                p_ddot = z[3 * self.nb:7 * self.nb]
-                self.set_q_ddot(r_ddot, p_ddot)
-                lambda_p = z[7 * self.nb:8 * self.nb]
-                self.set_lambda_p(lambda_p)
-                lam = z[8 * self.nb:]
-                self.set_lambda(lam)
+                self.lam += delta[8 * self.nb:]
+                self.lambda_p += delta[7 * self.nb:8 * self.nb]
 
                 delta_norm = np.linalg.norm(delta)
                 iteration += 1
+                if iteration >= self.max_iters:
+                    logging.warning("Solution self.has not converged after", str(self.max_iters), "iterations. Stopping.")
+                    break
 
             #logging.info("Iteration: ", iteration)
             iterations[i] = iteration
 
-            r = c_r + beta_0 ** 2 * self.h ** 2 * r_ddot
-            p = c_p + beta_0 ** 2 * self.h ** 2 * p_ddot
-            self.set_q(np.concatenate((r, p), axis=0))
-            r_dot = c_r_dot + beta_0 * self.h * r_ddot
-            p_dot = c_p_dot + beta_0 * self.h * p_ddot
-            self.set_q_dot(r_dot, p_dot)
+            for body in self.bodies_list:
+                if body.is_ground:
+                    pass
+                else:
+                    # store solution in array for plotting
+                    self.r_sol[i, (body.body_id - 1) * 3:(body.body_id - 1) * 3 + 3] = body.r.T
+                    self.r_dot_sol[i, (body.body_id - 1) * 3:(body.body_id - 1) * 3 + 3] = body.r_dot.T
+                    self.r_ddot_sol[i, (body.body_id - 1) * 3:(body.body_id - 1) * 3 + 3] = body.r_ddot.T
 
-            self.r_sol[i, :] = r.T
-            self.r_dot_sol[i, :] = r_dot.T
-            self.r_ddot_sol[i, :] = r_ddot.T
-            p_sol[i, :] = p.T
-            p_dot_sol[i, :] = p_dot.T
-            p_ddot_sol[i, :] = p_ddot.T
 
         duration = time.perf_counter() - start
         print('Avg. iterations: {}'.format(np.mean(iterations)))
@@ -405,12 +406,6 @@ class rpSimEngine3D:
                 idx += 1
         return tau
 
-    def set_lambda(self, lam):
-        self.lam = lam
-
-    def set_lambda_p(self, lambda_p):
-        self.lambda_p = lambda_p
-
     def residual(self, order, t):
         if order == 1:
             beta_0 = 1
@@ -419,7 +414,9 @@ class rpSimEngine3D:
         else:
             logging.warning("BDF of order greater than 2 not implemented yet.")
 
-        r_ddot, p_ddot = self.get_q_ddot()
+        r_ddot = np.vstack([body.r_ddot for body in self.bodies_list if body.is_ground == False])
+        p_ddot = np.vstack([body.p_ddot for body in self.bodies_list if body.is_ground == False])
+
         Phi = self.get_phi(t)[:self.nc, :]
         Phi_euler = self.get_phi(t)[self.nc:self.nc + self.nb, :]
         Phi_r = self.get_phi_q()[0:self.nc, 0:3 * self.nb]
