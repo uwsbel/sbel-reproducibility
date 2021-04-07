@@ -1,6 +1,14 @@
+"""
+Defines a body and geometric constraints (gcons) that internally use the rp-formulation for their generalized
+coordinates. In particular this means using unit quaternions (Euler Parameters) to represent body orientations.
+
+Used by:    system_rp.py
+See also:   rA.gcons_ra.py, rEps.gcons_reps.py
+"""
+
 import numpy as np
 from scipy.spatial.transform import Rotation as Rot
-from physics import Constraints, check_vector, skew, I3, A, B, G, dG, E, to_scalar_first, generate_sympy_constraint
+from ..utils.physics import Constraints, check_vector, skew, I3, A, B, G, dG, E, to_scalar_first, generate_sympy_constraint
 from collections import namedtuple
 import json as js
 from enum import Enum

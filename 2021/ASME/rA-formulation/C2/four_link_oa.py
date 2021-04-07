@@ -22,7 +22,7 @@ def four_link(args):
     parser = arg.ArgumentParser(description='Simulation of Haug\'s four-link mechanism')
     parser.add_argument('-t', '--end_time', type=float, default=3, dest='t_end')
 
-    model_files = defaultdict(lambda: 'models/four_link_rotated.mdl')
+    model_files = defaultdict(lambda: 'models/four_link.mdl')
 
     # Get system and change some settings
     sys, params = standard_setup(parser, model_files, args)

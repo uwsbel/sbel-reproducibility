@@ -1,17 +1,17 @@
 import logging
 import argparse as arg
 from collections import defaultdict
-from time import perf_counter, process_time
+from time import process_time
 
 import numpy as np
 import sympy as sp
 import matplotlib.pyplot as plt
 
-from system_ra import SystemRA
-from system_rp import SystemRP
-from system_reps import SystemREps
-from physics import Z_AXIS
-from tools import profiler, plot_many_kinematics, print_profiling, standard_setup
+from ..rEps.system_reps import SystemREps
+from ..rp.system_rp import SystemRP
+from ..rA.system_ra import SystemRA
+from ..utils.physics import Z_AXIS
+from ..utils.tools import profiler, plot_many_kinematics, print_profiling, standard_setup
 
 π = np.pi
 

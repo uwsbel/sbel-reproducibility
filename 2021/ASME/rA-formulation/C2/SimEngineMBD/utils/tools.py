@@ -1,19 +1,18 @@
-import matplotlib.pyplot as plt
+import pstats
 import argparse as arg
 import logging
-
 import cProfile
-import pstats
 import io
-from pstats import SortKey
 
-from system_ra import SystemRA
-from system_rp import SystemRP
-from system_reps import SystemREps
+import matplotlib.pyplot as plt
+
+from ..rA.system_ra import SystemRA
+from ..rp.system_rp import SystemRP
+from ..rEps.system_reps import SystemREps
 
 profiler = cProfile.Profile()
 
-def standard_setup(parser, model_files, args = None):
+def standard_setup(parser, model_files, args=None):
     """
     Initializes common command-line options for multi-body simulation
     """

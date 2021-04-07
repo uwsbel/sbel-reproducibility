@@ -2,9 +2,10 @@ import numpy as np
 import json as js
 import logging
 from scipy.linalg import lu_factor, lu_solve
-from gcons_rp import Constraints, DP1, DP2, CD, D, Body, ConGroup, EulerCon
-from physics import Z_AXIS, block_mat, R, skew, exp, SolverType, bdf1, bdf2
 
+from .gcons_rp import Constraints, DP1, DP2, CD, D, Body, ConGroup, EulerCon
+from ..utils.physics import Z_AXIS, block_mat, R, skew, exp, SolverType, bdf1, bdf2
+from ..utils.systems import read_model_file
 
 class SystemRP:
 
@@ -368,16 +369,6 @@ def create_constraint(json_con, body_i, body_j):
         raise ValueError('Unmapped enum value')
 
     return con
-
-
-def read_model_file(file_name):
-    with open(file_name) as model_file:
-        model_data = js.load(model_file)
-
-        model_bodies = model_data['bodies']
-        model_constraints = model_data['constraints']
-
-    return (model_bodies, model_constraints)
 
 
 def process_system(file_bodies, file_constraints):

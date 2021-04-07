@@ -8,11 +8,11 @@ import numpy as np
 import sympy as sp
 import matplotlib.pyplot as plt
 
-from system_ra import SystemRA
-from system_rp import SystemRP
-from system_reps import SystemREps
-from physics import R, Y_AXIS, Z_AXIS
-from tools import profiler, plot_many_kinematics, plot_kinematics_analysis, print_profiling, standard_setup
+from ..rEps.system_reps import SystemREps
+from ..rp.system_rp import SystemRP
+from ..rA.system_ra import SystemRA
+from ..utils.physics import Z_AXIS
+from ..utils.tools import profiler, plot_many_kinematics, plot_kinematics_analysis, print_profiling, standard_setup
 
 π = np.pi
 
@@ -20,7 +20,7 @@ from tools import profiler, plot_many_kinematics, plot_kinematics_analysis, prin
 parser = arg.ArgumentParser(description='Simulation of a Haug\'s slider-crank model')
 parser.add_argument('-t', '--end_time', type=float, default=3, dest='t_end')
 
-model_files = defaultdict(lambda: 'models/slider_crank_rotated.mdl')
+model_files = defaultdict(lambda: 'models/slider_crank.mdl')
 
 # Get system and change some settings
 sys, params = standard_setup(parser, model_files)

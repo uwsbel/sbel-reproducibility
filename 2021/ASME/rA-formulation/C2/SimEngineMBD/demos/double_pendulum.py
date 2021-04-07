@@ -6,11 +6,11 @@ from time import process_time
 import numpy as np
 import matplotlib.pyplot as plt
 
-from system_rp import SystemRP
-from system_ra import SystemRA
-from system_reps import SystemREps
-from physics import R, Y_AXIS, Z_AXIS
-from tools import profiler, plot_many_kinematics, print_profiling, standard_setup
+from ..rEps.system_reps import SystemREps
+from ..rp.system_rp import SystemRP
+from ..rA.system_ra import SystemRA
+from ..utils.physics import Z_AXIS
+from ..utils.tools import profiler, plot_many_kinematics, print_profiling, standard_setup
 
 # Set up command-line options
 parser = arg.ArgumentParser(description='Simulation of a two-link pendulum')

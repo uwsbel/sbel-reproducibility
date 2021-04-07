@@ -1,7 +1,16 @@
+"""
+Defines a body and geometric constraints (gcons) that internally use the rε-formulation for their generalized
+coordinates. In particular this means using 3-1-3 Euler Angles to represent body orientations.
+
+Used by:    system_reps.py
+See also:   rp.gcons_rp.py, rA.gcons_ra.py
+"""
+
 import numpy as np
 import warnings as warn
-from physics import Constraints, skew, I3, check_SO3, generate_sympy_constraint, euler_to_rot
 from scipy.spatial.transform import Rotation as Rot
+
+from ..utils.physics import Constraints, skew, I3, check_SO3, generate_sympy_constraint, euler_to_rot
 
 AI = 'a_bar_i'
 AJ = 'a_bar_j'
@@ -17,6 +26,8 @@ JS_A = "A"
 JS_omega = "omega"
 
 ZXZ = 'ZXZ'             # Euler angle sequence that we use
+
+x = 3
 
 THETA_CRITERIA = 0.1    # When to consider an euler angle dangerously close to singular
 
@@ -107,8 +118,8 @@ class Body:
         B_bar = self.A.T @ self.B
         term_1 = self.B.T @ skew(B_bar @ self.dε) @ self.J @ self.B @ self.dε
         term_2 = B_bar.T @ self.J @ self.dB @ self.dε
-        
-        return term_1 + term_2
+
+        return -term_1 -term_2
 
     def get_J_term(self):
         B_bar = self.A.T @ self.B

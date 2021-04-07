@@ -1,5 +1,13 @@
+"""
+Defines a body and geometric constraints (gcons) that internally use the rA-formulation for their generalized
+coordinates. In particular this means directly using rotation matrices to represent body orientations.
+
+Used by:    system_ra.py
+See also:   rp.gcons_rp.py, rEps.gcons_reps.py
+"""
+
 import numpy as np
-from physics import Constraints, skew, I3, check_SO3, generate_sympy_constraint
+from ..utils.physics import Constraints, skew, I3, check_SO3, generate_sympy_constraint
 
 AI = 'a_bar_i'
 AJ = 'a_bar_j'
