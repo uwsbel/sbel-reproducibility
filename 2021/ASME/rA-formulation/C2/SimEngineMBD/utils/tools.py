@@ -12,7 +12,7 @@ from ..rEps.system_reps import SystemREps
 
 profiler = cProfile.Profile()
 
-def standard_setup(parser, model_files, args=None):
+def standard_setup(parser, model_file, args=None):
     """
     Initializes common command-line options for multi-body simulation
     """
@@ -36,11 +36,11 @@ def standard_setup(parser, model_files, args=None):
 
     # Determine which formulation to use
     if out_args.form == 'rp':
-        sys = SystemRP.init_from_file(model_files['rp'])
+        sys = SystemRP.init_from_file(model_file)
     elif out_args.form == 'rA':
-        sys = SystemRA.init_from_file(model_files['rA'])
+        sys = SystemRA.init_from_file(model_file)
     elif out_args.form == 'reps':
-        sys = SystemREps.init_from_file(model_files['reps'])
+        sys = SystemREps.init_from_file(model_file)
     else:
         raise ValueError('Unmapped formulation {} encountered'.format(out_args.form))
 

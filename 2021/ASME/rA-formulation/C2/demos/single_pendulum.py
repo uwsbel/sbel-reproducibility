@@ -1,4 +1,5 @@
 import logging
+import os
 import argparse as arg
 from collections import defaultdict
 from time import process_time
@@ -7,11 +8,11 @@ import numpy as np
 import sympy as sp
 import matplotlib.pyplot as plt
 
-from ..rEps.system_reps import SystemREps
-from ..rp.system_rp import SystemRP
-from ..rA.system_ra import SystemRA
-from ..utils.physics import Z_AXIS
-from ..utils.tools import profiler, plot_many_kinematics, print_profiling, standard_setup
+from SimEngineMBD.rEps.system_reps import SystemREps
+from SimEngineMBD.rp.system_rp import SystemRP
+from SimEngineMBD.rA.system_ra import SystemRA
+from SimEngineMBD.utils.physics import Z_AXIS
+from SimEngineMBD.utils.tools import profiler, plot_many_kinematics, print_profiling, standard_setup
 
 π = np.pi
 
@@ -19,10 +20,10 @@ from ..utils.tools import profiler, plot_many_kinematics, print_profiling, stand
 parser = arg.ArgumentParser(description='Simulation of a single link pendulum')
 parser.add_argument('-t', '--end_time', type=float, default=10, dest='t_end')
 
-model_files = defaultdict(lambda: 'models/single_pendulum.mdl')
+model_file = os.path.join(os.path.dirname(__file__), '../models/single_pendulum.mdl')
 
 # Call utility function to setup our system and set the running mode
-sys, params = standard_setup(parser, model_files)
+sys, params = standard_setup(parser, model_file)
 
 # Get system and change some settings
 sys.set_g_acc(-9.81 * Z_AXIS)
