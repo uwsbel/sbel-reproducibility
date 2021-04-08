@@ -1,11 +1,11 @@
 import logging
 import json as js
-
 import numpy as np
 from scipy.linalg import lu_factor, lu_solve
-from gcons_reps import Constraints, DP1, DP2, CD, D, Body, ConGroup
-from physics import Z_AXIS, block_mat, R, skew, exp, SolverType, bdf1, bdf2
 
+from .gcons_reps import Constraints, DP1, DP2, CD, D, Body, ConGroup
+from ..utils.physics import Z_AXIS, block_mat, R, skew, exp, SolverType, bdf1, bdf2
+from ..utils.systems import read_model_file
 
 class SystemREps:
 
@@ -142,6 +142,8 @@ class SystemREps:
         if i == 0:
             return
 
+        self.g_cons.maybe_swap_gcons(t)
+
         self.bdf = bdf1 if (i == 1 or self.solver_order == 1) else bdf2
 
         for body in self.bodies:
@@ -222,6 +224,8 @@ class SystemREps:
 
     def do_kinematics_step(self, i, t):
 
+        self.g_cons.maybe_swap_gcons(t)
+
         for body in self.bodies:
             if body.near_singular:
                 value, flip_mat = body.compute_new_frame()
@@ -298,16 +302,6 @@ def create_constraint(json_con, body_i, body_j):
         raise ValueError('Unmapped enum value')
 
     return con
-
-
-def read_model_file(file_name):
-    with open(file_name) as model_file:
-        model_data = js.load(model_file)
-
-        model_bodies = model_data['bodies']
-        model_constraints = model_data['constraints']
-
-    return (model_bodies, model_constraints)
 
 
 def process_system(file_bodies, file_constraints):

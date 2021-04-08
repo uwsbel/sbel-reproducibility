@@ -1,7 +1,9 @@
 [MESSAGES CONTROL]
 
-disable=all
-enable=F,E,unreachable,duplicate-key,unnecessary-semicolon,global-variable-not-assigned,unused-variable,binary-op-exception,bad-format-string,anomalous-backslash-in-string,bad-open-mode
+# disable=all
+# enable=F,E,unreachable,duplicate-key,unnecessary-semicolon,global-variable-not-assigned,unused-variable,binary-op-exception,bad-format-string,anomalous-backslash-in-string,bad-open-mode
+enable=all
+disable=invalid-name,line-too-long,non-ascii-name
 
 [VARIABLES]
 

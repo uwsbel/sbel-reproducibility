@@ -56,23 +56,9 @@ def single_pendulum(args):
     t_steps = int(params.t_end/params.h)
     t_grid = np.linspace(0, params.t_end, t_steps, endpoint=True)
 
-    # (num bodies) x (x, y, z) x (time steps)
-    pos_data = np.zeros((sys.nb, 3, t_steps))
-    vel_data = np.zeros((sys.nb, 3, t_steps))
-    acc_data = np.zeros((sys.nb, 3, t_steps))
-
-    num_iters = np.zeros(t_steps)
-
+    start = process_time()
     for i, t in enumerate(t_grid):
         sys.do_step(i, t)
+    Δt = process_time() - start
 
-        num_iters[i] = sys.k
-
-        for j, body in enumerate(sys.bodies):
-            pos_data[j, :, i] = body.r.T
-            vel_data[j, :, i] = body.dr.T    
-            acc_data[j, :, i] = body.ddr.T
-
-    return pos_data, vel_data, acc_data, num_iters, t_grid
-
-
+    return Δt

@@ -1,4 +1,5 @@
 import logging
+import os
 import argparse as arg
 from collections import defaultdict
 from time import process_time
@@ -8,11 +9,11 @@ import numpy as np
 import sympy as sp
 import matplotlib.pyplot as plt
 
-from system_ra import SystemRA
-from system_rp import SystemRP
-from system_reps import SystemREps
-from physics import R, Y_AXIS, Z_AXIS
-from tools import profiler, plot_many_kinematics, print_profiling, standard_setup
+from SimEngineMBD.rEps.system_reps import SystemREps
+from SimEngineMBD.rp.system_rp import SystemRP
+from SimEngineMBD.rA.system_ra import SystemRA
+from SimEngineMBD.utils.physics import Y_AXIS, Z_AXIS
+from SimEngineMBD.utils.tools import profiler, plot_many_kinematics, print_profiling, standard_setup
 
 π = np.pi
 
@@ -20,10 +21,10 @@ from tools import profiler, plot_many_kinematics, print_profiling, standard_setu
 parser = arg.ArgumentParser(description='Simulation of Haug\'s four-link mechanism')
 parser.add_argument('-t', '--end_time', type=float, default=2.5, dest='t_end')
 
-model_files = defaultdict(lambda: 'models/four_link_rotated.mdl')
+model_file = os.path.join(os.path.dirname(__file__), '..models/four_link.json')
 
 # Get system and change some settings
-sys, params = standard_setup(parser, model_files)
+sys, params = standard_setup(parser, model_file)
 sys.set_g_acc(-9.81 * Z_AXIS)
 sys.h = params.h
 sys.tol = params.tol

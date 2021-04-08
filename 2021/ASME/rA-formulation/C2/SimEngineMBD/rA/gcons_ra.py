@@ -1,5 +1,13 @@
+"""
+Defines a body and geometric constraints (gcons) that internally use the rA-formulation for their generalized
+coordinates. In particular this means directly using rotation matrices to represent body orientations.
+
+Used by:    system_ra.py
+See also:   rp.gcons_rp.py, rEps.gcons_reps.py
+"""
+
 import numpy as np
-from physics import Constraints, skew, I3, check_SO3, generate_sympy_constraint
+from ..utils.physics import Constraints, skew, I3, check_SO3, generate_sympy_constraint
 
 AI = 'a_bar_i'
 AJ = 'a_bar_j'
@@ -426,6 +434,9 @@ class ConGroup:
         self.nc = len(self.cons)
         self.nb = nb
 
+        self.alt_gcon = None
+        self.alt_index = None
+
         self.init_storage()
 
     def init_storage(self):
@@ -440,6 +451,15 @@ class ConGroup:
         self.nc = len(self.cons)
 
         self.init_storage()
+
+    def maybe_swap_gcons(self, t):
+        """Check if a g-con is close to being singular and if so swap it with the provided alternate"""
+        
+        if self.alt_gcon is None or self.alt_index is None:
+            return
+            
+        if np.abs(np.abs(self.cons[self.alt_index].f(t)) - 1) < 0.1:
+            self.cons[self.alt_index], self.alt_gcon = self.alt_gcon, self.cons[self.alt_index]
 
     def get_phi(self, t):
         for i, con in enumerate(self.cons):

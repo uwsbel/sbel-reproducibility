@@ -61,15 +61,8 @@ def slider_crank(args):
     sys.initialize()
 
     t_grid = np.arange(0, params.t_end, params.h)
-    t_steps = len(t_grid)
 
-    # (num bodies) x (x, y, z) x (time steps)
-    pos_data = np.zeros((sys.nb, 3, t_steps))
-    vel_data = np.zeros((sys.nb, 3, t_steps))
-    acc_data = np.zeros((sys.nb, 3, t_steps))
-
-    num_iters = np.zeros(t_steps)
-
+    start = process_time()
     for i, t in enumerate(t_grid):
         # (Hack) swap g-cons to avoid driving constraint singularity
         if np.abs(np.abs(sys.g_cons.cons[con_num].f(t)) - 1) < 0.1:
@@ -79,14 +72,8 @@ def slider_crank(args):
             logging.debug(alt_dp1.f(t))
 
         sys.do_step(i, t)
+    Δt = process_time() - start
 
-        num_iters[i] = sys.k
-
-        for j, body in enumerate(sys.bodies):
-            pos_data[j, :, i] = body.r.T
-            vel_data[j, :, i] = body.dr.T    
-            acc_data[j, :, i] = body.ddr.T
-
-    return pos_data, vel_data, acc_data, num_iters, t_grid
+    return Δt
 
 

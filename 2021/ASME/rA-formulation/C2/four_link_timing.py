@@ -32,14 +32,6 @@ def four_link(args):
     sys.solver_order = 1
 
     t_grid = np.arange(0, params.t_end, params.h)
-    t_steps = len(t_grid)
-
-    # Physical constants
-    L = 2                                   # [m] - length of the bar
-    w = 0.05                                # [m] - side length of bar
-    ρ = 10                                  # [kg/m^3] - density of the bar
-    r = 2                                   # [m] - radius of the rotor
-    height = 0.1                            # [m] - the height of the rotor
 
     # See Haug p. 459 for properties
     # Link 1
@@ -69,13 +61,7 @@ def four_link(args):
 
     sys.initialize()
 
-    # (num bodies) x (x, y, z) x (time steps)
-    pos_data = np.zeros((sys.nb, 3, t_steps))
-    vel_data = np.zeros((sys.nb, 3, t_steps))
-    acc_data = np.zeros((sys.nb, 3, t_steps))
-
-    num_iters = np.zeros(t_steps)
-
+    start = process_time()
     for i, t in enumerate(t_grid):
         # (Hack) swap g-cons to avoid driving constraint singularity
         if np.abs(np.abs(sys.g_cons.cons[con_num].f(t)) - 1) < 0.1:
@@ -83,14 +69,6 @@ def four_link(args):
             sys.g_cons.cons[con_num], alt_dp1 = alt_dp1, sys.g_cons.cons[con_num]
 
         sys.do_step(i, t)
+    Δt = process_time() - start
 
-        num_iters[i] = sys.k
-
-        for j, body in enumerate(sys.bodies):
-            pos_data[j, :, i] = body.r.T
-            vel_data[j, :, i] = body.dr.T    
-            acc_data[j, :, i] = body.ddr.T
-
-    return pos_data, vel_data, acc_data, num_iters, t_grid
-
-four_link(['--form', 'rA', '--mode', 'kinematics', '--tol', '1e-12'])
+    return Δt

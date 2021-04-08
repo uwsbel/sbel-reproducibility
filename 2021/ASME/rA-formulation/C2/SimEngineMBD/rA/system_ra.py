@@ -1,9 +1,12 @@
-import numpy as np
-import json as js
 import logging
+import json as js
+
+import numpy as np
 from scipy.linalg import lu_factor, lu_solve
-from gcons_ra import Constraints, DP1, DP2, CD, D, Body, ConGroup
-from physics import Z_AXIS, block_mat, R, skew, exp, SolverType
+
+from .gcons_ra import Constraints, DP1, DP2, CD, D, Body, ConGroup
+from ..utils.physics import Z_AXIS, block_mat, R, skew, exp, SolverType
+from ..utils.systems import read_model_file
 
 class SystemRA:
 
@@ -132,6 +135,8 @@ class SystemRA:
         if i == 0:
             return
 
+        self.g_cons.maybe_swap_gcons(t)
+
         self.Φ_r = self.g_cons.get_phi_r(t)
         self.Π = self.g_cons.get_pi(t)
 
@@ -193,6 +198,8 @@ class SystemRA:
         # logging.debug('t: {:.3f}, iterations: {:>2d}'.format(t, self.k))
 
     def do_kinematics_step(self, t):
+
+        self.g_cons.maybe_swap_gcons(t)
 
         # Refresh the inverse matrix with our new positions
         self.Φq = self.g_cons.get_phi_q(t)
@@ -265,16 +272,6 @@ def create_constraint(json_con, body_i, body_j):
         raise ValueError('Unmapped enum value')
 
     return con
-
-
-def read_model_file(file_name):
-    with open(file_name) as model_file:
-        model_data = js.load(model_file)
-
-        model_bodies = model_data['bodies']
-        model_constraints = model_data['constraints']
-
-    return (model_bodies, model_constraints)
 
 
 def process_system(file_bodies, file_constraints):

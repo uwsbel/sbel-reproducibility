@@ -2,9 +2,10 @@ import numpy as np
 import json as js
 import logging
 from scipy.linalg import lu_factor, lu_solve
-from gcons_rp import Constraints, DP1, DP2, CD, D, Body, ConGroup, EulerCon
-from physics import Z_AXIS, block_mat, R, skew, exp, SolverType, bdf1, bdf2
 
+from .gcons_rp import Constraints, DP1, DP2, CD, D, Body, ConGroup, EulerCon
+from ..utils.physics import Z_AXIS, block_mat, R, skew, exp, SolverType, bdf1, bdf2
+from ..utils.systems import read_model_file
 
 class SystemRP:
 
@@ -78,8 +79,7 @@ class SystemRP:
                 # Set tighter tolerance for kinematics
                 self.tol = 1e-6 if self.tol == None else self.tol
                 for e_con in self.e_cons:
-                    self.g_cons.cons.append(e_con)
-                    self.g_cons = ConGroup(self.g_cons.cons, self.nb)
+                    self.g_cons.add_constraint(e_con)
 
                 logging.info('Initializing system for kinematics')
             else:
@@ -96,6 +96,7 @@ class SystemRP:
 
             self.initialize_dynamics()
 
+        self.g_cons.initialize()
         self.is_initialized = True
 
     def initialize_dynamics(self):
@@ -224,6 +225,8 @@ class SystemRP:
         if i == 0:
             return
 
+        self.g_cons.maybe_swap_gcons(t)
+
         self.bdf = bdf1 if (i == 1 or self.solver_order == 1) else bdf2
         for body in self.bodies:
             body.update_bdf_coeffs(self.bdf, self.h)
@@ -298,6 +301,8 @@ class SystemRP:
 
     def do_kinematics_step(self, t):
 
+        self.g_cons.maybe_swap_gcons(t)
+
         # Refresh the inverse matrix with our new positions
         self.Φq = self.g_cons.get_phi_q(t)
         Φq_lu = lu_factor(self.Φq)
@@ -368,16 +373,6 @@ def create_constraint(json_con, body_i, body_j):
         raise ValueError('Unmapped enum value')
 
     return con
-
-
-def read_model_file(file_name):
-    with open(file_name) as model_file:
-        model_data = js.load(model_file)
-
-        model_bodies = model_data['bodies']
-        model_constraints = model_data['constraints']
-
-    return (model_bodies, model_constraints)
 
 
 def process_system(file_bodies, file_constraints):
