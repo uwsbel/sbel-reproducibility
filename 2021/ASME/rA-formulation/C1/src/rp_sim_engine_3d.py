@@ -25,6 +25,8 @@ class rpSimEngine3D:
         self.t_grid = None
         self.tol = None
         self.max_iters = 20
+        self.duration = 0
+        self.avg_iterations = 0
 
         self.init_system(filename)
 
@@ -98,9 +100,7 @@ class rpSimEngine3D:
 
             iteration = 0
             while True:
-
                 Phi = self.get_phi(t)
-
                 delta_q = lu_solve(Phi_q_lu, -Phi)
 
                 for body in self.bodies_list:
@@ -115,11 +115,9 @@ class rpSimEngine3D:
                 if iteration >= self.max_iters:
                     logging.warning("Newton-Raphson self.has not converged after", str(self.max_iters), "iterations. Stopping at time ", str(t))
                     break
-
                 if np.linalg.norm(delta_q) < self.tol:
                     break
-
-            #logging.info("Newton-Raphson took", str(iteration), "iterations to converge.")
+            logging.info("Newton-Raphson took", str(iteration), "iterations to converge.")
             iterations[i] = iteration
 
             Phi_q = self.get_phi_q()
@@ -149,23 +147,27 @@ class rpSimEngine3D:
                     self.r_dot_sol[i, (body.body_id - 1) * 3:(body.body_id - 1) * 3 + 3] = body.r_dot.T
                     self.r_ddot_sol[i, (body.body_id - 1) * 3:(body.body_id - 1) * 3 + 3] = body.r_ddot.T
 
-        duration = time.perf_counter() - start
-        print('Avg. iterations: {}'.format(np.mean(iterations)))
-        print('Simulation time: {}'.format(duration))
+        self.duration = time.perf_counter() - start
+        self.avg_iterations = np.mean(iterations)
+        logging.info('Avg. iterations: {}'.format(self.avg_iterations))
+        print('Simulation time: {}'.format(self.duration))
 
     def dynamics_solver(self, order=1):
         logging.info("Number of bodies counted:", self.nb)
         self.initialize_plotting()
 
         # build full RHS matrix
-        RHS = np.zeros((self.nc + 8 * self.nb, 1))
-        RHS[0:3 * self.nb] = self.get_F_g()
-        RHS[3 * self.nb:7 * self.nb] = self.get_tau()
-        RHS[7 * self.nb:8 * self.nb] = self.get_gamma(self.t_start)[self.nc:, :]
-        RHS[8 * self.nb:] = self.get_gamma(self.t_start)[0:self.nc, :]
+        F = self.get_F_g()
+        tau = self.get_tau()
+        gamma_p = self.get_gamma(self.t_start)[self.nc:, :]
+        gamma = self.get_gamma(self.t_start)[0:self.nc, :]
+        eom_rhs = np.block([[F],
+                            [tau],
+                            [gamma_p],
+                            [gamma]])
 
         # solve to find initial accelerations and lagrange multipliers, vector z
-        z = np.linalg.solve(self.psi(), RHS)
+        z = np.linalg.solve(self.psi(), eom_rhs)
         for body in self.bodies_list:
             if body.is_ground:
                 pass
@@ -184,8 +186,8 @@ class rpSimEngine3D:
                 body.r_dot_prev = body.r_dot
                 body.p_dot_prev = body.p_dot
 
-        self.lam += z[8 * self.nb:]
-        self.lambda_p += z[7 * self.nb:8 * self.nb]
+        self.lam = z[8 * self.nb:]
+        self.lambda_p = z[7 * self.nb:8 * self.nb]
 
         iterations = np.zeros((self.N, 1))
         start = time.perf_counter()
@@ -266,7 +268,6 @@ class rpSimEngine3D:
                     logging.warning("Solution self.has not converged after", str(self.max_iters), "iterations. Stopping.")
                     break
 
-            #logging.info("Iteration: ", iteration)
             iterations[i] = iteration
 
             for body in self.bodies_list:
@@ -279,9 +280,10 @@ class rpSimEngine3D:
                     self.r_ddot_sol[i, (body.body_id - 1) * 3:(body.body_id - 1) * 3 + 3] = body.r_ddot.T
 
 
-        duration = time.perf_counter() - start
-        print('Avg. iterations: {}'.format(np.mean(iterations)))
-        print('Simulation time: {}'.format(duration))
+        self.duration = time.perf_counter() - start
+        self.avg_iterations = np.mean(iterations)
+        logging.info('Avg. iterations: {}'.format(self.avg_iterations))
+        print('Simulation time: {}'.format(self.duration))
 
     def get_phi(self, t):
         # includes all kinematic constraints

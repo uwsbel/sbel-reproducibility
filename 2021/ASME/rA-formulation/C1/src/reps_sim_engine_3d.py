@@ -1,8 +1,4 @@
-import sys
-import pathlib as pl
-
-src_folder = pl.Path('./src/')
-sys.path.append(str(src_folder))
+#!/usr/bin/env python3
 
 import reps_gcons as gcons
 
@@ -93,11 +89,12 @@ class repsSimEngine3D:
         start = time.perf_counter()
         for i, t in enumerate(self.t_grid):
             # check for configuration singularity
-            for body in self.bodies:
+            for body in self.bodies_list:
                 if body.near_singular:
                     value, flip_mat = body.compute_new_frame()
                     body.eps = value
-                    gcons.flip_gcons(body.body_id, flip_mat)
+                    for con in self.constraint_list:
+                        con.flip_gcons(body.body_id, flip_mat)
             # check for driving constraint singularity
             if np.abs(np.abs(self.constraint_list[-1].prescribed_val.f(t)) - 1) < 0.1:
                 logging.info("Switching to alternative constraint. Time = ", t)
@@ -111,9 +108,7 @@ class repsSimEngine3D:
 
             iteration = 0
             while True:
-
                 Phi = self.get_phi(t)
-
                 delta_q = lu_solve(Phi_q_lu, -Phi)
 
                 for body in self.bodies_list:
@@ -128,11 +123,9 @@ class repsSimEngine3D:
                 if iteration >= self.max_iters:
                     logging.warning("Newton-Raphson self.has not converged after", str(self.max_iters), "iterations. Stopping at time ", str(t))
                     break
-
                 if np.linalg.norm(delta_q) < self.tol:
                     break
-
-            #logging.info("Newton-Raphson took", str(iteration), "iterations to converge.")
+            logging.info("Newton-Raphson took", str(iteration), "iterations to converge.")
             iterations[i] = iteration
 
             Phi_q = self.get_phi_q()
@@ -148,6 +141,8 @@ class repsSimEngine3D:
                                 body.body_id - 1) * 3 + 3, :]
 
             # calculate acceleration
+            Phi_q = self.get_phi_q()
+            Phi_q_lu = lu_factor(Phi_q)
             q_ddot = lu_solve(Phi_q_lu, self.get_gamma(t))
             for body in self.bodies_list:
                 if body.is_ground:
@@ -163,15 +158,152 @@ class repsSimEngine3D:
                     self.r_ddot_sol[i, (body.body_id - 1) * 3:(body.body_id - 1) * 3 + 3] = body.r_ddot.T
 
         duration = time.perf_counter() - start
-        print('Avg. iterations: {}'.format(np.mean(iterations)))
+        self.avg_iterations = np.mean(iterations)
+        logging.info('Avg. iterations: {}'.format(self.avg_iterations))
         print('Simulation time: {}'.format(duration))
+
+    def dynamics_solver(self, order=1):
+        logging.info("Number of bodies counted:", self.nb)
+        self.initialize_plotting()
+
+        # build full RHS matrix
+        F = self.get_F_g()
+        tau = self.get_tau()
+        gamma = self.get_gamma(self.t_start)
+        eom_rhs = np.block([[F],
+                            [tau],
+                            [gamma]])
+
+        # solve to find initial accelerations and lagrange multipliers, vector z
+        z = np.linalg.solve(self.psi(), eom_rhs)
+        for body in self.bodies_list:
+            if body.is_ground:
+                pass
+            else:
+                body.r_ddot = z[(body.body_id - 1) * 3:(body.body_id - 1) * 3 + 3, :]
+                body.eps_ddot = z[3 * self.nb + (body.body_id - 1) * 3:3 * self.nb + (
+                        body.body_id - 1) * 3 + 3, :]
+
+                # store solution in array for plotting
+                self.r_sol[0, (body.body_id - 1) * 3:(body.body_id - 1) * 3 + 3] = body.r.T
+                self.r_dot_sol[0, (body.body_id - 1) * 3:(body.body_id - 1) * 3 + 3] = body.r_dot.T
+                self.r_ddot_sol[0, (body.body_id - 1) * 3:(body.body_id - 1) * 3 + 3] = body.r_ddot.T
+
+                body.r_prev = body.r
+                body.eps_prev = body.eps
+                body.r_dot_prev = body.r_dot
+                body.eps_dot_prev = body.eps_dot
+
+        self.lam = z[6 * self.nb:]
+
+        iterations = np.zeros((self.N, 1))
+        start = time.perf_counter()
+        for i, t in enumerate(self.t_grid):
+            if i == 0:
+                continue
+
+            # check for configuration singularity
+            for body in self.bodies_list:
+                if body.near_singular:
+                    value, flip_mat = body.compute_new_frame()
+                    body.eps = value
+                    for con in self.constraint_list:
+                        con.flip_gcons(body.body_id, flip_mat)
+            # check for driving constraint singularity
+            if np.abs(np.abs(self.constraint_list[-1].prescribed_val.f(t)) - 1) < 0.1:
+                logging.info("Switching to alternative constraint. Time = ", t)
+                if self.alternative_driver is None:
+                    logging.warning("Alternative driving constraint not defined.")
+                    break
+                self.constraint_list[-1], self.alternative_driver = self.alternative_driver, self.constraint_list[-1]
+
+            if i == 1 or order == 1:
+                beta = 1
+                alphas = np.array([1, 0])
+            else:
+                beta = 2/3
+                alphas = np.array([4/3, -1/3])
+
+            for body in self.bodies_list:
+                if body.is_ground:
+                    pass
+                else:
+                    body.c_r_dot = alphas[0]*body.r_dot + alphas[1]*body.r_dot_prev
+                    body.c_eps_dot = alphas[0]*body.eps_dot + alphas[1]*body.eps_dot_prev
+
+                    body.c_r = alphas[0]*body.r + alphas[1]*body.r_prev + beta*self.h*body.c_r_dot
+                    body.c_eps = alphas[0] * body.eps + alphas[1] * body.eps_prev + beta * self.h * body.c_eps_dot
+
+            psi = self.psi()
+            psi_lu = lu_factor(psi)
+            for body in self.bodies_list:
+                if body.is_ground:
+                    pass
+                else:
+                    body.r_prev = body.r
+                    body.eps_prev = body.eps
+                    body.r_dot_prev = body.r_dot
+                    body.eps_dot_prev = body.eps_dot
+
+            # Begin Newton Iteration
+            iteration = 0
+            delta_norm = 2 * self.tol  # initialize larger than tolerance so loop begins
+            while delta_norm > self.tol:
+                for body in self.bodies_list:
+                    if body.is_ground:
+                        pass
+                    else:
+                        body.r = body.c_r + beta**2 * self.h**2 * body.r_ddot
+                        body.r_dot = body.c_r_dot + beta * self.h * body.r_ddot
+                        body.eps = body.c_eps + beta ** 2 * self.h ** 2 * body.eps_ddot
+                        body.eps_dot = body.c_eps_dot + beta * self.h * body.eps_ddot
+
+                if order == 2 and i == 1:
+                    g = self.residual(1, t)
+                else:
+                    g = self.residual(order, t)
+
+                delta = lu_solve(psi_lu, -g)
+
+                for body in self.bodies_list:
+                    if body.is_ground:
+                        pass
+                    else:
+                        body.r_ddot = body.r_ddot + delta[(body.body_id - 1) * 3:((body.body_id - 1) * 3) + 3, :]
+                        body.eps_ddot = body.eps_ddot + delta[3 * self.nb + (body.body_id - 1) * 3:3 * self.nb + (
+                                body.body_id - 1) * 3 + 3, :]
+
+                self.lam += delta[6 * self.nb:]
+
+                delta_norm = np.linalg.norm(delta)
+                iteration += 1
+                if iteration >= self.max_iters:
+                    logging.info("Solution self.has not converged after", str(self.max_iters), "iterations. Stopping. Time = ", t)
+                    break
+
+            iterations[i] = iteration
+
+            for body in self.bodies_list:
+                if body.is_ground:
+                    pass
+                else:
+                    # store solution in array for plotting
+                    self.r_sol[i, (body.body_id - 1) * 3:(body.body_id - 1) * 3 + 3] = body.r.T
+                    self.r_dot_sol[i, (body.body_id - 1) * 3:(body.body_id - 1) * 3 + 3] = body.r_dot.T
+                    self.r_ddot_sol[i, (body.body_id - 1) * 3:(body.body_id - 1) * 3 + 3] = body.r_ddot.T
+
+
+        self.duration = time.perf_counter() - start
+        self.avg_iterations = np.mean(iterations)
+        logging.info('Avg. iterations: {}'.format(self.avg_iterations))
+        print('Simulation time: {}'.format(self.duration))
 
     def get_phi(self, t):
         # includes all kinematic constraints
         return np.concatenate([con.phi(t) for con in self.constraint_list], axis=0)
 
     def get_phi_q(self):
-        jacobian = np.zeros((self.nc + self.nb, 6 * self.nb))
+        jacobian = np.zeros((self.nc, 6 * self.nb))
         offset = 3 * self.nb
 
         for row, con in enumerate(self.constraint_list):
@@ -201,64 +333,307 @@ class repsSimEngine3D:
     def get_gamma(self, t):
         return np.concatenate([con.gamma(t) for con in self.constraint_list], axis=0)
 
+    def get_M(self):
+        m_mat = np.zeros((3 * self.nb, 3 * self.nb))
+        idx = 0
+        for body in self.bodies_list:
+            if body.is_ground:
+                pass
+            else:
+                m_mat[idx * 3:idx * 3 + 3, idx * 3:idx * 3 + 3] = body.m * np.eye(3)
+                idx += 1
+        return m_mat
+
+    def get_J(self):
+        j_mat = np.zeros((3 * self.nb, 3 * self.nb))
+        idx = 0
+        for body in self.bodies_list:
+            if body.is_ground:
+                pass
+            else:
+                B_bar = body.A.T @ body.B
+                j_mat[idx * 3:idx * 3 + 3, idx * 3:idx * 3 + 3] = B_bar.T @ body.J @ B_bar
+                idx += 1
+        return j_mat
+
+    def get_F_g(self):
+        # return F when gravity is the only force
+        f_g_mat = np.zeros((3 * self.nb, 1))
+        idx = 0
+        for body in self.bodies_list:
+            if body.is_ground:
+                pass
+            else:
+                f_g_mat[idx * 3:idx * 3 + 3] = np.array([[0], [0], [body.m * self.g]])
+                idx += 1
+        return f_g_mat
+
+    def get_tau(self):
+        tau = np.zeros((3 * self.nb, 1))
+        idx = 0
+        for body in self.bodies_list:
+            if body.is_ground:
+                pass
+            else:
+                B_bar = body.A.T @ body.B
+                term_1 = body.B.T @ gcons.skew(B_bar @ body.eps_dot) @ body.J @ body.B @ body.eps_dot
+                term_2 = B_bar.T @ body.J @ body.B_dot @ body.eps_dot
+                tau[idx * 3:idx * 3 + 3] = term_1 - term_2
+                idx += 1
+        return tau
+
+    def residual(self, order, t):
+        if order == 1:
+            beta_0 = 1
+        elif order == 2:
+            beta_0 = 2 / 3
+        else:
+            logging.warning("BDF of order greater than 2 not implemented yet.")
+
+        r_ddot = np.vstack([body.r_ddot for body in self.bodies_list if body.is_ground == False])
+        eps_ddot = np.vstack([body.eps_ddot for body in self.bodies_list if body.is_ground == False])
+
+        Phi = self.get_phi(t)
+        Phi_r = self.get_phi_q()[0:self.nc, 0:3 * self.nb]
+        Phi_eps = self.get_phi_q()[0:self.nc, 3 * self.nb:]
+
+        g_row1 = self.get_M() @ r_ddot + Phi_r.T @ self.lam - self.get_F_g()
+        g_row2 = self.get_J() @ eps_ddot + Phi_eps.T @ self.lam - self.get_tau()
+        g_row3 = 1 / (beta_0 ** 2 * self.h ** 2) * Phi
+        g = np.block([[g_row1],
+                      [g_row2],
+                      [g_row3]])
+        return g
+
+    def psi(self):
+        M = self.get_M()
+        J = self.get_J()
+        Phi_r = self.get_phi_q()[0:self.nc, 0:3 * self.nb]
+        Phi_eps = self.get_phi_q()[0:self.nc, 3 * self.nb:]
+
+        # build Psi, our quasi-newton iteration matrix
+        zero_block_12 = np.zeros((3 * self.nb, 3 * self.nb))
+        zero_block_21 = np.zeros((3 * self.nb, 3 * self.nb))
+        zero_block_33 = np.zeros((self.nc, self.nc))
+        psi = np.block([[M, zero_block_12, Phi_r.T],
+                        [zero_block_21, J, Phi_eps.T],
+                        [Phi_r, Phi_eps, zero_block_33]])
+
+        return psi
+
+def from_eps(eps):
+    """
+    Deconstruct eps into our three angles
+    """
+    return eps[0, 0], eps[1, 0], eps[2, 0]
+
 class RigidBody:
     def __init__(self, body_dict):
         if body_dict['name'] == 'ground':
             self.is_ground = True
             self.body_id = body_dict['id']
+
             self.r = np.zeros((3,1))
             self.r_dot = np.zeros((3,1))
             self.r_ddot = np.zeros((3,1))
-            self.eps = np.zeros((3,1))
+
+            eps = np.zeros((3,1))
+            self.eps = eps
             self.eps_dot = np.zeros((3,1))
             self.eps_ddot = np.zeros((3,1))
 
-            self.A_dot = np.zeros((3, 3))
-            self.A_ddot = np.zeros((3, 3))
-
             self.r_prev = self.r
             self.r_dot_prev = self.r_dot
-            self.eps_prev = self.eps
+            self.eps_prev = eps
             self.eps_dot_prev = self.eps_dot
+
             self.c_r = None
             self.c_eps = None
             self.c_r_dot = None
             self.c_eps_dot = None
+
             self.m = None
             self.J = None
+
+            self.A = np.eye(3,3)
+            self.A_dot = np.zeros((3, 3))
+            self.A_ddot = np.zeros((3, 3))
         else:
             self.is_ground = False
             self.body_id = body_dict['id']
+
             self.r = np.array([body_dict['r']]).T
             self.r_dot = np.array([body_dict['r_dot']]).T
             self.r_ddot = np.zeros((3,1))
 
-            self.A = Rot.from_matrix(np.array(dict['A']))
+            self.A = Rot.from_matrix(np.array(body_dict['A']))
             eps = self.A.as_euler('ZXZ', degrees=False)
-            self.eps = np.asmatrix(eps).T
-
-            self.eps_dot = np.zeros((3, 1)) #@todo should this be nonzero?
+            eps = np.asmatrix(eps).T
+            self.eps = eps
+            self.eps_dot = np.zeros((3, 1))
             self.eps_ddot = np.zeros((3, 1))
-
-            self.A_dot = np.zeros((3, 3))
-            self.A_ddot = np.zeros((3, 3))
 
             self.r_prev = self.r
             self.r_dot_prev = self.r_dot
-            self.eps_prev = self.eps
+            self.eps_prev = eps
             self.eps_dot_prev = self.eps_dot
+
             self.c_r = None
             self.c_eps = None
             self.c_r_dot = None
             self.c_eps_dot = None
+
             self.m = 0
             self.J = np.zeros((3, 3))
 
+            self.A_dot = np.zeros((3, 3))
+            self.A_ddot = np.zeros((3, 3))
+
     def compute_new_frame(self):
         flip_mat = np.array([[0, 0, 1], [0, 1, 0], [-1, 0, 0]])
-
         new_A = flip_mat @ self.A
         rot = Rot.from_matrix(new_A)
         value = np.array([rot.as_euler('ZXZ', degrees=False)]).T
 
         return value, flip_mat
+
+    def get_partials(self):
+        return (self.A_phi, self.A_theta, self.A_psi)
+
+    def get_As(self):
+        A1 = np.array([[self._cos_phi, -self._sin_phi, 0],
+                       [self._sin_phi, self._cos_phi, 0], [0, 0, 1]])
+        A2 = np.array([[1, 0, 0], [0, self._cos_theta, -self._sin_theta],
+                       [0, self._sin_theta, self._cos_theta]])
+        A3 = np.array([[self._cos_psi, -self._sin_psi, 0],
+                       [self._sin_psi, self._cos_psi, 0], [0, 0, 1]])
+
+        return A1, A2, A3
+
+    def get_A_dots(self):
+        A_dot1 = np.array([[-self._sin_phi, -self._cos_phi, 0],
+                        [self._cos_phi, -self._sin_phi, 0], [0, 0, 0]])
+        A_dot2 = np.array([[0, 0, 0], [0, -self._sin_theta, -self._cos_theta],
+                        [0, self._cos_theta, -self._sin_theta]])
+        A_dot3 = np.array([[-self._sin_psi, -self._cos_psi, 0],
+                        [self._cos_psi, -self._sin_psi, 0], [0, 0, 0]])
+
+        return A_dot1, A_dot2, A_dot3
+
+    def get_A_ddots(self):
+        A_ddot1 = np.array([[-self._cos_phi, self._sin_phi, 0],
+                         [-self._sin_phi, -self._cos_phi, 0], [0, 0, 0]])
+        A_ddot2 = np.array([[0, 0, 0], [0, -self._cos_theta, self._sin_theta],
+                         [0, -self._sin_theta, -self._cos_theta]])
+        A_ddot3 = np.array([[-self._cos_psi, self._sin_psi, 0],
+                         [-self._sin_psi, -self._cos_psi, 0], [0, 0, 0]])
+
+        return A_ddot1, A_ddot2, A_ddot3
+
+    def cache_sin_cos(self, phi, theta, psi):
+        """
+        From a given set of Euler angles, computes and caches their sine and cosine in local properties
+        """
+        self._cos_phi = np.cos(phi)
+        self._sin_phi = np.sin(phi)
+
+        self._cos_theta = np.cos(theta)
+        self._sin_theta = np.sin(theta)
+
+        self._cos_psi = np.cos(psi)
+        self._sin_psi = np.sin(psi)
+
+    def cache_A_partials(self):
+        """
+        Based on the cached sine/cosine values, computes and caches the partial derivative of the rotation matrix A with
+        respect to the three euler angles
+        """
+
+        self.A_phi = np.array([[-self._sin_psi * self._cos_theta * self._cos_phi - self._sin_phi * self._cos_psi,
+                               self._sin_psi * self._sin_phi - self._cos_theta * self._cos_psi * self._cos_phi, self._sin_theta * self._cos_phi],
+                              [-self._sin_psi * self._sin_phi * self._cos_theta + self._cos_psi * self._cos_phi,
+                               -self._sin_psi * self._cos_phi - self._sin_phi * self._cos_theta * self._cos_psi, self._sin_theta * self._sin_phi], [0, 0, 0]])
+        self.A_theta = np.array([[self._sin_theta * self._sin_psi * self._sin_phi, self._sin_theta * self._sin_phi * self._cos_psi, self._sin_phi * self._cos_theta],
+                              [-self._sin_theta * self._sin_psi * self._cos_phi, -self._sin_theta * self._cos_psi * self._cos_phi, -self._cos_theta * self._cos_phi],
+                              [self._sin_psi * self._cos_theta, self._cos_theta * self._cos_psi, -self._sin_theta]])
+        self.A_psi = np.array([[-self._sin_psi * self._cos_phi - self._sin_phi * self._cos_theta * self._cos_psi,
+                               self._sin_psi * self._sin_phi * self._cos_theta - self._cos_psi * self._cos_phi, 0],
+                              [-self._sin_psi * self._sin_phi + self._cos_theta * self._cos_psi * self._cos_phi,
+                               -self._sin_psi * self._cos_theta * self._cos_phi - self._sin_phi * self._cos_psi, 0],
+                              [self._sin_theta * self._cos_psi, -self._sin_theta * self._sin_psi, 0]])
+
+    def cache_time_derivs(self):
+        """
+        Computes time derivative terms needed by g-cons in the computation of γ and caches these so that g-cons don't
+        have to re-compute them
+        """
+        phi_dot, theta_dot, psi_dot = from_eps(self.eps_dot)
+
+        A1, A2, A3 = self.get_As()
+        A_dot1, A_dot2, A_dot3 = self.get_A_dots()
+        A_ddot1, A_ddot2, A_ddot3 = self.get_A_ddots()
+
+        # Terms related to Ȧ
+        A_dot_phi = phi_dot * A_dot1 @ A2 @ A3
+        A_dot_theta = theta_dot * A1 @ A_dot2 @ A3
+        A_dot_psi = psi_dot * A1 @ A2 @ A_dot3
+
+        # Ȧ
+        self.A_dot = A_dot_phi + A_dot_theta + A_dot_psi
+
+        # Terms related to Ä
+        phi_theta = 2 * phi_dot * theta_dot * A_dot1 @ A_dot2 @ A3
+        theta_psi = 2 * theta_dot * psi_dot * A1 @ A_dot2 @ A_dot3
+        phi_psi = 2 * phi_dot * psi_dot * A_dot1 @ A2 @ A_dot3
+        A_ddot_phi = phi_dot ** 2 * A_ddot1 @ A2 @ A3
+        A_ddot_theta = theta_dot ** 2 * A1 @ A_ddot2 @ A3
+        A_ddot_psi = psi_dot ** 2 * A1 @ A2 @ A_ddot3
+
+        # What we denote as Ä_γ - Ä with all second derivative terms removed
+        self.A_ddot = A_ddot_phi + A_ddot_theta + A_ddot_psi + phi_theta + theta_psi + phi_psi
+
+    @property
+    def eps(self):
+        return self._eps
+
+    @eps.setter
+    def eps(self, value):
+        """
+        Whenever we set eps, cache A for future use
+        """
+
+        rot = Rot.from_euler('ZXZ', value.T, degrees=False)
+        # If we keep value as a 1x3 array it will give A an extra dimension, so we squeeze away the extra dim
+        self.A = np.squeeze(rot.as_matrix())
+
+        phi, theta, psi = from_eps(value)
+
+        self.near_singular = np.abs(np.fmod(theta, np.pi)) < 0.1 and (not self.is_ground)
+
+        self.cache_sin_cos(phi, theta, psi)
+        self.cache_A_partials()
+
+        self._eps = value
+
+    @property
+    def B(self):
+        B = np.array([[0, self._cos_phi, self._sin_theta * self._sin_phi],
+                      [0, self._sin_phi, -self._sin_theta * self._cos_phi], [1, 0, self._cos_theta]])
+        return B
+
+    @property
+    def B_dot(self):
+        phi_dot, theta_dot, psi_dot = from_eps(self.eps_dot)
+
+        B_dot = np.array([[0, -phi_dot * self._sin_phi, theta_dot * self._cos_theta * self._sin_phi + phi_dot * self._sin_theta * self._cos_phi], [0,
+                                                                                                  phi_dot * self._sin_phi,
+                                                                                                  -theta_dot * self._cos_theta * self._cos_phi + phi_dot * self._sin_theta * self._sin_phi],
+                       [0, 0, -theta_dot * self._sin_theta]])
+        B_dot_bar = np.array([[psi_dot * self._cos_psi * self._sin_theta + theta_dot * self._sin_psi * self._cos_theta, -psi_dot * self._sin_psi, 0],
+                           [-psi_dot * self._sin_psi * self._sin_theta + theta_dot * self._cos_psi * self._cos_theta, -psi_dot * self._cos_psi, 0],
+                           [-theta_dot * self._sin_theta, 0, 0]])
+        return B_dot_bar
+
+    @property
+    def omega(self):
+        return self.A.T @ self.B @ self.eps_dot
