@@ -20,7 +20,7 @@ def single_pendulum(args):
     parser = arg.ArgumentParser(description='Simulation of a single link pendulum')
     parser.add_argument('-t', '--end_time', type=float, default=3, dest='t_end')
 
-    model_files = defaultdict(lambda: 'models/single_pendulum.mdl')
+    model_files = defaultdict(lambda: 'models/single_pendulum.json')
 
     # Call utility function to setup our system and set the running mode
     sys, params = standard_setup(parser, model_files, args)

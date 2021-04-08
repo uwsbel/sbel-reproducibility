@@ -21,7 +21,7 @@ from SimEngineMBD.utils.tools import profiler, plot_many_kinematics, plot_kinema
 parser = arg.ArgumentParser(description='Simulation of a Haug\'s slider-crank model')
 parser.add_argument('-t', '--end_time', type=float, default=3, dest='t_end')
 
-model_file = os.path.join(os.path.dirname(__file__), '..models/slider_crank.mdl')
+model_file = os.path.join(os.path.dirname(__file__), '..models/slider_crank.json')
 
 # Get system and change some settings
 sys, params = standard_setup(parser, model_file)

@@ -22,7 +22,7 @@ def slider_crank(args):
     parser = arg.ArgumentParser(description='Simulation of a Haug\'s slider-crank model')
     parser.add_argument('-t', '--end_time', type=float, default=3, dest='t_end')
 
-    model_files = defaultdict(lambda: 'models/slider_crank.mdl')
+    model_files = defaultdict(lambda: 'models/slider_crank.json')
 
     # Get system and change some settings
     sys, params = standard_setup(parser, model_files, args)

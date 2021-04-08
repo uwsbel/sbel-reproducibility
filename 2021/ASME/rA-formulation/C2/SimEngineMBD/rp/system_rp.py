@@ -79,8 +79,7 @@ class SystemRP:
                 # Set tighter tolerance for kinematics
                 self.tol = 1e-6 if self.tol == None else self.tol
                 for e_con in self.e_cons:
-                    self.g_cons.cons.append(e_con)
-                    self.g_cons = ConGroup(self.g_cons.cons, self.nb)
+                    self.g_cons.add_constraint(e_con)
 
                 logging.info('Initializing system for kinematics')
             else:
@@ -97,6 +96,7 @@ class SystemRP:
 
             self.initialize_dynamics()
 
+        self.g_cons.initialize()
         self.is_initialized = True
 
     def initialize_dynamics(self):
@@ -225,6 +225,8 @@ class SystemRP:
         if i == 0:
             return
 
+        self.g_cons.maybe_swap_gcons(t)
+
         self.bdf = bdf1 if (i == 1 or self.solver_order == 1) else bdf2
         for body in self.bodies:
             body.update_bdf_coeffs(self.bdf, self.h)
@@ -298,6 +300,8 @@ class SystemRP:
         # logging.debug('t: {:.3f}, iterations: {:>2d}'.format(t, self.k))
 
     def do_kinematics_step(self, t):
+
+        self.g_cons.maybe_swap_gcons(t)
 
         # Refresh the inverse matrix with our new positions
         self.Φq = self.g_cons.get_phi_q(t)

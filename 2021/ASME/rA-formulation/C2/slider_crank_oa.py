@@ -22,7 +22,7 @@ def slider_crank(args):
     parser = arg.ArgumentParser(description='Simulation of a Haug\'s slider-crank model')
     parser.add_argument('-t', '--end_time', type=float, default=3, dest='t_end')
 
-    model_files = defaultdict(lambda: 'models/slider_crank.mdl')
+    model_files = defaultdict(lambda: 'models/slider_crank.json')
 
     # Get system and change some settings
     sys, params = standard_setup(parser, model_files, args)
@@ -63,7 +63,7 @@ def slider_crank(args):
     t_grid = np.arange(0, params.t_end, params.h)
     t_steps = len(t_grid)
 
-    # (num bodies) x (time steps) x (x, y, z)
+    # (num bodies) x (x, y, z) x (time steps)
     pos_data = np.zeros((sys.nb, 3, t_steps))
     vel_data = np.zeros((sys.nb, 3, t_steps))
     acc_data = np.zeros((sys.nb, 3, t_steps))

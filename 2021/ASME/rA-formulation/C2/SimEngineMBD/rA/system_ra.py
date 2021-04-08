@@ -135,6 +135,8 @@ class SystemRA:
         if i == 0:
             return
 
+        self.g_cons.maybe_swap_gcons(t)
+
         self.Φ_r = self.g_cons.get_phi_r(t)
         self.Π = self.g_cons.get_pi(t)
 
@@ -196,6 +198,8 @@ class SystemRA:
         # logging.debug('t: {:.3f}, iterations: {:>2d}'.format(t, self.k))
 
     def do_kinematics_step(self, t):
+
+        self.g_cons.maybe_swap_gcons(t)
 
         # Refresh the inverse matrix with our new positions
         self.Φq = self.g_cons.get_phi_q(t)

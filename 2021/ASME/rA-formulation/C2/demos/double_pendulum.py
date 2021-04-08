@@ -17,7 +17,7 @@ from SimEngineMBD.utils.tools import profiler, plot_many_kinematics, print_profi
 parser = arg.ArgumentParser(description='Simulation of a two-link pendulum')
 parser.add_argument('-t', '--end_time', type=float, default=10, dest='t_end')
 
-model_file = os.path.join(os.path.dirname(__file__), '..models/double_pendulum.mdl')
+model_file = os.path.join(os.path.dirname(__file__), '..models/double_pendulum.json')
 
 # Get system and change some settings
 sys, params = standard_setup(parser, model_file)

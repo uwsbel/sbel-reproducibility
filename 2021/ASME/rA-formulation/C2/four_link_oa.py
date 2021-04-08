@@ -22,7 +22,7 @@ def four_link(args):
     parser = arg.ArgumentParser(description='Simulation of Haug\'s four-link mechanism')
     parser.add_argument('-t', '--end_time', type=float, default=3, dest='t_end')
 
-    model_files = defaultdict(lambda: 'models/four_link.mdl')
+    model_files = defaultdict(lambda: 'models/four_link.json')
 
     # Get system and change some settings
     sys, params = standard_setup(parser, model_files, args)
@@ -69,7 +69,7 @@ def four_link(args):
 
     sys.initialize()
 
-    # (num bodies) x (time steps) x (x, y, z)
+    # (num bodies) x (x, y, z) x (time steps)
     pos_data = np.zeros((sys.nb, 3, t_steps))
     vel_data = np.zeros((sys.nb, 3, t_steps))
     acc_data = np.zeros((sys.nb, 3, t_steps))

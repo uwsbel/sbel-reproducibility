@@ -21,7 +21,7 @@ from SimEngineMBD.utils.tools import profiler, plot_many_kinematics, print_profi
 parser = arg.ArgumentParser(description='Simulation of Haug\'s four-link mechanism')
 parser.add_argument('-t', '--end_time', type=float, default=2.5, dest='t_end')
 
-model_file = os.path.join(os.path.dirname(__file__), '..models/four_link.mdl')
+model_file = os.path.join(os.path.dirname(__file__), '..models/four_link.json')
 
 # Get system and change some settings
 sys, params = standard_setup(parser, model_file)

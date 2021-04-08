@@ -142,6 +142,8 @@ class SystemREps:
         if i == 0:
             return
 
+        self.g_cons.maybe_swap_gcons(t)
+
         self.bdf = bdf1 if (i == 1 or self.solver_order == 1) else bdf2
 
         for body in self.bodies:
@@ -221,6 +223,8 @@ class SystemREps:
         # logging.debug('t: {:.3f}, iterations: {:>2d}'.format(t, self.k))
 
     def do_kinematics_step(self, i, t):
+
+        self.g_cons.maybe_swap_gcons(t)
 
         for body in self.bodies:
             if body.near_singular:
