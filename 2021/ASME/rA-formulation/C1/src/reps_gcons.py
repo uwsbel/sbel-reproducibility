@@ -6,6 +6,13 @@
 import numpy as np
 from numpy import cos, sin, pi
 
+
+def skew(vector):
+    """ Function to transform 3x1 vector into a skew symmetric cross product matrix """
+    return np.array([[0, -vector.item(2), vector.item(1)],
+                     [vector.item(2), 0, -vector.item(0)],
+                     [-vector.item(1), vector.item(0), 0]])
+
 # ------------------------------------- Driving Constraint -----------------------------------------
 class DrivingConstraint:
     """This class defines a driving function and its first and second derivatives
@@ -97,15 +104,15 @@ class GConDP1:
             return phi_eps_i
         return [phi_eps_i, phi_eps_j]
 
-    # def flip_gcon_body(self, body_id, flip_mat):
-    #     """
-    #     Rotates all vectors in the reference frame of body with id == body_id by flip_mat
-    #     """
-    #     if self.body_i.id == body_id:
-    #         self.ai = flip_mat @ self.ai
-    #
-    #     if self.body_j.id == body_id:
-    #         self.aj = flip_mat @ self.aj
+    def flip_gcons(self, body_id, flip_mat):
+        """
+        Rotates all vectors in the reference frame of body with id == body_id by flip_mat
+        """
+        if self.body_i.body_id == body_id:
+            self.a_bar_i = flip_mat @ self.a_bar_i
+
+        if self.body_j.body_id == body_id:
+            self.a_bar_j = flip_mat @ self.a_bar_j
 
 # ------------------------------------- DP2 Constraint --------------------------------------------
 class GConDP2:
@@ -161,7 +168,7 @@ class GConDP2:
         r_dot_i = self.body_i.r_dot
         r_dot_j = self.body_j.r_dot
 
-        term_1 = -self.a_bar_i.T @ A_ddot_i.T @ self.d_ij()
+        term_1 = -self.a_bar_i.T @ A_ddot_i @ self.d_ij()
         term_2 = -self.a_bar_i.T @ A_i.T @ (A_ddot_j @ self.s_bar_q_j - A_ddot_i @ self.s_bar_p_i)
         term_3 = -2 * self.a_bar_i.T @ A_dot_i @ (r_dot_j - r_dot_i + A_dot_j @ self.s_bar_q_j - A_dot_i @ self.s_bar_p_i)
         return term_1 + term_2 + term_3 + self.prescribed_val.f_ddot(t)
@@ -186,8 +193,7 @@ class GConDP2:
         phi_eps_i = np.block([[
             self.d_ij().T @ A_phi_i @ self.a_bar_i,
             self.d_ij().T @ A_theta_i @ self.a_bar_i,
-            self.d_ij().T @ A_psi_i @ self.a_bar_i]])
-        - np.block([[
+            self.d_ij().T @ A_psi_i @ self.a_bar_i]]) - np.block([[
             a_i.T @ A_phi_i @ self.s_bar_p_i,
             a_i.T @ A_theta_i @ self.s_bar_p_i,
             a_i.T @ A_psi_i @ self.s_bar_p_i]])
@@ -202,16 +208,16 @@ class GConDP2:
             return phi_eps_i
         return [phi_eps_i, phi_eps_j]
 
-    # def flip_gcon_body(self, body_id, flip_mat):
-    #     """
-    #     Rotates all vectors in the reference frame of body with id == body_id by flip_mat
-    #     """
-    #     if self.body_i.id == body_id:
-    #         self.ai = flip_mat @ self.ai
-    #         self.si = flip_mat @ self.si
-    #
-    #     if self.body_j.id == body_id:
-    #         self.sj = flip_mat @ self.sj
+    def flip_gcons(self, body_id, flip_mat):
+        """
+        Rotates all vectors in the reference frame of body with id == body_id by flip_mat
+        """
+        if self.body_i.body_id == body_id:
+            self.a_bar_i = flip_mat @ self.a_bar_i
+            self.s_bar_p_i = flip_mat @ self.s_bar_p_i
+
+        if self.body_j.body_id == body_id:
+            self.s_bar_q_j = flip_mat @ self.s_bar_q_j
 
 # -------------------------------------- D Constraint ---------------------------------------------
 class GConD:
@@ -287,35 +293,33 @@ class GConD:
         phi_eps_i = -np.block([[
             self.d_ij().T @ A_phi_i @ self.s_bar_p_i,
             self.d_ij().T @ A_theta_i @ self.s_bar_p_i,
-            self.d_ij().T @ A_psi_i @ self.s_bar_p_i]])
-        - np.block([[
-            self.s_bar_p_i.T @ A_phi_i @ self.d_ij(),
-            self.s_bar_p_i.T @ A_theta_i @ self.d_ij(),
-            self.s_bar_p_i.T @ A_psi_i @ self.d_ij()]])
+            self.d_ij().T @ A_psi_i @ self.s_bar_p_i]]) - np.block([[
+            self.s_bar_p_i.T @ A_phi_i.T @ self.d_ij(),
+            self.s_bar_p_i.T @ A_theta_i.T @ self.d_ij(),
+            self.s_bar_p_i.T @ A_psi_i.T @ self.d_ij()]])
 
         phi_eps_j = np.block([[
             self.d_ij().T @ A_phi_j @ self.s_bar_q_j,
             self.d_ij().T @ A_theta_j @ self.s_bar_q_j,
-            self.d_ij().T @ A_psi_j @ self.s_bar_q_j]])
-        + np.block([[
-            self.s_bar_q_j @ A_phi_j @ self.d_ij(),
-            self.s_bar_q_j @ A_theta_j @ self.d_ij(),
-            self.s_bar_q_j @ A_psi_j @ self.d_ij()]])
+            self.d_ij().T @ A_psi_j @ self.s_bar_q_j]]) + np.block([[
+                self.s_bar_q_j.T @ A_phi_j.T @ self.d_ij(),
+                self.s_bar_q_j.T @ A_theta_j.T @ self.d_ij(),
+                self.s_bar_q_j.T @ A_psi_j.T @ self.d_ij()]])
         if self.body_i.is_ground:
             return phi_eps_j
         if self.body_j.is_ground:
             return phi_eps_i
         return [phi_eps_i, phi_eps_j]
 
-    # def flip_gcon_body(self, body_id, flip_mat):
-    #     """
-    #     Rotates all vectors in the reference frame of body with id == body_id by flip_mat
-    #     """
-    #     if self.body_i.id == body_id:
-    #         self.si = flip_mat @ self.si
-    #
-    #     if self.body_j.id == body_id:
-    #         self.sj = flip_mat @ self.sj
+    def flip_gcons(self, body_id, flip_mat):
+        """
+        Rotates all vectors in the reference frame of body with id == body_id by flip_mat
+        """
+        if self.body_i.body_id == body_id:
+            self.s_bar_p_i = flip_mat @ self.s_bar_p_i
+
+        if self.body_j.body_id == body_id:
+            self.s_bar_q_j = flip_mat @ self.s_bar_q_j
 
 # ------------------------------------- CD Constraint ---------------------------------------------
 class GConCD:
@@ -398,12 +402,12 @@ class GConCD:
             return phi_eps_i
         return [phi_eps_i, phi_eps_j]
 
-    # def flip_gcon_body(self, body_id, flip_mat):
-    #     """
-    #     Rotates all vectors in the reference frame of body with id == body_id by flip_mat
-    #     """
-    #     if self.body_i.id == body_id:
-    #         self.si = flip_mat @ self.si
-    #
-    #     if self.body_j.id == body_id:
-    #         self.sj = flip_mat @ self.sj
+    def flip_gcons(self, body_id, flip_mat):
+        """
+        Rotates all vectors in the reference frame of body with id == body_id by flip_mat
+        """
+        if self.body_i.body_id == body_id:
+            self.s_bar_p_i = flip_mat @ self.s_bar_p_i
+
+        if self.body_j.body_id == body_id:
+            self.s_bar_q_j = flip_mat @ self.s_bar_q_j
