@@ -1,10 +1,10 @@
-import numpy as np
 import json as js
 import logging
+import numpy as np
 from scipy.linalg import lu_factor, lu_solve
 
 from .gcons_rp import Constraints, DP1, DP2, CD, D, Body, ConGroup, EulerCon
-from ..utils.physics import Z_AXIS, block_mat, R, skew, exp, SolverType, bdf1, bdf2
+from ..utils.physics import Z_AXIS, block_mat, SolverType, bdf1, bdf2
 from ..utils.systems import read_model_file
 
 class SystemRP:
@@ -88,15 +88,17 @@ class SystemRP:
 
                 self.solver_type = SolverType.DYNAMICS
                 self.tol = 1e-3 if self.tol == None else self.tol
+
+            self.g_cons.initialize()
         if self.solver_type == SolverType.DYNAMICS:
             if self.nc > 6*self.nb:
                 logging.warning('System is overconstrained')
 
             self.tol = 1e-3 if self.tol == None else self.tol
 
+            self.g_cons.initialize()
             self.initialize_dynamics()
 
-        self.g_cons.initialize()
         self.is_initialized = True
 
     def initialize_dynamics(self):

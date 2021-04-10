@@ -209,9 +209,6 @@ def exp(mat):
     v = cross_vec(mat)
     v_norm = np.linalg.norm(v)
 
-    if v_norm > tol:
-        raise ValueError('Non-small value passed to exponential map')
-
     # If length 0 then we don't rotate at all
     if v_norm == 0:
         return I3
