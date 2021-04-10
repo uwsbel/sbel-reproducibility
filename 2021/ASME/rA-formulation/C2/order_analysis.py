@@ -1,17 +1,17 @@
-import numpy as np
 import pickle
-import matplotlib.pyplot as plt
-import itertools
 from multiprocessing import Pool
-from four_link_oa import four_link
-from slider_crank_oa import slider_crank
-from single_pendulum_oa import single_pendulum
+
+import numpy as np
+
+from SimEngineMBD.example_models.single_pendulum import run_single_pendulum
+from SimEngineMBD.example_models.four_link import run_four_link
+from SimEngineMBD.example_models.slider_crank import run_slider_crank
 
 dir_path = './output/oa/'
 
 # step_sizes = np.logspace(-2, -5, 4)
-step_sizes = [1e-3, 2e-3, 4e-3, 8e-3, 1e-2, 2e-2, 4e-2, 8e-2, 1e-1]
-# step_sizes = [1e-2, 2e-2, 4e-2]
+# step_sizes = [1e-3, 2e-3, 4e-3, 8e-3, 1e-2, 2e-2, 4e-2, 8e-2, 1e-1]
+step_sizes = [1e-2, 2e-2, 4e-2]
 tols = [1e-10 / step**2 for step in step_sizes]
 
 to_xyz = 'xyz'
@@ -25,7 +25,8 @@ def run_model(args):
 
     pos_exact, vel_exact, acc_exact, _, _ = model_fn(['--form', form, '--mode', 'kinematics', '--tol', '1e-12'])
 
-    pretty_name = ' '.join([word.capitalize() for word in model_fn.__name__.split('_')])
+    # run_some_model_name -> Some_Model_Name
+    pretty_name = '_'.join([word.capitalize() for word in model_fn.__name__[4:].split('_')])
 
     # We leave the NaNs in if it fails to converge and they don't get plotted
     pos_diff = np.full((len(step_sizes), num_bodies, 3), np.nan)
@@ -53,8 +54,8 @@ def run_model(args):
 
 tasks = []
 
-for model_fn in [single_pendulum, four_link, slider_crank]:
-    num_bodies = 1 if model_fn.__name__ == 'single_pendulum' else 3
+for model_fn in [run_single_pendulum, run_four_link, run_slider_crank]:
+    num_bodies = 1 if model_fn.__name__ == 'run_single_pendulum' else 3
 
     for form in ['reps', 'rp', 'rA']:
         tasks.append((form, model_fn, num_bodies))

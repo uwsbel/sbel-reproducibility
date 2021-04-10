@@ -16,7 +16,7 @@ for f in os.listdir(dir_path):
         
         continue
 
-    if f.endswith('.pickle') and f.startswith('Slider Crank'):
+    if f.endswith('.pickle') and f.startswith('Slider_Crank'):
         files.append(f)
 
 for file_name in files:

@@ -1,19 +1,19 @@
-import numpy as np
 import pickle
-
-import itertools
 from multiprocessing import Pool
-from single_pendulum_timing import single_pendulum
-from four_link_timing import four_link
-from slider_crank_timing import slider_crank
+
+import numpy as np
+
+from SimEngineMBD.example_models.single_pendulum import time_single_pendulum
+from SimEngineMBD.example_models.four_link import time_four_link
+from SimEngineMBD.example_models.slider_crank import time_slider_crank
 
 # For 'production'
-step_sizes = np.array([1e-3, 2e-3, 4e-3, 8e-3, 1e-2, 2e-2, 4e-2, 8e-2, 1e-1])
-M_vals = np.array([1e-8, 1e-9, 1e-10, 1e-11, 1e-12, 1e-13])
+# step_sizes = np.array([1e-3, 2e-3, 4e-3, 8e-3, 1e-2, 2e-2, 4e-2, 8e-2, 1e-1])
+# M_vals = np.array([1e-8, 1e-9, 1e-10, 1e-11, 1e-12, 1e-13])
 
 # # For testing
-# step_sizes = np.array([2e-2, 4e-2, 8e-2])
-# M_vals = np.array([1e-8, 1e-9])
+step_sizes = np.array([2e-2, 4e-2, 8e-2])
+M_vals = np.array([1e-8, 1e-9])
 
 end_time = 3
 timing_runs = 5
@@ -30,7 +30,8 @@ with open(dir_path + 'mesh_params.pickle', 'wb') as handle:
 def run_model(args):
     form, model_fn = args
 
-    pretty_name = '_'.join([word.capitalize() for word in model_fn.__name__.split('_')])
+    # time_some_model_name -> Some_Model_Name
+    pretty_name = '_'.join([word.capitalize() for word in model_fn.__name__[5:].split('_')])
 
     timing = np.full((len(M_vals), len(step_sizes)), np.nan)
 
@@ -59,8 +60,8 @@ def run_model(args):
 
 tasks = []
 
-for model_fn in [single_pendulum, four_link, slider_crank]:
-    for form in ['rA', 'rp', 'reps']:
+for model_fn in [time_single_pendulum, time_four_link, time_slider_crank]:
+    for form in ['rp', 'reps', 'rA']:
         tasks.append((form, model_fn))
 
 for task in tasks:
