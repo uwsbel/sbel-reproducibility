@@ -9,7 +9,7 @@ from SimEngineMBD.example_models.single_pendulum import time_single_pendulum
 from SimEngineMBD.example_models.four_link import time_four_link
 from SimEngineMBD.example_models.slider_crank import time_slider_crank
 
-dir_path = './output/timing/'
+dir_path = './output/timing_surface/'
 
 def save_data():
 
