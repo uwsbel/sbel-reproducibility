@@ -177,91 +177,6 @@ class DP1:
         self.ddf = ddf
 
 
-class CD:
-    cons_type = Constraints.CD
-
-    def __init__(self, body_i, body_j, si, sj, c, f, df, ddf):
-        self.body_i = body_i
-        self.body_j = body_j
-
-        if body_i.is_ground and body_j.is_ground:
-            raise ValueError('Both bodies cannot be ground')
-
-        self.si = si
-        self.sj = sj
-
-        self.c = c
-
-        self.f = lambda t: 0
-        self.df = lambda t: 0
-        self.ddf = lambda t: 0
-
-    @classmethod
-    def init_from_dict(cls, dict, body_i, body_j):
-        si = np.array([dict[SI]]).T
-        sj = np.array([dict[SJ]]).T
-        c = np.array([dict[C]]).T
-
-        return cls(body_i, body_j, si, sj, c, dict[F], dict[DF], dict[DDF])
-
-    def d_ij(self):
-        """
-        Compact function call for distance between two points
-        """
-        return distance_fn(self.body_i, self.body_j, self.si, self.sj)
-
-    def get_phi(self, t):
-        return self.c.T @ self.d_ij() - self.f(t)
-
-    def get_gamma(self, t):
-        Ai = self.body_i.A
-        Aj = self.body_j.A
-        ωi = skew(self.body_i.ω)
-        ωj = skew(self.body_j.ω)
-
-        return self.c.T @ (Ai @ ωi @ ωi @ self.si - Aj @ ωj @ ωj @ self.sj) + self.ddf(t)
-
-    def get_nu(self, t):
-        return self.df(t)
-
-    def get_phi_r(self, t):
-        Φr = []
-        if not self.body_i.is_ground:
-            Φr.append((self.body_i.id, -self.c.T))
-        if not self.body_j.is_ground:
-            Φr.append((self.body_j.id, self.c.T))
-        return Φr
-
-    def get_pi(self, t):
-        Π = []
-
-        if not self.body_i.is_ground:
-            Π.append((self.body_i.id, self.c.T @ self.body_i.A @ skew(self.si)))
-        if not self.body_j.is_ground:
-            Π.append((self.body_j.id, -self.c.T @
-                      self.body_j.A @ skew(self.sj)))
-        return Π
-
-    def get_reaction_force_r(self, t):
-        nb = 1 if self.body_i.is_ground or self.body_j.is_ground else 2
-        return np.zeros((3*nb, 3*nb))
-
-    def get_reaction_force_A(self, t):
-        Ai = self.body_i.A
-        Aj = self.body_j.A
-
-        a11 = -skew(self.si) @ skew(Ai.T @ self.c)
-        a22 = skew(self.sj) @ skew(Aj.T @ self.c)
-
-        if self.body_i.is_ground:
-            return a22
-
-        if self.body_j.is_ground:
-            return a11
-
-        return np.block([[a11, np.zeros((3, 3))], [np.zeros((3, 3)), a22]])
-
-
 class DP2:
     cons_type = Constraints.DP2
 
@@ -427,6 +342,89 @@ class D:
         self.df = df
         self.ddf = ddf
 
+class CD:
+    cons_type = Constraints.CD
+
+    def __init__(self, body_i, body_j, si, sj, c, f, df, ddf):
+        self.body_i = body_i
+        self.body_j = body_j
+
+        if body_i.is_ground and body_j.is_ground:
+            raise ValueError('Both bodies cannot be ground')
+
+        self.si = si
+        self.sj = sj
+
+        self.c = c
+
+        self.f = lambda t: 0
+        self.df = lambda t: 0
+        self.ddf = lambda t: 0
+
+    @classmethod
+    def init_from_dict(cls, dict, body_i, body_j):
+        si = np.array([dict[SI]]).T
+        sj = np.array([dict[SJ]]).T
+        c = np.array([dict[C]]).T
+
+        return cls(body_i, body_j, si, sj, c, dict[F], dict[DF], dict[DDF])
+
+    def d_ij(self):
+        """
+        Compact function call for distance between two points
+        """
+        return distance_fn(self.body_i, self.body_j, self.si, self.sj)
+
+    def get_phi(self, t):
+        return self.c.T @ self.d_ij() - self.f(t)
+
+    def get_gamma(self, t):
+        Ai = self.body_i.A
+        Aj = self.body_j.A
+        ωi = skew(self.body_i.ω)
+        ωj = skew(self.body_j.ω)
+
+        return self.c.T @ (Ai @ ωi @ ωi @ self.si - Aj @ ωj @ ωj @ self.sj) + self.ddf(t)
+
+    def get_nu(self, t):
+        return self.df(t)
+
+    def get_phi_r(self, t):
+        Φr = []
+        if not self.body_i.is_ground:
+            Φr.append((self.body_i.id, -self.c.T))
+        if not self.body_j.is_ground:
+            Φr.append((self.body_j.id, self.c.T))
+        return Φr
+
+    def get_pi(self, t):
+        Π = []
+
+        if not self.body_i.is_ground:
+            Π.append((self.body_i.id, self.c.T @ self.body_i.A @ skew(self.si)))
+        if not self.body_j.is_ground:
+            Π.append((self.body_j.id, -self.c.T @
+                      self.body_j.A @ skew(self.sj)))
+        return Π
+
+    def get_reaction_force_r(self, t):
+        nb = 1 if self.body_i.is_ground or self.body_j.is_ground else 2
+        return np.zeros((3*nb, 3*nb))
+
+    def get_reaction_force_A(self, t):
+        Ai = self.body_i.A
+        Aj = self.body_j.A
+
+        a11 = -skew(self.si) @ skew(Ai.T @ self.c)
+        a22 = skew(self.sj) @ skew(Aj.T @ self.c)
+
+        if self.body_i.is_ground:
+            return a22
+
+        if self.body_j.is_ground:
+            return a11
+
+        return np.block([[a11, np.zeros((3, 3))], [np.zeros((3, 3)), a22]])
 
 class ConGroup:
     def __init__(self, con_list, nb):

@@ -19,9 +19,9 @@ bdf1 = BDFVals(β=1, α=[-1, 1, 0])
 bdf2 = BDFVals(β=2/3, α=[-1, 4/3, -1/3])
 class Constraints(Enum):
     DP1 = auto()
-    CD = auto()
     DP2 = auto()
     D = auto()
+    CD = auto()
     EULER = auto()
 
 

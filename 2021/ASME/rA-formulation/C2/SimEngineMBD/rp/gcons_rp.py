@@ -217,70 +217,6 @@ class Body:
         self._p = value
 
 
-class CD:
-    cons_type = Constraints.CD
-
-    def __init__(self, body_i, body_j, si, sj, c, f, df, ddf):
-        self.body_i = body_i
-        self.body_j = body_j
-
-        if body_i.is_ground and body_j.is_ground:
-            raise ValueError('Both bodies cannot be ground')
-
-        self.si = si
-        self.sj = sj
-
-        self.c = c
-
-        self.f = lambda t: 0
-        self.df = lambda t: 0
-        self.ddf = lambda t: 0
-
-    @classmethod
-    def init_from_dict(cls, dict, body_i, body_j):
-        si = np.array([dict[SI]]).T
-        sj = np.array([dict[SJ]]).T
-        c = np.array([dict[C]]).T
-
-        return cls(body_i, body_j, si, sj, c, dict[F], dict[DF], dict[DDF])
-
-    def d_ij(self):
-        """
-        Compact function call for distance between two points
-        """
-        return distance_fn(self.body_i, self.body_j, self.si, self.sj)
-
-    def get_phi(self, t):
-        return self.c.T @ self.d_ij() - self.f(t)
-
-    def get_gamma(self, t):
-        term1 = B(self.body_i.dp, self.si) @ self.body_i.dp
-        term2 = B(self.body_j.dp, self.sj) @ self.body_j.dp
-
-        return self.c.T @ (term1 - term2) + self.ddf(t)
-
-    def get_nu(self, t):
-        return [self.df(t)]
-
-    def get_phi_r(self, t):
-        if self.body_i.is_ground:
-            return [(self.body_j.id, self.c.T)]
-        if self.body_j.is_ground:
-            return [(self.body_i.id, -self.c.T)]
-        return [(self.body_i.id, -self.c.T), (self.body_j.id, self.c.T)]
-
-    def get_phi_p(self, t):
-        Bpj = (self.body_j.id, self.c.T @ B(self.body_j.p, self.sj))
-        Bpi = (self.body_i.id, -self.c.T @ B(self.body_i.p, self.si))
-
-        if self.body_i.is_ground:
-            return [Bpj]
-        if self.body_j.is_ground:
-            return [Bpi]
-
-        return [Bpi, Bpj]
-
-
 class DP1:
     cons_type = Constraints.DP1
 
@@ -532,6 +468,68 @@ class D:
         self.df = df
         self.ddf = ddf
 
+class CD:
+    cons_type = Constraints.CD
+
+    def __init__(self, body_i, body_j, si, sj, c, f, df, ddf):
+        self.body_i = body_i
+        self.body_j = body_j
+
+        if body_i.is_ground and body_j.is_ground:
+            raise ValueError('Both bodies cannot be ground')
+
+        self.si = si
+        self.sj = sj
+
+        self.c = c
+
+        self.f = lambda t: 0
+        self.df = lambda t: 0
+        self.ddf = lambda t: 0
+
+    @classmethod
+    def init_from_dict(cls, dict, body_i, body_j):
+        si = np.array([dict[SI]]).T
+        sj = np.array([dict[SJ]]).T
+        c = np.array([dict[C]]).T
+
+        return cls(body_i, body_j, si, sj, c, dict[F], dict[DF], dict[DDF])
+
+    def d_ij(self):
+        """
+        Compact function call for distance between two points
+        """
+        return distance_fn(self.body_i, self.body_j, self.si, self.sj)
+
+    def get_phi(self, t):
+        return self.c.T @ self.d_ij() - self.f(t)
+
+    def get_gamma(self, t):
+        term1 = B(self.body_i.dp, self.si) @ self.body_i.dp
+        term2 = B(self.body_j.dp, self.sj) @ self.body_j.dp
+
+        return self.c.T @ (term1 - term2) + self.ddf(t)
+
+    def get_nu(self, t):
+        return [self.df(t)]
+
+    def get_phi_r(self, t):
+        if self.body_i.is_ground:
+            return [(self.body_j.id, self.c.T)]
+        if self.body_j.is_ground:
+            return [(self.body_i.id, -self.c.T)]
+        return [(self.body_i.id, -self.c.T), (self.body_j.id, self.c.T)]
+
+    def get_phi_p(self, t):
+        Bpj = (self.body_j.id, self.c.T @ B(self.body_j.p, self.sj))
+        Bpi = (self.body_i.id, -self.c.T @ B(self.body_i.p, self.si))
+
+        if self.body_i.is_ground:
+            return [Bpj]
+        if self.body_j.is_ground:
+            return [Bpi]
+
+        return [Bpi, Bpj]
 
 class EulerCon:
     cons_type = Constraints.EULER

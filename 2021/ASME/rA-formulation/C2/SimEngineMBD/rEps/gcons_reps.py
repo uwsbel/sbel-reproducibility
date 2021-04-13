@@ -379,87 +379,6 @@ class DP1:
             self.aj = flip_mat @ self.aj
 
 
-class CD:
-    cons_type = Constraints.CD
-
-    def __init__(self, body_i, body_j, si, sj, c, f, df, ddf, name=None):
-        self.body_i = body_i
-        self.body_j = body_j
-
-        if body_i.is_ground and body_j.is_ground:
-            raise ValueError('Both bodies cannot be ground')
-
-        self.si = si
-        self.sj = sj
-
-        self.c = c
-
-        self.f = lambda t: 0
-        self.df = lambda t: 0
-        self.ddf = lambda t: 0
-
-        self.name = name
-
-    @classmethod
-    def init_from_dict(cls, dict, body_i, body_j):
-        si = np.array([dict[SI]]).T
-        sj = np.array([dict[SJ]]).T
-        c = np.array([dict[C]]).T
-
-        return cls(body_i, body_j, si, sj, c, dict[F], dict[DF], dict[DDF], dict["name"])
-
-    def d_ij(self):
-        """
-        Compact function call for distance between two points
-        """
-        return distance_fn(self.body_i, self.body_j, self.si, self.sj)
-
-    def get_phi(self, t):
-        return self.c.T @ self.d_ij() - self.f(t)
-
-    def get_gamma(self, t):
-        ddAi = self.body_i.ddA
-        ddAj = self.body_j.ddA
-
-        return -self.c.T @ (ddAj @ self.sj - ddAi @ self.si) + self.ddf(t)
-
-    def get_nu(self, t):
-        return self.df(t)
-
-    def get_phi_r(self, t):
-        Φr = []
-        if not self.body_i.is_ground:
-            Φr.append((self.body_i.id, -self.c.T))
-        if not self.body_j.is_ground:
-            Φr.append((self.body_j.id, self.c.T))
-        return Φr
-
-    def get_phi_eps(self, t):
-        Φε = []
-
-        Ai_ϕ, Ai_θ, Ai_ψ = self.body_i.get_partials()
-        Aj_ϕ, Aj_θ, Aj_ψ = self.body_j.get_partials()
-
-        if not self.body_i.is_ground:
-            i_term = self.c.T @ np.block(
-                [[-Ai_ϕ @ self.si, -Ai_θ @ self.si, -Ai_ψ @ self.si]])
-            Φε.append((self.body_i.id, i_term))
-        if not self.body_j.is_ground:
-            j_term = self.c.T @ np.block(
-                [[Aj_ϕ @ self.sj, Aj_θ @ self.sj, Aj_ψ @ self.sj]])
-            Φε.append((self.body_j.id, j_term))
-        return Φε
-
-    def flip_gcon_body(self, body_id, flip_mat):
-        """
-        Rotates all vectors in the reference frame of body with id == body_id by flip_mat
-        """
-        if self.body_i.id == body_id:
-            self.si = flip_mat @ self.si
-            
-        if self.body_j.id == body_id:
-            self.sj = flip_mat @ self.sj
-
 
 class DP2:
     cons_type = Constraints.DP2
@@ -668,6 +587,86 @@ class D:
         if self.body_j.id == body_id:
             self.sj = flip_mat @ self.sj
 
+class CD:
+    cons_type = Constraints.CD
+
+    def __init__(self, body_i, body_j, si, sj, c, f, df, ddf, name=None):
+        self.body_i = body_i
+        self.body_j = body_j
+
+        if body_i.is_ground and body_j.is_ground:
+            raise ValueError('Both bodies cannot be ground')
+
+        self.si = si
+        self.sj = sj
+
+        self.c = c
+
+        self.f = lambda t: 0
+        self.df = lambda t: 0
+        self.ddf = lambda t: 0
+
+        self.name = name
+
+    @classmethod
+    def init_from_dict(cls, dict, body_i, body_j):
+        si = np.array([dict[SI]]).T
+        sj = np.array([dict[SJ]]).T
+        c = np.array([dict[C]]).T
+
+        return cls(body_i, body_j, si, sj, c, dict[F], dict[DF], dict[DDF], dict["name"])
+
+    def d_ij(self):
+        """
+        Compact function call for distance between two points
+        """
+        return distance_fn(self.body_i, self.body_j, self.si, self.sj)
+
+    def get_phi(self, t):
+        return self.c.T @ self.d_ij() - self.f(t)
+
+    def get_gamma(self, t):
+        ddAi = self.body_i.ddA
+        ddAj = self.body_j.ddA
+
+        return -self.c.T @ (ddAj @ self.sj - ddAi @ self.si) + self.ddf(t)
+
+    def get_nu(self, t):
+        return self.df(t)
+
+    def get_phi_r(self, t):
+        Φr = []
+        if not self.body_i.is_ground:
+            Φr.append((self.body_i.id, -self.c.T))
+        if not self.body_j.is_ground:
+            Φr.append((self.body_j.id, self.c.T))
+        return Φr
+
+    def get_phi_eps(self, t):
+        Φε = []
+
+        Ai_ϕ, Ai_θ, Ai_ψ = self.body_i.get_partials()
+        Aj_ϕ, Aj_θ, Aj_ψ = self.body_j.get_partials()
+
+        if not self.body_i.is_ground:
+            i_term = self.c.T @ np.block(
+                [[-Ai_ϕ @ self.si, -Ai_θ @ self.si, -Ai_ψ @ self.si]])
+            Φε.append((self.body_i.id, i_term))
+        if not self.body_j.is_ground:
+            j_term = self.c.T @ np.block(
+                [[Aj_ϕ @ self.sj, Aj_θ @ self.sj, Aj_ψ @ self.sj]])
+            Φε.append((self.body_j.id, j_term))
+        return Φε
+
+    def flip_gcon_body(self, body_id, flip_mat):
+        """
+        Rotates all vectors in the reference frame of body with id == body_id by flip_mat
+        """
+        if self.body_i.id == body_id:
+            self.si = flip_mat @ self.si
+            
+        if self.body_j.id == body_id:
+            self.sj = flip_mat @ self.sj
 
 class ConGroup:
     def __init__(self, con_list, nb):
