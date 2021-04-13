@@ -125,7 +125,7 @@ class SystemREps:
             body.ddr = z[3*i:3*(i+1)]
             body.ddε = z[3*self.nb + 3*i:3*self.nb + 3*(i+1)]
 
-            body.cache_repsilon_values
+            body.cache_repsilon_values()
 
         self.λ = z[6*self.nb:]
 
