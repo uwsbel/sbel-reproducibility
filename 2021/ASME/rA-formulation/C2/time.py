@@ -39,7 +39,7 @@ for form in forms:
             time_dict[(form, model, mode)] = [model_fn(args) for _ in range(0, num_runs)]
             
 for key, times in time_dict.items():
-    print('{} {} {}'.format(form, model, mode))
+    print('{} {} {}'.format(*key))
 
     for time in times:
         print(time)
