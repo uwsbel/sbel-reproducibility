@@ -80,12 +80,27 @@ class Body:
         self.ω_prev = self.ω
 
     def get_tau(self):
-        return -skew(self.ω) @ self.J @ self.ω
+        return -self.ω_tilde @ self.J @ self.ω
 
     def get_J_term(self, h):
         # NOTE: h**2 terms dropped for now
-        return self.J - h*(skew(self.J @ self.ω) - skew(self.ω)
+        return self.J - h*(skew(self.J @ self.ω) - self.ω_tilde
                            @ self.J + self.n_ω)
+
+    @property
+    def ω_tilde(self):
+        """Returns cross product of ω, ω_tilde = skew(ω) """
+        return self._ω_tilde
+
+    @property
+    def ω(self):
+        """Body's angular velocity"""
+        return self._ω
+
+    @ω.setter
+    def ω(self, value):
+        self._ω_tilde = skew(value)
+        self._ω = value
 
 
 class DP1:
@@ -121,8 +136,8 @@ class DP1:
     def get_gamma(self, t):
         Ai = self.body_i.A
         Aj = self.body_j.A
-        ωi = skew(self.body_i.ω)
-        ωj = skew(self.body_j.ω)
+        ωi = self.body_i.ω_tilde
+        ωj = self.body_j.ω_tilde
 
         term_1 = -self.aj.T @ (Aj.T @ Ai @ ωi @ ωi + ωj @
                                ωj @ Aj.T @ Ai) @ self.ai
@@ -215,8 +230,8 @@ class DP2:
         return self.ai.T @ self.body_i.A.T @ self.d_ij() - self.f(t)
 
     def get_gamma(self, t):
-        ωi = skew(self.body_i.ω)
-        ωj = skew(self.body_j.ω)
+        ωi = self.body_i.ω_tilde
+        ωj = self.body_j.ω_tilde
 
         t1 = 2 * self.body_i.ω.T @ skew(self.ai) @ self.body_i.A.T @ (
             self.body_i.dr - self.body_j.dr)
@@ -293,8 +308,8 @@ class D:
 
     def get_gamma(self, t):
         Δ_dr = self.body_j.dr - self.body_i.dr
-        ωi = skew(self.body_i.ω)
-        ωj = skew(self.body_j.ω)
+        ωi = self.body_i.ω_tilde
+        ωj = self.body_j.ω_tilde
 
         Ai = self.body_i.A
         Aj = self.body_j.A
@@ -381,8 +396,8 @@ class CD:
     def get_gamma(self, t):
         Ai = self.body_i.A
         Aj = self.body_j.A
-        ωi = skew(self.body_i.ω)
-        ωj = skew(self.body_j.ω)
+        ωi = self.body_i.ω_tilde
+        ωj = self.body_j.ω_tilde
 
         return self.c.T @ (Ai @ ωi @ ωi @ self.si - Aj @ ωj @ ωj @ self.sj) + self.ddf(t)
 
