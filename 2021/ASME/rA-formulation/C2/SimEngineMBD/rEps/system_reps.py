@@ -7,6 +7,7 @@ from .gcons_reps import Constraints, DP1, DP2, CD, D, Body, ConGroup
 from ..utils.physics import Z_AXIS, block_mat, R, skew, exp, SolverType, bdf1, bdf2
 from ..utils.systems import read_model_file
 
+
 class SystemREps:
 
     def __init__(self, bodies, constraints):
@@ -42,13 +43,15 @@ class SystemREps:
 
     def set_dynamics(self):
         if self.is_initialized:
-            logging.warning('Cannot change solver type on an initialized system')
+            logging.warning(
+                'Cannot change solver type on an initialized system')
         else:
             self.solver_type = SolverType.DYNAMICS
 
     def set_kinematics(self):
         if self.is_initialized:
-            logging.warning('Cannot change solver type on an initialized system')
+            logging.warning(
+                'Cannot change solver type on an initialized system')
         else:
             self.solver_type = SolverType.KINEMATICS
 
@@ -66,7 +69,7 @@ class SystemREps:
         """
         for body in self.bodies:
             body.cache_time_derivs()
-        
+
         return self.g_cons.get_gamma(t)
 
     def initialize(self):
@@ -87,7 +90,8 @@ class SystemREps:
 
                 logging.info('Initializing system for kinematics')
             else:
-                logging.warning('Kinematic system has nc ({}) < 6⋅nb ({}), running dynamics instead'.format(self.nc, 6*self.nb))
+                logging.warning('Kinematic system has nc ({}) < 6⋅nb ({}), running dynamics instead'.format(
+                    self.nc, 6*self.nb))
                 self.solver_type = SolverType.DYNAMICS
         if self.solver_type == SolverType.DYNAMICS:
             if self.nc > 6*self.nb:
@@ -129,6 +133,8 @@ class SystemREps:
 
         self.λ = z[6*self.nb:]
 
+        self.do_step = self.do_dynamics_step
+
     def do_step(self, i, t):
         if self.solver_type == SolverType.KINEMATICS:
             self.do_kinematics_step(i, t)
@@ -148,7 +154,8 @@ class SystemREps:
 
         for body in self.bodies:
             if body.near_singular:
-                logging.info('Body {} near singular at time {:.3f}, rotating reference frame'.format(body.id, t))
+                logging.info(
+                    'Body {} near singular at time {:.3f}, rotating reference frame'.format(body.id, t))
 
                 value, flip_mat = body.compute_new_frame()
                 body.ε = value
@@ -218,7 +225,8 @@ class SystemREps:
 
             self.k += 1
             if self.k >= self.max_iters:
-                raise RuntimeError('Newton-Raphson not converging at t: {:.3f}, k: {:>2d}'.format(t, self.max_iters))
+                raise RuntimeError(
+                    'Newton-Raphson not converging at t: {:.3f}, k: {:>2d}'.format(t, self.max_iters))
 
         # logging.debug('t: {:.3f}, iterations: {:>2d}'.format(t, self.k))
 
@@ -257,7 +265,8 @@ class SystemREps:
                 break
 
             if self.k >= self.max_iters:
-                raise RuntimeError('Newton-Raphson not converging at t: {:.3f}, k: {:>2d}'.format(t, self.max_iters))
+                raise RuntimeError(
+                    'Newton-Raphson not converging at t: {:.3f}, k: {:>2d}'.format(t, self.max_iters))
 
         self.Φq = self.g_cons.get_phi_q(t)
         Φq_lu = lu_factor(self.Φq)

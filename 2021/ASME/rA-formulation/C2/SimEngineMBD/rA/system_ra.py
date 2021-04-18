@@ -8,6 +8,7 @@ from .gcons_ra import Constraints, DP1, DP2, CD, D, Body, ConGroup
 from ..utils.physics import Z_AXIS, block_mat, R, skew, exp, SolverType
 from ..utils.systems import read_model_file
 
+
 class SystemRA:
 
     def __init__(self, bodies, constraints):
@@ -43,13 +44,15 @@ class SystemRA:
 
     def set_dynamics(self):
         if self.is_initialized:
-            logging.warning('Cannot change solver type on an initialized system')
+            logging.warning(
+                'Cannot change solver type on an initialized system')
         else:
             self.solver_type = SolverType.DYNAMICS
 
     def set_kinematics(self):
         if self.is_initialized:
-            logging.warning('Cannot change solver type on an initialized system')
+            logging.warning(
+                'Cannot change solver type on an initialized system')
         else:
             self.solver_type = SolverType.KINEMATICS
 
@@ -79,7 +82,8 @@ class SystemRA:
 
                 logging.info('Initializing system for kinematics')
             else:
-                logging.warning('Kinematic system has nc ({}) < 6⋅nb ({}), running dynamics instead'.format(self.nc, 6*self.nb))
+                logging.warning('Kinematic system has nc ({}) < 6⋅nb ({}), running dynamics instead'.format(
+                    self.nc, 6*self.nb))
                 self.solver_type = SolverType.DYNAMICS
 
         if self.solver_type == SolverType.DYNAMICS:
@@ -122,6 +126,8 @@ class SystemRA:
 
         self.λ = z[6*self.nb:]
 
+        self.do_step = self.do_dynamics_step
+
     def do_step(self, i, t):
         if self.solver_type == SolverType.KINEMATICS:
             self.do_kinematics_step(t)
@@ -145,7 +151,7 @@ class SystemRA:
         G_ωω = block_mat([body.get_J_term(self.h) for body in self.bodies])
         G = np.block([[self.M, G_rω, self.Φ_r.T], [G_ωr, G_ωω, self.Π.T],
                       [self.Φ_r, self.Π, np.zeros((self.nc, self.nc))]])
-        
+
         G_lu = lu_factor(G)
 
         for body in self.bodies:
@@ -193,8 +199,9 @@ class SystemRA:
 
             self.k += 1
             if self.k >= self.max_iters:
-                raise RuntimeError('Newton-Raphson not converging at t: {:.3f}, k: {:>2d}'.format(t, self.max_iters))
-        
+                raise RuntimeError(
+                    'Newton-Raphson not converging at t: {:.3f}, k: {:>2d}'.format(t, self.max_iters))
+
         # logging.debug('t: {:.3f}, iterations: {:>2d}'.format(t, self.k))
 
     def do_kinematics_step(self, t):
@@ -228,7 +235,8 @@ class SystemRA:
                 break
 
             if self.k >= self.max_iters:
-                raise RuntimeError('Newton-Raphson not converging at t: {:.3f}, k: {:>2d}'.format(t, self.max_iters))
+                raise RuntimeError(
+                    'Newton-Raphson not converging at t: {:.3f}, k: {:>2d}'.format(t, self.max_iters))
 
         self.Φq = self.g_cons.get_phi_q(t)
         Φq_lu = lu_factor(self.Φq)
@@ -242,6 +250,7 @@ class SystemRA:
         for j, body in enumerate(self.bodies):
             body.ddr = ddq[3*j:3*(j+1), :]
             body.dω = ddq[3*(self.nb + j):3*(self.nb + j+1), :]
+
 
 def create_constraint_from_bodies(json_con, all_bodies):
     """

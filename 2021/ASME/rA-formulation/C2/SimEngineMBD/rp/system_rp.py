@@ -7,6 +7,7 @@ from .gcons_rp import Constraints, DP1, DP2, CD, D, Body, ConGroup, EulerCon
 from ..utils.physics import Z_AXIS, block_mat, SolverType, bdf1, bdf2
 from ..utils.systems import read_model_file
 
+
 class SystemRP:
 
     def __init__(self, bodies, constraints):
@@ -46,13 +47,15 @@ class SystemRP:
 
     def set_dynamics(self):
         if self.is_initialized:
-            logging.warning('Cannot change solver type on an initialized system')
+            logging.warning(
+                'Cannot change solver type on an initialized system')
         else:
             self.solver_type = SolverType.DYNAMICS
 
     def set_kinematics(self):
         if self.is_initialized:
-            logging.warning('Cannot change solver type on an initialized system')
+            logging.warning(
+                'Cannot change solver type on an initialized system')
         else:
             self.solver_type = SolverType.KINEMATICS
 
@@ -146,7 +149,8 @@ class SystemRP:
                     break
 
                 if self.k >= self.max_iters:
-                    raise RuntimeError('Newton-Raphson not converging at t: {:.3f}, k: {:>2d}'.format(t, self.max_iters))
+                    raise RuntimeError(
+                        'Newton-Raphson not converging at t: {:.3f}, k: {:>2d}'.format(t, self.max_iters))
 
             kin_Φq = self.g_cons.get_phi_q(t_start)
 
@@ -213,6 +217,8 @@ class SystemRP:
             self.λp[i] = z[7*self.nb + i]
 
         self.λ = z[8*self.nb:8*self.nb + self.nc]
+
+        self.do_step = self.do_dynamics_step
 
     def do_step(self, i, t):
         if self.solver_type == SolverType.KINEMATICS:
@@ -330,7 +336,8 @@ class SystemRP:
                 break
 
             if self.k >= self.max_iters:
-                raise RuntimeError('Newton-Raphson not converging at t: {:.3f}, k: {:>2d}'.format(t, self.max_iters))
+                raise RuntimeError(
+                    'Newton-Raphson not converging at t: {:.3f}, k: {:>2d}'.format(t, self.max_iters))
 
         self.Φq = self.g_cons.get_phi_q(t)
         Φq_lu = lu_factor(self.Φq)
