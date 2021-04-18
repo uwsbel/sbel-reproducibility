@@ -218,8 +218,6 @@ class SystemRP:
 
         self.λ = z[8*self.nb:8*self.nb + self.nc]
 
-        self.do_step = self.do_dynamics_step
-
     def do_step(self, i, t):
         if self.solver_type == SolverType.KINEMATICS:
             self.do_kinematics_step(t)

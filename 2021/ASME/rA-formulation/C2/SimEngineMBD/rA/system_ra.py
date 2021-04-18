@@ -126,8 +126,6 @@ class SystemRA:
 
         self.λ = z[6*self.nb:]
 
-        self.do_step = self.do_dynamics_step
-
     def do_step(self, i, t):
         if self.solver_type == SolverType.KINEMATICS:
             self.do_kinematics_step(t)
