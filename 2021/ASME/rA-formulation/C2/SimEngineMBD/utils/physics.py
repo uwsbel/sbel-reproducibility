@@ -109,7 +109,8 @@ def skew(v):
 
     ṽ satisfies ṽa = v x a - where x is the cross-product operator
     """
-    v = check_vector(v, 3)
+    if __debug__:
+        v = check_vector(v, 3)
 
     # NOTE: Using np.cross is significantly slower than this version, despite the aesthetic appeal
     return np.array([[0, -v[2, 0], v[1, 0]], [v[2, 0], 0, -v[0, 0]], [-v[1, 0], v[0, 0], 0]])
@@ -120,7 +121,8 @@ def A(p):
     Computes a rotation matrix (A) from a given orientation vector (unit quaternion) p. Expects a column vector but will
     noisily transpose a row vector
     """
-    p = check_vector(p, 4)
+    if __debug__:
+        p = check_vector(p, 4)
 
     e = p[1:, ...]
     e0 = p[0, 0]
@@ -136,8 +138,9 @@ def B(p, a):
 
     TODO: Write down what B actually means...
     """
-    p = check_vector(p, 4)
-    a = check_vector(a, 3)
+    if __debug__:
+        p = check_vector(p, 4)
+        a = check_vector(a, 3)
 
     e = p[1:, ...]
     e0 = p[0, 0]
@@ -196,7 +199,8 @@ def R(u, Chi):
     """
     Get the rotation matrix associated with a rotation Chi around unit axis u. Rodrigues' formula
     """
-    u = check_unit_vector(u, 3)
+    if __debug__:
+        u = check_unit_vector(u, 3)
 
     return np.cos(Chi)*I3 + (1 - np.cos(Chi)) * (u @ u.T) + np.sin(Chi)*skew(u)
 
@@ -222,21 +226,10 @@ def rodrigues_rot(v, k, θ):
     """
     Uses Rodrigues' rotation formula to rotate a vector v by θ about the unit vector axis k
     """
-    v = check_vector(v, 3)
+    if __debug__:
+        v = check_vector(v, 3)
 
     return v @ R(k, θ)
-
-
-def log_map(R):
-    """
-    The logarithm map SO(3) -> so(3), from orthogonal matrix to skew-symmetric cross product matrix
-    """
-    check_SO3(R)
-
-    A = 0.5*(R - R.T)
-    A_mag = np.sqrt(-0.5*np.trace(A@A))
-
-    return A * (np.arcsin(A_mag) / A_mag)
 
 
 class Quaternion:
@@ -276,7 +269,8 @@ def rot_axis(v, θ):
     """
     Gets the quaternion representing a rotation of θ radians about the v axis
     """
-    v = check_vector(v, 3)
+    if __debug__:
+        v = check_vector(v, 3)
 
     e0 = np.array([[np.cos(θ/2)]])
     e = v * np.sin(θ/2)

@@ -6,11 +6,12 @@ Used by:    system_reps.py
 See also:   rp.gcons_rp.py, rA.gcons_ra.py
 """
 
-import numpy as np
 import warnings as warn
+
+import numpy as np
 from scipy.spatial.transform import Rotation as Rot
 
-from ..utils.physics import Constraints, skew, I3, check_SO3, generate_sympy_constraint, euler_to_rot
+from ..utils.physics import Constraints, skew, generate_sympy_constraint, euler_to_rot
 
 AI = 'a_bar_i'
 AJ = 'a_bar_j'
@@ -34,6 +35,7 @@ THETA_CRITERIA = 0.1    # When to consider an euler angle dangerously close to s
 # Causes us to error on Euler angle problems
 warn.filterwarnings(action="error", category=UserWarning)
 
+
 def from_eps(ε):
     """
     Deconstruct ε into our three angles
@@ -55,6 +57,22 @@ class Body:
         self.is_ground = is_ground
         self.id = None  # Assigned later for non-ground bodies
 
+        # Initialize parameters used for caching
+        # NOTE: These are correctly initialized only when self.ε is called, so this block must come first
+        self._cϕ = 0
+        self._sϕ = 0
+
+        self._cθ = 0
+        self._sθ = 0
+
+        self._cψ = 0
+        self._sψ = 0
+
+        self._A_ϕ = np.zeros((3, 3))
+        self._A_θ = np.zeros((3, 3))
+        self._A_ψ = np.zeros((3, 3))
+
+        # Initialize generalized coordinates
         self.r = r
         self.dr = dr
         self.ε = ε
@@ -119,7 +137,7 @@ class Body:
         term_1 = self.B.T @ skew(B_bar @ self.dε) @ self.J @ self.B @ self.dε
         term_2 = B_bar.T @ self.J @ self.dB @ self.dε
 
-        return -term_1 -term_2
+        return -term_1 - term_2
 
     def get_J_term(self):
         B_bar = self.A.T @ self.B
@@ -177,9 +195,12 @@ class Body:
         respect to the three euler angles
         """
 
-        self._A_ϕ = np.array([[-self._sψ*self._cθ*self._cϕ - self._sϕ*self._cψ, self._sψ*self._sϕ - self._cθ*self._cψ*self._cϕ, self._sθ*self._cϕ], [-self._sψ*self._sϕ*self._cθ + self._cψ*self._cϕ, -self._sψ*self._cϕ - self._sϕ*self._cθ*self._cψ, self._sθ*self._sϕ], [0, 0, 0]])
-        self._A_θ = np.array([[self._sθ*self._sψ*self._sϕ, self._sθ*self._sϕ*self._cψ, self._sϕ*self._cθ], [-self._sθ*self._sψ * self._cϕ, -self._sθ*self._cψ*self._cϕ, -self._cθ*self._cϕ], [self._sψ*self._cθ, self._cθ*self._cψ, -self._sθ]])
-        self._A_ψ = np.array([[-self._sψ*self._cϕ - self._sϕ*self._cθ*self._cψ, self._sψ*self._sϕ*self._cθ - self._cψ*self._cϕ, 0], [-self._sψ * self._sϕ + self._cθ*self._cψ*self._cϕ, -self._sψ*self._cθ*self._cϕ - self._sϕ*self._cψ, 0], [self._sθ*self._cψ, -self._sθ*self._sψ, 0]])
+        self._A_ϕ = np.array([[-self._sψ*self._cθ*self._cϕ - self._sϕ*self._cψ, self._sψ*self._sϕ - self._cθ*self._cψ*self._cϕ, self._sθ*self._cϕ],
+                              [-self._sψ*self._sϕ*self._cθ + self._cψ*self._cϕ, -self._sψ*self._cϕ - self._sϕ*self._cθ*self._cψ, self._sθ*self._sϕ], [0, 0, 0]])
+        self._A_θ = np.array([[self._sθ*self._sψ*self._sϕ, self._sθ*self._sϕ*self._cψ, self._sϕ*self._cθ], [-self._sθ*self._sψ *
+                                                                                                            self._cϕ, -self._sθ*self._cψ*self._cϕ, -self._cθ*self._cϕ], [self._sψ*self._cθ, self._cθ*self._cψ, -self._sθ]])
+        self._A_ψ = np.array([[-self._sψ*self._cϕ - self._sϕ*self._cθ*self._cψ, self._sψ*self._sϕ*self._cθ - self._cψ*self._cϕ, 0], [-self._sψ *
+                                                                                                                                     self._sϕ + self._cθ*self._cψ*self._cϕ, -self._sψ*self._cθ*self._cϕ - self._sϕ*self._cψ, 0], [self._sθ*self._cψ, -self._sθ*self._sψ, 0]])
 
     def cache_time_derivs(self):
         """
@@ -196,7 +217,7 @@ class Body:
         dAϕ = ϕ_dot * dA1 @ A2 @ A3
         dAθ = θ_dot * A1 @ dA2 @ A3
         dAψ = ψ_dot * A1 @ A2 @ dA3
-        
+
         # Ȧ
         self._dA = dAϕ + dAθ + dAψ
 
@@ -207,7 +228,7 @@ class Body:
         ddAϕ = ϕ_dot**2 * ddA1 @ A2 @ A3
         ddAθ = θ_dot**2 * A1 @ ddA2 @ A3
         ddAψ = ψ_dot**2 * A1 @ A2 @ ddA3
-        
+
         # What we denote as Ä_γ - Ä with all second derivative terms removed
         self._ddA = ddAϕ + ddAθ + ddAψ + ϕθ + θψ + ϕψ
 
@@ -240,7 +261,8 @@ class Body:
 
         ϕ, θ, ψ = from_eps(value)
 
-        self.near_singular = np.abs(np.fmod(θ, np.pi)) < THETA_CRITERIA and (not self.is_ground)
+        self.near_singular = np.abs(
+            np.fmod(θ, np.pi)) < THETA_CRITERIA and (not self.is_ground)
 
         self.cache_sin_cos(ϕ, θ, ψ)
         self.cache_A_partials()
@@ -279,10 +301,8 @@ class Body:
 
     @property
     def dB(self):
-        dϕ, dθ, dψ = from_eps(self.dε)
+        _, dθ, dψ = from_eps(self.dε)
 
-        dB = np.array([[0, -dϕ*self._sϕ, dθ*self._cθ*self._sϕ + dϕ*self._sθ*self._cϕ], [0,
-                                                                                        dϕ*self._sϕ, -dθ*self._cθ*self._cϕ + dϕ*self._sθ*self._sϕ], [0, 0, -dθ*self._sθ]])
         dB_bar = np.array([[dψ*self._cψ*self._sθ + dθ*self._sψ*self._cθ, -dψ*self._sψ, 0],
                            [-dψ*self._sψ*self._sθ+dθ*self._cψ*self._cθ, -dψ*self._cψ, 0], [-dθ*self._sθ, 0, 0]])
         return dB_bar
@@ -333,7 +353,7 @@ class DP1:
         j_term = self.ai.T @ self.body_i.A.T @ ddAj @ self.aj
         x_term = 2*self.ai.T @ dAi.T @ dAj @ self.aj
 
-        γ_rε = -i_term -x_term -j_term + self.ddf(t)
+        γ_rε = -i_term - x_term - j_term + self.ddf(t)
 
         return γ_rε
 
@@ -377,7 +397,6 @@ class DP1:
 
         if self.body_j.id == body_id:
             self.aj = flip_mat @ self.aj
-
 
 
 class DP2:
@@ -464,10 +483,13 @@ class DP2:
         dijT = self.d_ij().T
 
         if not self.body_i.is_ground:
-            i_term = np.block([[dijT @ Ai_ϕ @ self.ai, dijT @ Ai_θ @ self.ai, dijT @ Ai_ψ @ self.ai]]) - np.block([[aiT @ Ai_ϕ @ self.si, aiT @ Ai_θ @ self.si, aiT @ Ai_ψ @ self.si]])
+            i_term = np.block([[dijT @ Ai_ϕ @ self.ai, dijT @ Ai_θ @ self.ai, dijT @ Ai_ψ @ self.ai]]) - \
+                np.block(
+                    [[aiT @ Ai_ϕ @ self.si, aiT @ Ai_θ @ self.si, aiT @ Ai_ψ @ self.si]])
             Φε.append((self.body_i.id, i_term))
         if not self.body_j.is_ground:
-            j_term = np.block([[aiT @ Aj_ϕ @ self.sj, aiT @ Aj_θ @ self.sj, aiT @ Aj_ψ @ self.sj]])
+            j_term = np.block(
+                [[aiT @ Aj_ϕ @ self.sj, aiT @ Aj_θ @ self.sj, aiT @ Aj_ψ @ self.sj]])
             Φε.append((self.body_j.id, j_term))
 
         return Φε
@@ -479,7 +501,7 @@ class DP2:
         if self.body_i.id == body_id:
             self.ai = flip_mat @ self.ai
             self.si = flip_mat @ self.si
-            
+
         if self.body_j.id == body_id:
             self.sj = flip_mat @ self.sj
 
@@ -527,7 +549,8 @@ class D:
         ddAj = self.body_j.ddA
 
         # First time derivative of d_{ij}
-        d_dot = (self.body_j.dr - self.body_i.dr) + (dAj @ self.sj - dAi @ self.si)
+        d_dot = (self.body_j.dr - self.body_i.dr) + \
+            (dAj @ self.sj - dAi @ self.si)
 
         # Three terms, we took the second derivative of the product A d_ij, each term is one of the terms in the expansion
         term_1 = -2*d_dot.T @ d_dot
@@ -562,10 +585,14 @@ class D:
         dijT = dij.T
 
         if not self.body_i.is_ground:
-            term_i = -np.block([[dijT @ Ai_ϕ @ self.si, dijT @ Ai_θ @ self.si, dijT @ Ai_ψ @ self.si]])- np.block([[self.si.T @ Ai_ϕ.T @ dij, self.si.T @ Ai_θ.T @ dij, self.si.T @ Ai_ψ.T @ dij]])
-            Φε.append((self.body_i.id, term_i)) 
+            term_i = -np.block([[dijT @ Ai_ϕ @ self.si, dijT @ Ai_θ @ self.si, dijT @ Ai_ψ @ self.si]]) - \
+                np.block([[self.si.T @ Ai_ϕ.T @ dij, self.si.T @
+                           Ai_θ.T @ dij, self.si.T @ Ai_ψ.T @ dij]])
+            Φε.append((self.body_i.id, term_i))
         if not self.body_j.is_ground:
-            term_j = np.block([[dijT @ Aj_ϕ @ self.sj, dijT @ Aj_θ @ self.sj, dijT @ Aj_ψ @ self.sj]]) + np.block([[self.sj.T @ Aj_ϕ.T @ dij, self.sj.T @ Aj_θ.T @ dij, self.sj.T @ Aj_ψ.T @ dij]])
+            term_j = np.block([[dijT @ Aj_ϕ @ self.sj, dijT @ Aj_θ @ self.sj, dijT @ Aj_ψ @ self.sj]]) + \
+                np.block([[self.sj.T @ Aj_ϕ.T @ dij, self.sj.T @
+                           Aj_θ.T @ dij, self.sj.T @ Aj_ψ.T @ dij]])
             Φε.append((self.body_j.id, term_j))
 
         return Φε
@@ -583,9 +610,10 @@ class D:
         """
         if self.body_i.id == body_id:
             self.si = flip_mat @ self.si
-            
+
         if self.body_j.id == body_id:
             self.sj = flip_mat @ self.sj
+
 
 class CD:
     cons_type = Constraints.CD
@@ -664,9 +692,10 @@ class CD:
         """
         if self.body_i.id == body_id:
             self.si = flip_mat @ self.si
-            
+
         if self.body_j.id == body_id:
             self.sj = flip_mat @ self.sj
+
 
 class ConGroup:
     def __init__(self, con_list, nb):
@@ -694,10 +723,10 @@ class ConGroup:
 
     def maybe_swap_gcons(self, t):
         """Check if a g-con is close to being singular and if so swap it with the provided alternate"""
-        
+
         if self.alt_gcon is None or self.alt_index is None:
             return
-            
+
         if np.abs(np.abs(self.cons[self.alt_index].f(t)) - 1) < 0.1:
             self.cons[self.alt_index], self.alt_gcon = self.alt_gcon, self.cons[self.alt_index]
 

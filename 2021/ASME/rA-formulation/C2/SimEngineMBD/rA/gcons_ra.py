@@ -331,21 +331,25 @@ class D:
     def get_phi_r(self, t):
         Φr = []
 
+        dij = self.d_ij()
+
         if not self.body_i.is_ground:
-            Φr.append((self.body_i.id, -2*self.d_ij().T))
+            Φr.append((self.body_i.id, -2*dij.T))
         if not self.body_j.is_ground:
-            Φr.append((self.body_j.id, 2*self.d_ij().T))
+            Φr.append((self.body_j.id, 2*dij.T))
 
         return Φr
 
     def get_pi(self, t):
         Π = []
 
+        dij = self.d_ij()
+
         if not self.body_i.is_ground:
-            term_i = 2*self.d_ij().T @ self.body_i.A @ skew(self.si)
+            term_i = 2*dij.T @ self.body_i.A @ skew(self.si)
             Π.append((self.body_i.id, term_i))
         if not self.body_j.is_ground:
-            term_j = -2*self.d_ij().T @ self.body_j.A @ skew(self.sj)
+            term_j = -2*dij.T @ self.body_j.A @ skew(self.sj)
             Π.append((self.body_j.id, term_j))
 
         return Π
@@ -356,6 +360,7 @@ class D:
         self.f = f
         self.df = df
         self.ddf = ddf
+
 
 class CD:
     cons_type = Constraints.CD
@@ -441,6 +446,7 @@ class CD:
 
         return np.block([[a11, np.zeros((3, 3))], [np.zeros((3, 3)), a22]])
 
+
 class ConGroup:
     def __init__(self, con_list, nb):
         self.cons = con_list
@@ -467,10 +473,10 @@ class ConGroup:
 
     def maybe_swap_gcons(self, t):
         """Check if a g-con is close to being singular and if so swap it with the provided alternate"""
-        
+
         if self.alt_gcon is None or self.alt_index is None:
             return
-            
+
         if np.abs(np.abs(self.cons[self.alt_index].f(t)) - 1) < 0.1:
             self.cons[self.alt_index], self.alt_gcon = self.alt_gcon, self.cons[self.alt_index]
 
