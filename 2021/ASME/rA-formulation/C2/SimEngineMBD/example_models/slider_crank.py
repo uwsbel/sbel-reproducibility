@@ -15,9 +15,10 @@ import numpy as np
 import sympy as sp
 
 from ..utils.physics import Y_AXIS, Z_AXIS
-from ..utils.tools import standard_setup
+from ..utils.tools import standard_setup, profiler, print_profiling
 
 π = np.pi
+
 
 def setup_slider_crank(args=None):
     """
@@ -25,9 +26,11 @@ def setup_slider_crank(args=None):
     """
 
     # Set up command-line options
-    parser = arg.ArgumentParser(description='Simulation of a Haug\'s slider-crank model')
+    parser = arg.ArgumentParser(
+        description='Simulation of a Haug\'s slider-crank model')
 
-    model_file = os.path.join(os.path.dirname(__file__), 'models/slider_crank.json')
+    model_file = os.path.join(os.path.dirname(
+        __file__), 'models/slider_crank.json')
 
     # Get system and change some settings
     sys, params = standard_setup(parser, model_file, args)
@@ -60,6 +63,7 @@ def setup_slider_crank(args=None):
     sys.g_cons.alt_index = len(sys.g_cons.cons) - 1
 
     return sys, params
+
 
 def run_slider_crank(args=None):
     """
@@ -108,13 +112,15 @@ def run_slider_crank(args=None):
     if params.plot:
         _, ax1 = plt.subplots()
         ax1.plot(t_grid, pos_data[2, 0, :], 'k')
-        ax1.set(xlabel='time [s]', ylabel='position [m]', title='Position of slider')
+        ax1.set(xlabel='time [s]', ylabel='position [m]',
+                title='Position of slider')
         plt.xticks(np.arange(0, 1.2, 0.2))
         plt.yticks(np.arange(0, 0.35, 0.05))
 
         _, ax2 = plt.subplots()
         ax2.plot(t_grid, vel_data[2, 0, :], 'k')
-        ax2.set(xlabel='time [s]', ylabel='velocity [m/s]', title='Velocity of slider')
+        ax2.set(xlabel='time [s]', ylabel='velocity [m/s]',
+                title='Velocity of slider')
         plt.xticks(np.arange(0, 1.2, 0.2))
         plt.yticks(np.arange(-0.6, 0.7, 0.1))
 
@@ -146,6 +152,7 @@ def run_slider_crank(args=None):
 
     return pos_data, vel_data, acc_data, num_iters, t_grid
 
+
 def time_slider_crank(args=None):
     """
     Runs and times the slider crank simulation, saving off no data
@@ -164,6 +171,27 @@ def time_slider_crank(args=None):
     Δt = process_time() - start
 
     return Δt
+
+
+def profile_slider_crank(args=None):
+    """
+    Profiles the slider crank simulation, saving off no data
+    """
+
+    sys, params = setup_slider_crank(args)
+
+    sys.initialize()
+
+    t_steps = int(params.t_end/params.h)
+    t_grid = np.linspace(0, params.t_end, t_steps, endpoint=True)
+
+    profiler.enable()
+    for i, t in enumerate(t_grid):
+        sys.do_step(i, t)
+    profiler.disable()
+
+    print_profiling(profiler)
+
 
 if __name__ == '__main__':
     run_slider_crank()

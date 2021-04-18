@@ -4,7 +4,6 @@ import numpy as np
 import sympy as sp
 from enum import Enum, auto
 from collections import namedtuple
-from scipy.spatial.transform import Rotation as Rot
 
 I3 = np.identity(3)
 
@@ -17,6 +16,8 @@ Z_AXIS = np.array([[0], [0], [1]])  # z-up
 BDFVals = namedtuple('BDFVals', ['β', 'α'])
 bdf1 = BDFVals(β=1, α=[-1, 1, 0])
 bdf2 = BDFVals(β=2/3, α=[-1, 4/3, -1/3])
+
+
 class Constraints(Enum):
     DP1 = auto()
     DP2 = auto()
@@ -66,7 +67,8 @@ def check_SO3(mat):
     if det_diff > tol**2:
         logging.warning('|det(mat) -1| = ' + str(det_diff))
     if det_diff > tol:
-        raise ValueError('Matrix was non-orthogonal: |det(mat) -1| = {}'.format(det_diff))
+        raise ValueError(
+            'Matrix was non-orthogonal: |det(mat) -1| = {}'.format(det_diff))
 
 
 def check_vector(v, n):

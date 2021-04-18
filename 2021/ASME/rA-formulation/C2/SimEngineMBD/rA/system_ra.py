@@ -1,5 +1,4 @@
 import logging
-import json as js
 
 import numpy as np
 from scipy.linalg import lu_factor, lu_solve
@@ -40,7 +39,12 @@ class SystemRA:
         self.Φ = np.zeros((self.nc, 1))
         self.Φ_r = np.zeros((self.nc, 3*self.nb))
         self.Π = np.zeros((self.nc, 3*self.nb))
+        self.Φq = np.zeros((self.nc, 6*self.nb))
         self.λ = np.zeros((self.nc, 1))
+
+        # Storage arrays for dynamics
+        self.ddr = np.zeros((3*self.nb, 1))
+        self.J_term = np.zeros((3*self.nb, 1))
 
     def set_dynamics(self):
         if self.is_initialized:
@@ -65,8 +69,6 @@ class SystemRA:
         self.g_acc = g
 
     def initialize(self):
-
-        # TODO print info about system setup here
 
         for body in self.bodies:
             body.F += body.m * self.g_acc
@@ -158,12 +160,17 @@ class SystemRA:
         # Setup and do Newton-Raphson Iteration
         self.k = 0
         while True:
-            for body in self.bodies:
+            for j, body in enumerate(self.bodies):
                 body.dr = body.dr_prev + self.h*body.ddr
                 body.ω = body.ω_prev + self.h*body.dω
 
                 body.r = body.r_prev + self.h*body.dr
                 body.A = body.A_prev @ exp(self.h*skew(body.ω))
+
+                # Conceptually these go lower, but this way we just loop over bodies once
+                self.ddr[3*j:3*(j + 1)] = body.ddr
+                self.J_term[3*j:3*(j + 1)] = body.J @ body.dω + \
+                    (skew(body.ω) @ body.J @ body.ω)
 
             # Compute values needed for the g matrix
             # We can't move this outside the loop since the g_cons
@@ -172,12 +179,9 @@ class SystemRA:
             self.Φ_r = self.g_cons.get_phi_r(t)
             self.Π = self.g_cons.get_pi(t)
 
-            ddr = np.vstack([body.ddr for body in self.bodies])
-
             # Form g matrix
-            g0 = self.M @ ddr + self.Φ_r.T @ self.λ - self.F_ext
-            g1 = np.vstack([body.J @ body.dω + (skew(body.ω) @ body.J @ body.ω)
-                            for body in self.bodies]) + self.Π.T @ self.λ
+            g0 = self.M @ self.ddr + self.Φ_r.T @ self.λ - self.F_ext
+            g1 = self.J_term + self.Π.T @ self.λ
             g2 = 1/self.h**2 * self.Φ
             g = np.block([[g0], [g1], [g2]])
 
