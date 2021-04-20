@@ -9,8 +9,6 @@ import rA_gcons as gcons
 import json as js
 import numpy as np
 import matplotlib.pyplot as plt
-from copy import copy
-
 import time
 import logging
 from scipy.linalg import lu_factor, lu_solve
@@ -33,7 +31,7 @@ class rASimEngine3D:
         # simulation parameters
         self.h = 0.001
         self.t_start = 0
-        self.t_end = 1
+        self.t_end = 3
         self.tspan = None
         self.N = None
         self.t_grid = None
@@ -60,18 +58,17 @@ class rASimEngine3D:
             model = js.load(f)
             bodies = model['bodies']
             constraints = model['constraints']
-
-        for body in bodies:
-            self.bodies_list.append(RigidBody(body))
+        # list of non-ground bodies
+        self.bodies_list = [body for body in bodies if not body.is_ground]
 
         for con in constraints:
-            for body in self.bodies_list:
+            for body in bodies:
                 if body.body_id == con['body_i']:
                     body_i = body
-                    logging.info("body_i found")
+                    #logging.info("body_i found")
                 if body.body_id == con['body_j']:
                     body_j = body
-                    logging.info("body_j found")
+                    #logging.info("body_j found")
             if con['type'] == 'DP1':
                 self.constraint_list.append(gcons.GConDP1(con, body_i, body_j))
             elif con['type'] == 'DP2':
@@ -89,22 +86,23 @@ class rASimEngine3D:
         self.tspan = self.t_end - self.t_start
         self.N = int(self.tspan / self.h)
         self.t_grid = np.linspace(self.t_start, self.t_end, self.N, endpoint=True)
-        self.r_sol = np.zeros((self.N, 3 * self.nb))
-        self.r_dot_sol = np.zeros((self.N, 3 * self.nb))
-        self.r_ddot_sol = np.zeros((self.N, 3 * self.nb))
+        # self.r_sol = np.zeros((self.N, 3 * self.nb))
+        # self.r_dot_sol = np.zeros((self.N, 3 * self.nb))
+        # self.r_ddot_sol = np.zeros((self.N, 3 * self.nb))
 
     def kinematics_solver(self):
-        logging.info("Number of bodies counted:", self.nb)
+       # logging.info("Number of bodies counted:", self.nb)
         self.initialize_plotting()
-        iterations = np.zeros((self.N, 1))
+       # iterations = np.zeros((self.N, 1))
 
-        start = time.perf_counter()
+        # start = time.perf_counter()
+        start = time.process_time()
         for i, t in enumerate(self.t_grid):
             # check for driving constraint singularity
             if np.abs(np.abs(self.constraint_list[-1].prescribed_val.f(t)) - 1) < 0.1:
-                logging.info("Switching to alternative constraint. Time = ", t)
+                #logging.info("Switching to alternative constraint. Time = ", t)
                 if self.alternative_driver is None:
-                    logging.warning("Alternative driving constraint not defined.")
+                    #logging.warning("Alternative driving constraint not defined.")
                     break
                 self.constraint_list[-1], self.alternative_driver = self.alternative_driver, self.constraint_list[-1]
 
@@ -117,61 +115,50 @@ class rASimEngine3D:
                 delta_q = lu_solve(Phi_q_lu, -Phi)
 
                 for body in self.bodies_list:
-                    if body.is_ground:
-                        pass
-                    else:
-                        body.r = body.r + delta_q[(body.body_id - 1) * 3:((body.body_id - 1) * 3) + 3, :]
-                        theta = delta_q[3 * self.nb + (body.body_id - 1) * self.nb:3 * self.nb + (
-                                    body.body_id - 1) * self.nb + 3, :]
-                        theta_norm = np.linalg.norm(theta)
-                        if theta_norm != 0:
-                            body.A = body.A @ R(theta / theta_norm, theta_norm)
+                    body.r = body.r + delta_q[(body.body_id - 1) * 3:((body.body_id - 1) * 3) + 3, :]
+                    theta = delta_q[3 * self.nb + (body.body_id - 1) * self.nb:3 * self.nb + (
+                                body.body_id - 1) * self.nb + 3, :]
+                    theta_norm = np.linalg.norm(theta)
+                    if theta_norm != 0:
+                        body.A = body.A @ R(theta / theta_norm, theta_norm)
 
                 iteration += 1
                 if iteration >= self.max_iters:
-                    logging.warning("Newton-Raphson has not converged after", str(self.max_iters),
-                                    "iterations. Stopping.")
+                    #logging.warning("Newton-Raphson has not converged after", str(self.max_iters),
+                                    #"iterations. Stopping.")
                     break
                 if np.linalg.norm(delta_q) < self.tol:
                     break
-            logging.info("Newton-Raphson took", str(iteration), "iterations to converge.")
-            iterations[i] = iteration
+            #logging.info("Newton-Raphson took", str(iteration), "iterations to converge.")
+            #iterations[i] = iteration
 
             Phi_q = self.get_sensitivities()
             Phi_q_lu = lu_factor(Phi_q)
             # calculate velocity
             q_dot = lu_solve(Phi_q_lu, self.get_nu(t))
             for body in self.bodies_list:
-                if body.is_ground:
-                    pass
-                else:
-                    body.r_dot = q_dot[(body.body_id - 1) * 3:(body.body_id - 1) * 3 + 3, :]
-                    body.omega = q_dot[3 * self.nb + (body.body_id - 1) * self.nb:3 * self.nb + (
+                body.r_dot = q_dot[(body.body_id - 1) * 3:(body.body_id - 1) * 3 + 3, :]
+                body.omega = q_dot[3 * self.nb + (body.body_id - 1) * self.nb:3 * self.nb + (
                                 body.body_id - 1) * self.nb + 3, :]
 
             # calculate acceleration
-            Phi_q = self.get_sensitivities()
-            Phi_q_lu = lu_factor(Phi_q)
             q_ddot = lu_solve(Phi_q_lu, self.get_gamma(t))
             for body in self.bodies_list:
-                if body.is_ground:
-                    pass
-                else:
-                    body.r_ddot = q_ddot[(body.body_id - 1) * 3:(body.body_id - 1) * 3 + 3, :]
-                    body.omega_dot = q_ddot[3 * self.nb + (body.body_id - 1) * self.nb:3 * self.nb + (
+                body.r_ddot = q_ddot[(body.body_id - 1) * 3:(body.body_id - 1) * 3 + 3, :]
+                body.omega_dot = q_ddot[3 * self.nb + (body.body_id - 1) * self.nb:3 * self.nb + (
                                 body.body_id - 1) * self.nb + 3, :]
-                    # store solution in array for plotting
-                    self.r_sol[i, (body.body_id - 1) * 3:(body.body_id - 1) * 3 + 3] = body.r.T
-                    self.r_dot_sol[i, (body.body_id - 1) * 3:(body.body_id - 1) * 3 + 3] = body.r_dot.T
-                    self.r_ddot_sol[i, (body.body_id - 1) * 3:(body.body_id - 1) * 3 + 3] = body.r_ddot.T
+                    # # store solution in array for plotting
+                    # self.r_sol[i, (body.body_id - 1) * 3:(body.body_id - 1) * 3 + 3] = body.r.T
+                    # self.r_dot_sol[i, (body.body_id - 1) * 3:(body.body_id - 1) * 3 + 3] = body.r_dot.T
+                    # self.r_ddot_sol[i, (body.body_id - 1) * 3:(body.body_id - 1) * 3 + 3] = body.r_ddot.T
 
-        self.duration = time.perf_counter() - start
-        self.avg_iterations = np.mean(iterations)
-        logging.info('Avg. iterations: {}'.format(self.avg_iterations))
+        self.duration = time.process_time() - start
+        # self.avg_iterations = np.mean(iterations)
+        # logging.info('Avg. iterations: {}'.format(self.avg_iterations))
         print('Simulation time: {}'.format(self.duration))
 
     def dynamics_solver(self):
-        logging.info("Number of bodies counted: ", self.nb)
+        #logging.info("Number of bodies counted: ", self.nb)
         self.initialize_plotting()
 
         # Need to solve for initial accelerations using our EOM and constraints
@@ -185,97 +172,86 @@ class rASimEngine3D:
         # solve to find initial accelerations and lagrange multipliers, vector z
         z = np.linalg.solve(self.get_psi(), eom_rhs)
         for body in self.bodies_list:
-            if body.is_ground:
-                pass
-            else:
-                body.r_ddot = z[(body.body_id - 1) * 3:(body.body_id - 1) * 3 + 3]
-                body.omega_dot = z[3 * self.nb + (body.body_id - 1) * 3:3 * self.nb + (body.body_id - 1) * 3 + 3]
-                # for plotting
-                self.r_sol[0, (body.body_id - 1) * 3:(body.body_id - 1) * 3 + 3] = body.r.T
-                self.r_dot_sol[0, (body.body_id - 1) * 3:(body.body_id - 1) * 3 + 3] = body.r_dot.T
-                self.r_ddot_sol[0, (body.body_id - 1) * 3:(body.body_id - 1) * 3 + 3] = body.r_ddot.T
+            body.r_ddot = z[(body.body_id - 1) * 3:(body.body_id - 1) * 3 + 3]
+            body.omega_dot = z[3 * self.nb + (body.body_id - 1) * 3:3 * self.nb + (body.body_id - 1) * 3 + 3]
+            # for plotting
+            # self.r_sol[0, (body.body_id - 1) * 3:(body.body_id - 1) * 3 + 3] = body.r.T
+            # self.r_dot_sol[0, (body.body_id - 1) * 3:(body.body_id - 1) * 3 + 3] = body.r_dot.T
+            # self.r_ddot_sol[0, (body.body_id - 1) * 3:(body.body_id - 1) * 3 + 3] = body.r_ddot.T
 
-                body.r_prev = body.r
-                body.A_prev = body.A
-                body.r_dot_prev = body.r_dot
-                body.omega_prev = body.omega
+            body.r_prev = body.r
+            body.A_prev = body.A
+            body.r_dot_prev = body.r_dot
+            body.omega_prev = body.omega
 
         self.lam = z[6 * self.nb:]
 
-        iterations = np.zeros((self.N, 1))
-        start = time.perf_counter()
+        #iterations = np.zeros((self.N, 1))
+        # start = time.perf_counter()
+        start = time.process_time()
         for i, t in enumerate(self.t_grid):
             if i == 0:
                 continue
 
             # check for driving constraint singularity
             if np.abs(np.abs(self.constraint_list[-1].prescribed_val.f(t)) - 1) < 0.1:
-                logging.info("Switching to alternative constraint. Time = ", t)
+               # logging.info("Switching to alternative constraint. Time = ", t)
                 if self.alternative_driver is None:
-                    logging.warning("Alternative driving constraint not defined.")
+                    #logging.warning("Alternative driving constraint not defined.")
                     break
                 self.constraint_list[-1], self.alternative_driver = self.alternative_driver, self.constraint_list[-1]
 
             psi = self.get_psi()
             psi_lu = lu_factor(psi)
             for body in self.bodies_list:
-                if body.is_ground:
-                    pass
-                else:
-                    body.r_prev = body.r
-                    body.A_prev = body.A
-                    body.r_dot_prev = body.r_dot
-                    body.omega_prev = body.omega
+                body.r_prev = body.r
+                body.A_prev = body.A
+                body.r_dot_prev = body.r_dot
+                body.omega_prev = body.omega
 
             # Begin Newton Iteration
             iteration = 0
             delta_norm = 2 * self.tol  # initialize larger than tolerance so loop begins
             while delta_norm > self.tol:
                 for body in self.bodies_list:
-                    if body.is_ground:
-                        pass
-                    else:
-                        body.r_dot = body.r_dot_prev + self.h * body.r_ddot
-                        body.omega = body.omega_prev + self.h * body.omega_dot
-                        body.r = body.r_prev + self.h * body.r_dot
-                        theta_mat = self.h * gcons.skew(body.omega)
-                        theta = np.array([[theta_mat[2,1]], [theta_mat[0,2]], [theta_mat[1,0]]])
-                        theta_norm = np.linalg.norm(theta)
-                        if theta_norm != 0:
-                            body.A = body.A_prev @ R(theta / theta_norm, theta_norm)
+                    body.r_dot = body.r_dot_prev + self.h * body.r_ddot
+                    body.omega = body.omega_prev + self.h * body.omega_dot
+                    body.r = body.r_prev + self.h * body.r_dot
+                    theta_mat = self.h * gcons.skew(body.omega)
+                    theta = np.array([[theta_mat[2,1]], [theta_mat[0,2]], [theta_mat[1,0]]])
+                    theta_norm = np.linalg.norm(theta)
+                    if theta_norm != 0:
+                        body.A = body.A_prev @ R(theta / theta_norm, theta_norm)
 
                 g = self.get_residual(t)
                 delta = lu_solve(psi_lu, -g)
 
                 for body in self.bodies_list:
-                    if body.is_ground:
-                        pass
-                    else:
-                        body.r_ddot = body.r_ddot + delta[(body.body_id - 1) * 3:(body.body_id - 1) * 3 + 3]
-                        body.omega_dot = body.omega_dot + delta[3 * self.nb + (body.body_id - 1) * 3:3 * self.nb + (body.body_id - 1) * 3 + 3]
+                    body.r_ddot = body.r_ddot + delta[(body.body_id - 1) * 3:(body.body_id - 1) * 3 + 3]
+                    body.omega_dot = body.omega_dot + delta[3 * self.nb + (body.body_id - 1) * 3:3 * self.nb + (body.body_id - 1) * 3 + 3]
 
                 self.lam += delta[6 * self.nb:]
 
                 delta_norm = np.linalg.norm(delta)
                 iteration += 1
                 if iteration >= self.max_iters:
-                    logging.warning("Solution has not converged after", str(self.max_iters), "iterations. Stopping.")
+                    #logging.warning("Solution has not converged after", str(self.max_iters), "iterations. Stopping.")
                     break
 
-            iterations[i] = iteration
+            #iterations[i] = iteration
 
-            for body in self.bodies_list:
-                if body.is_ground:
-                    pass
-                else:
-                    # store solution in array for plotting
-                    self.r_sol[i, (body.body_id - 1) * 3:(body.body_id - 1) * 3 + 3] = body.r.T
-                    self.r_dot_sol[i, (body.body_id - 1) * 3:(body.body_id - 1) * 3 + 3] = body.r_dot.T
-                    self.r_ddot_sol[i, (body.body_id - 1) * 3:(body.body_id - 1) * 3 + 3] = body.r_ddot.T
+            # for body in self.bodies_list:
+            #     if body.is_ground:
+            #         pass
+            #     else:
+            #         # store solution in array for plotting
+            #         self.r_sol[i, (body.body_id - 1) * 3:(body.body_id - 1) * 3 + 3] = body.r.T
+            #         self.r_dot_sol[i, (body.body_id - 1) * 3:(body.body_id - 1) * 3 + 3] = body.r_dot.T
+            #         self.r_ddot_sol[i, (body.body_id - 1) * 3:(body.body_id - 1) * 3 + 3] = body.r_ddot.T
 
-        self.duration = time.perf_counter() - start
-        self.avg_iterations = np.mean(iterations)
-        logging.info('Avg. iterations: {}'.format(self.avg_iterations))
+        self.duration = time.process_time() - start
+        # self.avg_iterations = np.mean(iterations)
+        # logging.info('Avg. iterations: {}'.format(self.avg_iterations))
         print('Simulation time: {}'.format(self.duration))
 
     # ============================ System variable getter functions ===============================
@@ -289,9 +265,8 @@ class rASimEngine3D:
         offset = 3 * self.nb
 
         for row, con in enumerate(self.constraint_list):
-            # subtract 1 since ground body does not show up in jacobian
-            idi = con.body_i.body_id - 1
-            idj = con.body_j.body_id - 1
+            idi = con.body_i.body_id
+            idj = con.body_j.body_id
             if con.body_i.is_ground:
                 # fill row of jacobian with only body j
                 jacobian[row, 3 * idj:3 * idj + 3] = con.r_sensitivity()
@@ -322,47 +297,35 @@ class rASimEngine3D:
         f_g_mat = np.zeros((3 * self.nb, 1))
         idx = 0
         for body in self.bodies_list:
-            if body.is_ground:
-                pass
-            else:
-                f_g_mat[idx * 3:idx * 3 + 3] = np.array([[0], [0], [body.m * self.g]])
-                idx += 1
+            f_g_mat[idx * 3:idx * 3 + 3] = np.array([[0], [0], [body.m * self.g]])
+            idx += 1
         return f_g_mat
 
     def get_M(self):
         m_mat = np.zeros((3 * self.nb, 3 * self.nb))
         idx = 0
         for body in self.bodies_list:
-            if body.is_ground:
-                pass
-            else:
-                m_mat[idx * 3:idx * 3 + 3, idx * 3:idx * 3 + 3] = body.m * np.eye(3)
-                idx += 1
+            m_mat[idx * 3:idx * 3 + 3, idx * 3:idx * 3 + 3] = body.m * np.eye(3)
+            idx += 1
         return m_mat
 
     def get_J(self):
         j_mat = np.zeros((3 * self.nb, 3 * self.nb))
         idx = 0
         for body in self.bodies_list:
-            if body.is_ground:
-                pass
-            else:
-                j_mat[idx * 3:idx * 3 + 3, idx * 3:idx * 3 + 3] = body.J - self.h*(gcons.skew(body.J @ body.omega) -
-                                                                                   gcons.skew(body.omega) @ body.J) #+ body.n_omega
-                idx += 1
+            j_mat[idx * 3:idx * 3 + 3, idx * 3:idx * 3 + 3] = body.J - self.h*(gcons.skew(body.J @ body.omega) -
+                                                                               gcons.skew(body.omega) @ body.J) #+ body.n_omega
+            idx += 1
         return j_mat
 
     def get_tau(self):
         tau = np.zeros((3 * self.nb, 1))
         idx = 0
         for body in self.bodies_list:
-            if body.is_ground:
-                pass
-            else:
-                n_bar = np.zeros((3, 1))
-                omega_bar = body.omega
-                tau[idx * 3:idx * 3 + 3] = n_bar - gcons.skew(omega_bar) @ body.J @ omega_bar
-                idx += 1
+            n_bar = np.zeros((3, 1))
+            omega_bar = body.omega
+            tau[idx * 3:idx * 3 + 3] = n_bar - gcons.skew(omega_bar) @ body.J @ omega_bar
+            idx += 1
         return tau
 
     def get_residual(self, t):
@@ -370,12 +333,9 @@ class rASimEngine3D:
         omega_bar = np.zeros((3 * self.nb, 1))
         omega_bar_dot = np.zeros((3 * self.nb, 1))
         for body in self.bodies_list:
-            if body.is_ground:
-                pass
-            else:
-                r_ddot[(body.body_id - 1) * 3:(body.body_id - 1) * 3 + 3] = body.r_ddot
-                omega_bar[(body.body_id - 1) * 3:(body.body_id - 1) * 3 + 3] = body.omega
-                omega_bar_dot[(body.body_id - 1) * 3:(body.body_id - 1) * 3 + 3] = body.omega_dot
+            r_ddot[(body.body_id - 1) * 3:(body.body_id - 1) * 3 + 3] = body.r_ddot
+            omega_bar[(body.body_id - 1) * 3:(body.body_id - 1) * 3 + 3] = body.omega
+            omega_bar_dot[(body.body_id - 1) * 3:(body.body_id - 1) * 3 + 3] = body.omega_dot
 
         M = self.get_M()
         lam = self.lam
@@ -387,11 +347,8 @@ class rASimEngine3D:
         g_row1 = M @ r_ddot + Phi_r.T @ lam - F_g
         g_row2 = np.zeros((3 * self.nb, 1))
         for body in self.bodies_list:
-            if body.is_ground:
-                pass
-            else:
-                g_row2[(body.body_id - 1) * 3:(body.body_id - 1) * 3 + 3] = body.J @ body.omega_dot + (
-                            gcons.skew(body.omega) @ body.J @ body.omega)
+            g_row2[(body.body_id - 1) * 3:(body.body_id - 1) * 3 + 3] = body.J @ body.omega_dot + (
+                        gcons.skew(body.omega) @ body.J @ body.omega)
         g_row2 += Pi.T @ lam
         g_row3 = 1 / self.h ** 2 * Phi
         g = np.block([[g_row1],
