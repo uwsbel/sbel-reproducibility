@@ -7,7 +7,7 @@ See also:   rp.gcons_rp.py, rEps.gcons_reps.py
 """
 
 import numpy as np
-from ..utils.physics import Constraints, skew, I3, check_SO3, generate_sympy_constraint
+from ..utils.physics import Constraints, skew, I3, check_SO3, generate_sympy_constraint, create_col_slice
 
 AI = 'a_bar_i'
 AJ = 'a_bar_j'
@@ -120,6 +120,8 @@ class DP1:
         self.df = lambda t: 0
         self.ddf = lambda t: 0
 
+        self.col_slice = create_col_slice(self.body_i.id, self.body_j.id, 3)
+
     @classmethod
     def init_from_dict(cls, dict, body_i, body_j):
         ai = np.array([dict[AI]]).T
@@ -149,18 +151,21 @@ class DP1:
         return self.df(t)
 
     def get_phi_r(self, t):
-        return []
+        return np.zeros(np.shape(self.col_slice[0]))
 
     def get_pi(self, t):
         Ai = self.body_i.A
         Aj = self.body_j.A
 
-        Π = []
-        if not self.body_i.is_ground:
-            Π.append((self.body_i.id, -self.aj.T @ Aj.T @ Ai @ skew(self.ai)))
-        if not self.body_j.is_ground:
-            Π.append((self.body_j.id, -self.ai.T @ Ai.T @ Aj @ skew(self.aj)))
-        return Π
+        # Π = []
+        if self.body_i.is_ground:
+            # Π.append((self.body_i.id, -self.aj.T @ Aj.T @ Ai @ skew(self.ai)))
+            return -self.ai.T @ Ai.T @ Aj @ skew(self.aj)
+        if self.body_j.is_ground:
+            # Π.append((self.body_j.id, -self.ai.T @ Ai.T @ Aj @ skew(self.aj)))
+            return -self.aj.T @ Aj.T @ Ai @ skew(self.ai)
+        # return Π
+        return np.concatenate((-self.aj.T @ Aj.T @ Ai @ skew(self.ai), -self.ai.T @ Ai.T @ Aj @ skew(self.aj)), axis=1)
 
     def get_reaction_force_r(self, t):
         nb = 1 if self.body_i.is_ground or self.body_j.is_ground else 2
@@ -211,6 +216,8 @@ class DP2:
         self.df = lambda t: 0
         self.ddf = lambda t: 0
 
+        self.col_slice = create_col_slice(self.body_i.id, self.body_j.id, 3)
+
     @classmethod
     def init_from_dict(cls, dict, body_i, body_j):
         ai = np.array([dict[AI]]).T
@@ -246,29 +253,31 @@ class DP2:
         return self.df(t)
 
     def get_phi_r(self, t):
-        Φr = []
+        # Φr = []
 
         ai = self.ai.T @ self.body_i.A.T
-        if not self.body_i.is_ground:
-            Φr.append((self.body_i.id, -ai))
-        if not self.body_j.is_ground:
-            Φr.append((self.body_j.id, ai))
+        if self.body_i.is_ground:
+            # Φr.append((self.body_i.id, -ai))
+            return ai
+        if self.body_j.is_ground:
+            # Φr.append((self.body_j.id, ai))
+            return -ai
 
-        return Φr
+        # return Φr
+        return np.concatenate((-ai, ai), axis=1)
 
     def get_pi(self, t):
-        Π = []
+        # Π = []
 
-        if not self.body_i.is_ground:
-            i_term = self.ai.T @ skew(
-                self.si) - self.d_ij().T @ self.body_i.A @ skew(self.ai)
-            Π.append((self.body_i.id, i_term))
-        if not self.body_j.is_ground:
-            j_term = - \
-                self.ai.T @ self.body_i.A.T @ self.body_j.A @ skew(self.sj)
-            Π.append((self.body_j.id, j_term))
+        if self.body_i.is_ground:
+            # Π.append((self.body_j.id, j_term))
+            return -self.ai.T @ self.body_i.A.T @ self.body_j.A @ skew(self.sj)
+        if self.body_j.is_ground:
+            # Π.append((self.body_i.id, i_term))
+            return self.ai.T @ skew(self.si) - self.d_ij().T @ self.body_i.A @ skew(self.ai)
 
-        return Π
+        # return Π
+        return np.concatenate((self.ai.T @ skew(self.si) - self.d_ij().T @ self.body_i.A @ skew(self.ai), -self.ai.T @ self.body_i.A.T @ self.body_j.A @ skew(self.sj)), axis=1)
 
 
 class D:
@@ -287,6 +296,8 @@ class D:
         self.f = lambda t: 0
         self.df = lambda t: 0
         self.ddf = lambda t: 0
+
+        self.col_slice = create_col_slice(self.body_i.id, self.body_j.id, 3)
 
     @classmethod
     def init_from_dict(cls, dict, body_i, body_j):
@@ -329,30 +340,34 @@ class D:
         return self.df(t)
 
     def get_phi_r(self, t):
-        Φr = []
+        # Φr = []
 
         dij = self.d_ij()
 
-        if not self.body_i.is_ground:
-            Φr.append((self.body_i.id, -2*dij.T))
-        if not self.body_j.is_ground:
-            Φr.append((self.body_j.id, 2*dij.T))
+        if self.body_i.is_ground:
+            # Φr.append((self.body_i.id, -2*dij.T))
+            return 2*dij.T
+        if self.body_j.is_ground:
+            # Φr.append((self.body_j.id, 2*dij.T))
+            return -2*dij.T
 
-        return Φr
+        # return Φr
+        return np.concatenate((-2*dij.T, 2*dij.T), axis=1)
 
     def get_pi(self, t):
-        Π = []
+        # Π = []
 
         dij = self.d_ij()
 
-        if not self.body_i.is_ground:
-            term_i = 2*dij.T @ self.body_i.A @ skew(self.si)
-            Π.append((self.body_i.id, term_i))
-        if not self.body_j.is_ground:
-            term_j = -2*dij.T @ self.body_j.A @ skew(self.sj)
-            Π.append((self.body_j.id, term_j))
+        if self.body_i.is_ground:
+            # Π.append((self.body_i.id, term_i))
+            return -2*dij.T @ self.body_j.A @ skew(self.sj)
+        if self.body_j.is_ground: 
+            return 2*dij.T @ self.body_i.A @ skew(self.si)
+            # Π.append((self.body_j.id, term_j))
 
-        return Π
+        # return Π
+        return np.concatenate((2*dij.T @ self.body_i.A @ skew(self.si), -2*dij.T @ self.body_j.A @ skew(self.sj)), axis=1)
 
     def set_constraint_fn(self, f_sym, var):
         f, df, ddf = generate_sympy_constraint(f_sym, var)
@@ -380,6 +395,8 @@ class CD:
         self.f = lambda t: 0
         self.df = lambda t: 0
         self.ddf = lambda t: 0
+
+        self.col_slice = create_col_slice(self.body_i.id, self.body_j.id, 3)
 
     @classmethod
     def init_from_dict(cls, dict, body_i, body_j):
@@ -410,22 +427,28 @@ class CD:
         return self.df(t)
 
     def get_phi_r(self, t):
-        Φr = []
-        if not self.body_i.is_ground:
-            Φr.append((self.body_i.id, -self.c.T))
-        if not self.body_j.is_ground:
-            Φr.append((self.body_j.id, self.c.T))
-        return Φr
+        # Φr = []
+        if self.body_i.is_ground:
+            # Φr.append((self.body_i.id, -self.c.T))
+            return self.c.T
+        if self.body_j.is_ground:
+            # Φr.append((self.body_j.id, self.c.T))
+            return -self.c.T
+        # return Φr
+        return np.concatenate((-self.c.T, self.c.T), axis=1)
 
     def get_pi(self, t):
-        Π = []
+        # Π = []
 
-        if not self.body_i.is_ground:
-            Π.append((self.body_i.id, self.c.T @ self.body_i.A @ skew(self.si)))
-        if not self.body_j.is_ground:
-            Π.append((self.body_j.id, -self.c.T @
-                      self.body_j.A @ skew(self.sj)))
-        return Π
+        if self.body_i.is_ground:
+            # Π.append((self.body_i.id, self.c.T @ self.body_i.A @ skew(self.si)))
+            return -self.c.T @ self.body_j.A @ skew(self.sj)
+        if self.body_j.is_ground:
+            # Π.append((self.body_j.id, -self.c.T @
+            #           self.body_j.A @ skew(self.sj)))
+            return self.c.T @ self.body_i.A @ skew(self.si)
+        # return Π
+        return np.concatenate((self.c.T @ self.body_i.A @ skew(self.si), -self.c.T @ self.body_j.A @ skew(self.sj)), axis=1)
 
     def get_reaction_force_r(self, t):
         nb = 1 if self.body_i.is_ground or self.body_j.is_ground else 2
@@ -497,14 +520,16 @@ class ConGroup:
 
     def get_phi_r(self, t):
         for i, con in enumerate(self.cons):
-            for b_id, phiR in con.get_phi_r(t):
-                self.Φr[i, 3*b_id:3*(b_id + 1)] = phiR
+            self.Φr[i, con.col_slice] = con.get_phi_r(t)
+            # for b_id, phiR in con.get_phi_r(t):
+            #     self.Φr[i, 3*b_id:3*(b_id + 1)] = phiR
         return self.Φr
 
     def get_pi(self, t):
         for i, con in enumerate(self.cons):
-            for b_id, Π in con.get_pi(t):
-                self.Π[i, 3*b_id:3*(b_id + 1)] = Π
+            self.Π[i, con.col_slice] = con.get_pi(t)
+            # for b_id, Π in con.get_pi(t):
+            #     self.Π[i, 3*b_id:3*(b_id + 1)] = Π
         return self.Π
 
     def get_phi_q(self, t):

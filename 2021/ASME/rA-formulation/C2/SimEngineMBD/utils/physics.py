@@ -306,3 +306,17 @@ def generate_sympy_constraint(f_sym, var):
     ddf = sp.lambdify(var, ddf_sym)
 
     return (f, df, ddf)
+
+def create_col_slice(i_id, j_id, dim):
+    """
+    Creates a NumPy multi-slice object representing the columns in the global Φ_r, Π_* arrays at which a particular
+    gcon's data should be placed. Combined with the gcon's ID (which only ConGroup knows), this tells us where to put
+    data in the global arrays
+    """
+    if i_id is None:
+        return dim*j_id + np.arange(0, dim)
+
+    if j_id is None:
+        return dim*i_id + np.arange(0, dim)
+    
+    return np.concatenate((dim*i_id + np.arange(0, dim), dim*j_id + np.arange(0, dim)))
