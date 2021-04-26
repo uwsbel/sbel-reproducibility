@@ -254,12 +254,33 @@ class Body:
         """
         Whenever we set ε, cache A for future use
         """
-
-        rot = Rot.from_euler(ZXZ, value.T, degrees=False)
-        # If we keep value as a 1x3 array it will give A an extra dimension, so we squeeze away the extra dim
-        self._A = np.squeeze(rot.as_matrix())
-
         ϕ, θ, ψ = from_eps(value)
+
+        sϕ = np.sin(ϕ)
+        cϕ = np.cos(ϕ)
+        
+        sθ = np.sin(θ)
+        cθ = np.cos(θ)
+        
+        sψ = np.sin(ψ)
+        cψ = np.cos(ψ)
+
+        # A1 = np.array([[cϕ, -sϕ, 0],
+        #         [sϕ, cϕ, 0], [0, 0, 1]])
+        # A2 = np.array([[1, 0, 0], [0, cθ, -sθ],
+        #                [0, sθ, cθ]])
+        # A3 = np.array([[cψ, -sψ, 0],
+        #                [sψ, cψ, 0], [0, 0, 1]])
+
+        self._A = np.array([[cϕ*cψ - cθ*sϕ*sψ, -cϕ*sψ - cθ*cψ*sϕ, sϕ*sθ], [cψ*sϕ + cϕ*cθ*sψ, cϕ*cθ*cψ - sϕ*sψ, -cϕ*sθ], [sθ*sψ, cψ*sθ, cθ]])
+
+        # rot = Rot.from_euler(ZXZ, value.T, degrees=False)
+        # # If we keep value as a 1x3 array it will give A an extra dimension, so we squeeze away the extra dim
+        # self._A = np.squeeze(rot.as_matrix())
+
+        # print('A - A1 @ A2 @ A3: {}'.format(np.linalg.norm(A - A1 @ A2 @ A3)))
+        # print('Rot diff: {}'.format(np.linalg.norm(self._A - A)))
+
 
         self.near_singular = np.abs(
             np.fmod(θ, np.pi)) < THETA_CRITERIA and (not self.is_ground)
