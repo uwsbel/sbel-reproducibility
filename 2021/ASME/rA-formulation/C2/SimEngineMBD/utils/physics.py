@@ -143,13 +143,11 @@ def B(p, a):
         a = check_vector(a, 3)
 
     e = p[1:, ...]
-    e0 = p[0, 0]
-    ẽ = skew(e)
+    e0 = np.diag(3*[p[0, 0]])
+    
+    c = e0 + skew(e)
 
-    c1 = (e0 * I3 + ẽ) @ a
-    c2 = e @ a.T - (e0 * I3 + ẽ) @ skew(a)
-
-    return 2 * np.concatenate((c1, c2), axis=1)
+    return 2 * np.concatenate((c @ a, e @ a.T - c @ skew(a)), axis=1)
 
 
 def dG(dp):
