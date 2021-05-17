@@ -7,8 +7,8 @@
 #SBATCH --cpus-per-task 1
 #SBATCH --partition wacc
 
-module load anaconda
-bootstrap_conda
+# module load anaconda
+# bootstrap_conda
 
 c1_sim=false
 
@@ -25,7 +25,7 @@ do
             continue
         fi
         
-        for mode in kinematics dynamics
+        for mode in kinematics
         do
 
             if [ "$model" = "double_pendulum" ] && [ "$mode" = "kinematics" ]; then
@@ -34,12 +34,12 @@ do
 
             tmp_file=tmp.log
             
-            for i in {1..20}
+            for i in {1..4}
             do
                 if [ "$c1_sim" = true ]; then
                     python3 ${model}_${mode}_${form}.py >> $tmp_file
                 else
-                    python3 ${model}.py --form $form --mode $mode --output $tmp_file
+                    python3 -m SimEngineMBD.example_models.${model} --form $form --mode $mode --output $tmp_file --end_time 3 --step_size 1e-3 --tol 1e-10
                 fi
             done
 

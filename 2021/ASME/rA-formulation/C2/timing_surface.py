@@ -1,71 +1,102 @@
-import numpy as np
 import pickle
-
-import itertools
 from multiprocessing import Pool
-from single_pendulum_timing import single_pendulum
-from four_link_timing import four_link
-from slider_crank_timing import slider_crank
+import os
 
-# For 'production'
-step_sizes = np.array([1e-3, 2e-3, 4e-3, 8e-3, 1e-2, 2e-2, 4e-2, 8e-2, 1e-1])
-M_vals = np.array([1e-8, 1e-9, 1e-10, 1e-11, 1e-12, 1e-13])
+import numpy as np
+import matplotlib.pyplot as plt
 
-# # For testing
-# step_sizes = np.array([2e-2, 4e-2, 8e-2])
-# M_vals = np.array([1e-8, 1e-9])
+from SimEngineMBD.example_models.single_pendulum import time_single_pendulum
+from SimEngineMBD.example_models.four_link import time_four_link
+from SimEngineMBD.example_models.slider_crank import time_slider_crank
 
-end_time = 3
-timing_runs = 5
+dir_path = './output/timing_surface/'
 
-dir_path = './output/timing/'
+def save_data():
 
-to_xyz = 'xyz'
-pretty_form = {'rp': 'rp', 'rA': 'rA', 'reps': 'rε'}
+    # For 'production'
+    # step_sizes = np.array([1e-3, 2e-3, 4e-3, 8e-3, 1e-2, 2e-2, 4e-2, 8e-2, 1e-1])
+    # M_vals = np.array([1e-8, 1e-9, 1e-10, 1e-11, 1e-12, 1e-13])
 
-ss, MM = np.meshgrid(step_sizes, M_vals)
-with open(dir_path + 'mesh_params.pickle', 'wb') as handle:
-    pickle.dump((ss, MM), handle, protocol=pickle.HIGHEST_PROTOCOL)
+    # # For testing
+    step_sizes = np.array([2e-2, 4e-2, 8e-2])
+    M_vals = np.array([1e-8, 1e-9])
 
-def run_model(args):
-    form, model_fn = args
+    end_time = 3
+    timing_runs = 5
 
-    pretty_name = '_'.join([word.capitalize() for word in model_fn.__name__.split('_')])
+    pretty_form = {'rp': 'rp', 'rA': 'rA', 'reps': 'rε'}
 
-    timing = np.full((len(M_vals), len(step_sizes)), np.nan)
+    ss, MM = np.meshgrid(step_sizes, M_vals)
+    with open(dir_path + 'mesh_params.pickle', 'wb') as handle:
+        pickle.dump((ss, MM), handle, protocol=pickle.HIGHEST_PROTOCOL)
 
-    for i, M in enumerate(M_vals):
-        for j, step in enumerate(step_sizes):
-            try:
-                times = np.zeros(timing_runs)
-                tol = M / step**2
+    def run_model(args):
+        form, model_fn = args
 
-                for k in range(0, timing_runs):
-                    Δt = model_fn(['--form', form, '--mode', 'dynamics', '--tol', str(tol), '--step_size', str(step), '--end_time', str(end_time)])
-                    times[k] = Δt
+        # time_some_model_name -> Some_Model_Name
+        pretty_name = '_'.join([word.capitalize() for word in model_fn.__name__[5:].split('_')])
 
-                timing[i, j] = np.mean(times) / end_time
+        timing = np.full((len(M_vals), len(step_sizes)), np.nan)
 
-            except RuntimeError:
-                print('{}-{}, step: {}, tol: {} failed to converge'.format(form, pretty_name, str(step), str(tol)))
+        for i, M in enumerate(M_vals):
+            for j, step in enumerate(step_sizes):
+                try:
+                    times = np.zeros(timing_runs)
+                    tol = M / step**2
 
-    save_name = '{}_{}_timing.pickle'.format(pretty_name, form)
-    info = (pretty_name, pretty_form[form])
+                    for k in range(0, timing_runs):
+                        Δt = model_fn(['--form', form, '--mode', 'dynamics', '--tol', str(tol), '--step_size', str(step), '--end_time', str(end_time)])
+                        times[k] = Δt
 
-    with open(dir_path + save_name, 'wb') as handle:
-        pickle.dump((info, timing), handle, protocol=pickle.HIGHEST_PROTOCOL)
+                    timing[i, j] = np.mean(times) / end_time
 
-    print('Completed {} {} Analysis'.format(pretty_name, pretty_form[form]))
+                except RuntimeError:
+                    print('{}-{}, step: {}, tol: {} failed to converge'.format(form, pretty_name, str(step), str(tol)))
 
-tasks = []
+        save_name = '{}_{}_timing.pickle'.format(pretty_name, form)
+        info = (pretty_name, pretty_form[form])
 
-for model_fn in [single_pendulum, four_link, slider_crank]:
-    for form in ['rA', 'rp', 'reps']:
-        tasks.append((form, model_fn))
+        with open(dir_path + save_name, 'wb') as handle:
+            pickle.dump((info, timing), handle, protocol=pickle.HIGHEST_PROTOCOL)
 
-for task in tasks:
-    run_model(task)
+        print('Completed {} {} Analysis'.format(pretty_name, pretty_form[form]))
 
-# pool = Pool()
-# pool.map(run_model, tasks)
-# pool.close()
+    tasks = []
+
+    for model_fn in [time_single_pendulum, time_four_link, time_slider_crank]:
+        for form in ['rp', 'reps', 'rA']:
+            tasks.append((form, model_fn))
+
+    # for task in tasks:
+    #     run_model(task)
+
+    pool = Pool()
+    pool.map(run_model, tasks)
+    pool.close()
+
+def generate_plots():
+
+    files = []
+    for f in os.listdir(dir_path):
+        if f == 'mesh_params.pickle':
+            with open(dir_path + f, 'rb') as handle:
+                ss, MM = pickle.load(handle)
+            
+            continue
+
+        if f.endswith('.pickle') and f.startswith('Four_Link'):
+            files.append(f)
+
+    for file_name in files:
+        with open(dir_path + file_name, 'rb') as handle:
+            info, timing = pickle.load(handle)
+
+        title = '{} {} Timing Analysis'.format(*info)
+
+        fig = plt.figure()
+        fig.suptitle(title)
+        ax = fig.gca(projection='3d')
+        _ = ax.plot_surface(np.log10(ss), np.log10(MM), timing)
+        ax.set(xlabel='log( Step Size )', ylabel='log( (Step Size)^2 * Θ )')
+
+    plt.show()

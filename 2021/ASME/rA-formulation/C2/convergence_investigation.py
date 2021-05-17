@@ -1,19 +1,20 @@
-import numpy as np
-import pickle
-
 import itertools
 from multiprocessing import Pool
-from four_link_oa import four_link
-from slider_crank_oa import slider_crank
-from single_pendulum_oa import single_pendulum
+import pickle
+
+import numpy as np
+
+from SimEngineMBD.example_models.single_pendulum import run_single_pendulum
+from SimEngineMBD.example_models.four_link import run_four_link
+from SimEngineMBD.example_models.slider_crank import run_slider_crank
 
 # For 'production'
-step_sizes = np.array([1e-3, 2e-3, 4e-3, 8e-3, 1e-2, 2e-2, 4e-2, 8e-2, 1e-1])
-M_vals = np.array([1e-8, 1e-9, 1e-10, 1e-11, 1e-12, 1e-13])
+# step_sizes = np.array([1e-3, 2e-3, 4e-3, 8e-3, 1e-2, 2e-2, 4e-2, 8e-2, 1e-1])
+# M_vals = np.array([1e-8, 1e-9, 1e-10, 1e-11, 1e-12, 1e-13])
 
 # # For testing
-# step_sizes = np.array([2e-2, 4e-2, 8e-2])
-# M_vals = np.array([1e-8, 1e-9])
+step_sizes = np.array([2e-2, 4e-2, 8e-2])
+M_vals = np.array([1e-8, 1e-9])
 
 dir_path = './output/surf/'
 
@@ -29,7 +30,8 @@ def run_model(args):
 
     pos_exact, vel_exact, acc_exact, _, _ = model_fn(['--form', form, '--mode', 'kinematics', '--tol', '1e-12'])
 
-    pretty_name = '_'.join([word.capitalize() for word in model_fn.__name__.split('_')])
+    # run_some_model_name -> Some_Model_Name
+    pretty_name = '_'.join([word.capitalize() for word in model_fn.__name__[4:].split('_')])
 
     # We leave the NaNs in if it fails to converge and they don't get plotted
     pos_diff = np.full((len(M_vals), len(step_sizes), num_bodies, 3), np.nan)
@@ -51,6 +53,9 @@ def run_model(args):
                 conv_iters[i, j] = 1 / np.mean(iters)
             except RuntimeError:
                 print('{}-{}, step: {}, tol: {} failed to converge'.format(form, pretty_name, str(step), str(tol)))
+            except ValueError:
+                print('{}-{}, step: {}, tol: {} raised value error'.format(form, pretty_name, str(step), str(tol)))
+                raise
 
     with open(dir_path + '{}_{}_iterations.pickle'.format(pretty_name, form), 'wb') as handle:
         pickle.dump(((pretty_name, pretty_form[form]), conv_iters), handle, protocol=pickle.HIGHEST_PROTOCOL)
@@ -67,8 +72,8 @@ def run_model(args):
 
 tasks = []
 
-for model_fn in [single_pendulum, four_link, slider_crank]:
-    num_bodies = 1 if model_fn.__name__ == 'single_pendulum' else 3
+for model_fn in [run_single_pendulum, run_four_link, run_slider_crank]:
+    num_bodies = 1 if model_fn.__name__ == 'run_single_pendulum' else 3
     
     for form in ['rA']:
         tasks.append((form, model_fn, num_bodies))

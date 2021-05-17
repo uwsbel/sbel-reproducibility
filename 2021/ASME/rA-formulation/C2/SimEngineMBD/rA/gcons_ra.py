@@ -7,7 +7,7 @@ See also:   rp.gcons_rp.py, rEps.gcons_reps.py
 """
 
 import numpy as np
-from ..utils.physics import Constraints, skew, I3, check_SO3, generate_sympy_constraint
+from ..utils.physics import Constraints, skew, I3, check_SO3, generate_sympy_constraint, create_col_slice
 
 AI = 'a_bar_i'
 AJ = 'a_bar_j'
@@ -80,12 +80,27 @@ class Body:
         self.ω_prev = self.ω
 
     def get_tau(self):
-        return -skew(self.ω) @ self.J @ self.ω
+        return -self.ω_tilde @ self.J @ self.ω
 
     def get_J_term(self, h):
         # NOTE: h**2 terms dropped for now
-        return self.J - h*(skew(self.J @ self.ω) - skew(self.ω)
+        return self.J - h*(skew(self.J @ self.ω) - self.ω_tilde
                            @ self.J + self.n_ω)
+
+    @property
+    def ω_tilde(self):
+        """Returns cross product of ω, ω_tilde = skew(ω) """
+        return self._ω_tilde
+
+    @property
+    def ω(self):
+        """Body's angular velocity"""
+        return self._ω
+
+    @ω.setter
+    def ω(self, value):
+        self._ω_tilde = skew(value)
+        self._ω = value
 
 
 class DP1:
@@ -105,6 +120,8 @@ class DP1:
         self.df = lambda t: 0
         self.ddf = lambda t: 0
 
+        self.col_slice = create_col_slice(self.body_i.id, self.body_j.id, 3)
+
     @classmethod
     def init_from_dict(cls, dict, body_i, body_j):
         ai = np.array([dict[AI]]).T
@@ -121,8 +138,8 @@ class DP1:
     def get_gamma(self, t):
         Ai = self.body_i.A
         Aj = self.body_j.A
-        ωi = skew(self.body_i.ω)
-        ωj = skew(self.body_j.ω)
+        ωi = self.body_i.ω_tilde
+        ωj = self.body_j.ω_tilde
 
         term_1 = -self.aj.T @ (Aj.T @ Ai @ ωi @ ωi + ωj @
                                ωj @ Aj.T @ Ai) @ self.ai
@@ -134,18 +151,21 @@ class DP1:
         return self.df(t)
 
     def get_phi_r(self, t):
-        return []
+        return np.zeros(np.shape(self.col_slice[0]))
 
     def get_pi(self, t):
         Ai = self.body_i.A
         Aj = self.body_j.A
 
-        Π = []
-        if not self.body_i.is_ground:
-            Π.append((self.body_i.id, -self.aj.T @ Aj.T @ Ai @ skew(self.ai)))
-        if not self.body_j.is_ground:
-            Π.append((self.body_j.id, -self.ai.T @ Ai.T @ Aj @ skew(self.aj)))
-        return Π
+        # Π = []
+        if self.body_i.is_ground:
+            # Π.append((self.body_i.id, -self.aj.T @ Aj.T @ Ai @ skew(self.ai)))
+            return -self.ai.T @ Ai.T @ Aj @ skew(self.aj)
+        if self.body_j.is_ground:
+            # Π.append((self.body_j.id, -self.ai.T @ Ai.T @ Aj @ skew(self.aj)))
+            return -self.aj.T @ Aj.T @ Ai @ skew(self.ai)
+        # return Π
+        return np.concatenate((-self.aj.T @ Aj.T @ Ai @ skew(self.ai), -self.ai.T @ Ai.T @ Aj @ skew(self.aj)), axis=1)
 
     def get_reaction_force_r(self, t):
         nb = 1 if self.body_i.is_ground or self.body_j.is_ground else 2
@@ -177,91 +197,6 @@ class DP1:
         self.ddf = ddf
 
 
-class CD:
-    cons_type = Constraints.CD
-
-    def __init__(self, body_i, body_j, si, sj, c, f, df, ddf):
-        self.body_i = body_i
-        self.body_j = body_j
-
-        if body_i.is_ground and body_j.is_ground:
-            raise ValueError('Both bodies cannot be ground')
-
-        self.si = si
-        self.sj = sj
-
-        self.c = c
-
-        self.f = lambda t: 0
-        self.df = lambda t: 0
-        self.ddf = lambda t: 0
-
-    @classmethod
-    def init_from_dict(cls, dict, body_i, body_j):
-        si = np.array([dict[SI]]).T
-        sj = np.array([dict[SJ]]).T
-        c = np.array([dict[C]]).T
-
-        return cls(body_i, body_j, si, sj, c, dict[F], dict[DF], dict[DDF])
-
-    def d_ij(self):
-        """
-        Compact function call for distance between two points
-        """
-        return distance_fn(self.body_i, self.body_j, self.si, self.sj)
-
-    def get_phi(self, t):
-        return self.c.T @ self.d_ij() - self.f(t)
-
-    def get_gamma(self, t):
-        Ai = self.body_i.A
-        Aj = self.body_j.A
-        ωi = skew(self.body_i.ω)
-        ωj = skew(self.body_j.ω)
-
-        return self.c.T @ (Ai @ ωi @ ωi @ self.si - Aj @ ωj @ ωj @ self.sj) + self.ddf(t)
-
-    def get_nu(self, t):
-        return self.df(t)
-
-    def get_phi_r(self, t):
-        Φr = []
-        if not self.body_i.is_ground:
-            Φr.append((self.body_i.id, -self.c.T))
-        if not self.body_j.is_ground:
-            Φr.append((self.body_j.id, self.c.T))
-        return Φr
-
-    def get_pi(self, t):
-        Π = []
-
-        if not self.body_i.is_ground:
-            Π.append((self.body_i.id, self.c.T @ self.body_i.A @ skew(self.si)))
-        if not self.body_j.is_ground:
-            Π.append((self.body_j.id, -self.c.T @
-                      self.body_j.A @ skew(self.sj)))
-        return Π
-
-    def get_reaction_force_r(self, t):
-        nb = 1 if self.body_i.is_ground or self.body_j.is_ground else 2
-        return np.zeros((3*nb, 3*nb))
-
-    def get_reaction_force_A(self, t):
-        Ai = self.body_i.A
-        Aj = self.body_j.A
-
-        a11 = -skew(self.si) @ skew(Ai.T @ self.c)
-        a22 = skew(self.sj) @ skew(Aj.T @ self.c)
-
-        if self.body_i.is_ground:
-            return a22
-
-        if self.body_j.is_ground:
-            return a11
-
-        return np.block([[a11, np.zeros((3, 3))], [np.zeros((3, 3)), a22]])
-
-
 class DP2:
     cons_type = Constraints.DP2
 
@@ -280,6 +215,8 @@ class DP2:
         self.f = lambda t: 0
         self.df = lambda t: 0
         self.ddf = lambda t: 0
+
+        self.col_slice = create_col_slice(self.body_i.id, self.body_j.id, 3)
 
     @classmethod
     def init_from_dict(cls, dict, body_i, body_j):
@@ -300,8 +237,8 @@ class DP2:
         return self.ai.T @ self.body_i.A.T @ self.d_ij() - self.f(t)
 
     def get_gamma(self, t):
-        ωi = skew(self.body_i.ω)
-        ωj = skew(self.body_j.ω)
+        ωi = self.body_i.ω_tilde
+        ωj = self.body_j.ω_tilde
 
         t1 = 2 * self.body_i.ω.T @ skew(self.ai) @ self.body_i.A.T @ (
             self.body_i.dr - self.body_j.dr)
@@ -316,29 +253,31 @@ class DP2:
         return self.df(t)
 
     def get_phi_r(self, t):
-        Φr = []
+        # Φr = []
 
         ai = self.ai.T @ self.body_i.A.T
-        if not self.body_i.is_ground:
-            Φr.append((self.body_i.id, -ai))
-        if not self.body_j.is_ground:
-            Φr.append((self.body_j.id, ai))
+        if self.body_i.is_ground:
+            # Φr.append((self.body_i.id, -ai))
+            return ai
+        if self.body_j.is_ground:
+            # Φr.append((self.body_j.id, ai))
+            return -ai
 
-        return Φr
+        # return Φr
+        return np.concatenate((-ai, ai), axis=1)
 
     def get_pi(self, t):
-        Π = []
+        # Π = []
 
-        if not self.body_i.is_ground:
-            i_term = self.ai.T @ skew(
-                self.si) - self.d_ij().T @ self.body_i.A @ skew(self.ai)
-            Π.append((self.body_i.id, i_term))
-        if not self.body_j.is_ground:
-            j_term = - \
-                self.ai.T @ self.body_i.A.T @ self.body_j.A @ skew(self.sj)
-            Π.append((self.body_j.id, j_term))
+        if self.body_i.is_ground:
+            # Π.append((self.body_j.id, j_term))
+            return -self.ai.T @ self.body_i.A.T @ self.body_j.A @ skew(self.sj)
+        if self.body_j.is_ground:
+            # Π.append((self.body_i.id, i_term))
+            return self.ai.T @ skew(self.si) - self.d_ij().T @ self.body_i.A @ skew(self.ai)
 
-        return Π
+        # return Π
+        return np.concatenate((self.ai.T @ skew(self.si) - self.d_ij().T @ self.body_i.A @ skew(self.ai), -self.ai.T @ self.body_i.A.T @ self.body_j.A @ skew(self.sj)), axis=1)
 
 
 class D:
@@ -357,6 +296,8 @@ class D:
         self.f = lambda t: 0
         self.df = lambda t: 0
         self.ddf = lambda t: 0
+
+        self.col_slice = create_col_slice(self.body_i.id, self.body_j.id, 3)
 
     @classmethod
     def init_from_dict(cls, dict, body_i, body_j):
@@ -378,8 +319,8 @@ class D:
 
     def get_gamma(self, t):
         Δ_dr = self.body_j.dr - self.body_i.dr
-        ωi = skew(self.body_i.ω)
-        ωj = skew(self.body_j.ω)
+        ωi = self.body_i.ω_tilde
+        ωj = self.body_j.ω_tilde
 
         Ai = self.body_i.A
         Aj = self.body_j.A
@@ -399,26 +340,34 @@ class D:
         return self.df(t)
 
     def get_phi_r(self, t):
-        Φr = []
+        # Φr = []
 
-        if not self.body_i.is_ground:
-            Φr.append((self.body_i.id, -2*self.d_ij().T))
-        if not self.body_j.is_ground:
-            Φr.append((self.body_j.id, 2*self.d_ij().T))
+        dij = self.d_ij()
 
-        return Φr
+        if self.body_i.is_ground:
+            # Φr.append((self.body_i.id, -2*dij.T))
+            return 2*dij.T
+        if self.body_j.is_ground:
+            # Φr.append((self.body_j.id, 2*dij.T))
+            return -2*dij.T
+
+        # return Φr
+        return np.concatenate((-2*dij.T, 2*dij.T), axis=1)
 
     def get_pi(self, t):
-        Π = []
+        # Π = []
 
-        if not self.body_i.is_ground:
-            term_i = 2*self.d_ij().T @ self.body_i.A @ skew(self.si)
-            Π.append((self.body_i.id, term_i))
-        if not self.body_j.is_ground:
-            term_j = -2*self.d_ij().T @ self.body_j.A @ skew(self.sj)
-            Π.append((self.body_j.id, term_j))
+        dij = self.d_ij()
 
-        return Π
+        if self.body_i.is_ground:
+            # Π.append((self.body_i.id, term_i))
+            return -2*dij.T @ self.body_j.A @ skew(self.sj)
+        if self.body_j.is_ground: 
+            return 2*dij.T @ self.body_i.A @ skew(self.si)
+            # Π.append((self.body_j.id, term_j))
+
+        # return Π
+        return np.concatenate((2*dij.T @ self.body_i.A @ skew(self.si), -2*dij.T @ self.body_j.A @ skew(self.sj)), axis=1)
 
     def set_constraint_fn(self, f_sym, var):
         f, df, ddf = generate_sympy_constraint(f_sym, var)
@@ -426,6 +375,99 @@ class D:
         self.f = f
         self.df = df
         self.ddf = ddf
+
+
+class CD:
+    cons_type = Constraints.CD
+
+    def __init__(self, body_i, body_j, si, sj, c, f, df, ddf):
+        self.body_i = body_i
+        self.body_j = body_j
+
+        if body_i.is_ground and body_j.is_ground:
+            raise ValueError('Both bodies cannot be ground')
+
+        self.si = si
+        self.sj = sj
+
+        self.c = c
+
+        self.f = lambda t: 0
+        self.df = lambda t: 0
+        self.ddf = lambda t: 0
+
+        self.col_slice = create_col_slice(self.body_i.id, self.body_j.id, 3)
+
+    @classmethod
+    def init_from_dict(cls, dict, body_i, body_j):
+        si = np.array([dict[SI]]).T
+        sj = np.array([dict[SJ]]).T
+        c = np.array([dict[C]]).T
+
+        return cls(body_i, body_j, si, sj, c, dict[F], dict[DF], dict[DDF])
+
+    def d_ij(self):
+        """
+        Compact function call for distance between two points
+        """
+        return distance_fn(self.body_i, self.body_j, self.si, self.sj)
+
+    def get_phi(self, t):
+        return self.c.T @ self.d_ij() - self.f(t)
+
+    def get_gamma(self, t):
+        Ai = self.body_i.A
+        Aj = self.body_j.A
+        ωi = self.body_i.ω_tilde
+        ωj = self.body_j.ω_tilde
+
+        return self.c.T @ (Ai @ ωi @ ωi @ self.si - Aj @ ωj @ ωj @ self.sj) + self.ddf(t)
+
+    def get_nu(self, t):
+        return self.df(t)
+
+    def get_phi_r(self, t):
+        # Φr = []
+        if self.body_i.is_ground:
+            # Φr.append((self.body_i.id, -self.c.T))
+            return self.c.T
+        if self.body_j.is_ground:
+            # Φr.append((self.body_j.id, self.c.T))
+            return -self.c.T
+        # return Φr
+        return np.concatenate((-self.c.T, self.c.T), axis=1)
+
+    def get_pi(self, t):
+        # Π = []
+
+        if self.body_i.is_ground:
+            # Π.append((self.body_i.id, self.c.T @ self.body_i.A @ skew(self.si)))
+            return -self.c.T @ self.body_j.A @ skew(self.sj)
+        if self.body_j.is_ground:
+            # Π.append((self.body_j.id, -self.c.T @
+            #           self.body_j.A @ skew(self.sj)))
+            return self.c.T @ self.body_i.A @ skew(self.si)
+        # return Π
+        return np.concatenate((self.c.T @ self.body_i.A @ skew(self.si), -self.c.T @ self.body_j.A @ skew(self.sj)), axis=1)
+
+    def get_reaction_force_r(self, t):
+        nb = 1 if self.body_i.is_ground or self.body_j.is_ground else 2
+        return np.zeros((3*nb, 3*nb))
+
+    def get_reaction_force_A(self, t):
+        Ai = self.body_i.A
+        Aj = self.body_j.A
+
+        a11 = -skew(self.si) @ skew(Ai.T @ self.c)
+        a22 = skew(self.sj) @ skew(Aj.T @ self.c)
+
+        if self.body_i.is_ground:
+            return a22
+
+        if self.body_j.is_ground:
+            return a11
+
+        return np.block([[a11, np.zeros((3, 3))], [np.zeros((3, 3)), a22]])
 
 
 class ConGroup:
@@ -454,10 +496,10 @@ class ConGroup:
 
     def maybe_swap_gcons(self, t):
         """Check if a g-con is close to being singular and if so swap it with the provided alternate"""
-        
+
         if self.alt_gcon is None or self.alt_index is None:
             return
-            
+
         if np.abs(np.abs(self.cons[self.alt_index].f(t)) - 1) < 0.1:
             self.cons[self.alt_index], self.alt_gcon = self.alt_gcon, self.cons[self.alt_index]
 
@@ -478,14 +520,16 @@ class ConGroup:
 
     def get_phi_r(self, t):
         for i, con in enumerate(self.cons):
-            for b_id, phiR in con.get_phi_r(t):
-                self.Φr[i, 3*b_id:3*(b_id + 1)] = phiR
+            self.Φr[i, con.col_slice] = con.get_phi_r(t)
+            # for b_id, phiR in con.get_phi_r(t):
+            #     self.Φr[i, 3*b_id:3*(b_id + 1)] = phiR
         return self.Φr
 
     def get_pi(self, t):
         for i, con in enumerate(self.cons):
-            for b_id, Π in con.get_pi(t):
-                self.Π[i, 3*b_id:3*(b_id + 1)] = Π
+            self.Π[i, con.col_slice] = con.get_pi(t)
+            # for b_id, Π in con.get_pi(t):
+            #     self.Π[i, 3*b_id:3*(b_id + 1)] = Π
         return self.Π
 
     def get_phi_q(self, t):

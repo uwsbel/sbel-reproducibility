@@ -1,11 +1,11 @@
-import numpy as np
-import json as js
 import logging
+import numpy as np
 from scipy.linalg import lu_factor, lu_solve
 
 from .gcons_rp import Constraints, DP1, DP2, CD, D, Body, ConGroup, EulerCon
-from ..utils.physics import Z_AXIS, block_mat, R, skew, exp, SolverType, bdf1, bdf2
+from ..utils.physics import Z_AXIS, block_mat, SolverType, bdf1, bdf2
 from ..utils.systems import read_model_file
+
 
 class SystemRP:
 
@@ -30,6 +30,7 @@ class SystemRP:
         self.tol = None
         self.max_iters = 50
         self.k = 0
+        self.bdf = None
 
         # Set physical quantities
         self.M = np.zeros((3*self.nb, 3*self.nb))
@@ -40,19 +41,27 @@ class SystemRP:
         self.Φ = np.zeros((self.nc, 1))
         self.Φ_r = np.zeros((self.nc, 3*self.nb))
         self.Φ_p = np.zeros((self.nc, 4*self.nb))
+        self.Φq = np.zeros((self.nc, 6*self.nb))
 
         self.λp = np.zeros((self.nb, 1))
         self.λ = np.zeros((self.nc, 1))
 
+        # Storage arrays for dynamics
+        self.τ = np.zeros((4*self.nb, 1))
+        self.ddr = np.zeros((3*self.nb, 1))
+        self.ddp = np.zeros((4*self.nb, 1))
+
     def set_dynamics(self):
         if self.is_initialized:
-            logging.warning('Cannot change solver type on an initialized system')
+            logging.warning(
+                'Cannot change solver type on an initialized system')
         else:
             self.solver_type = SolverType.DYNAMICS
 
     def set_kinematics(self):
         if self.is_initialized:
-            logging.warning('Cannot change solver type on an initialized system')
+            logging.warning(
+                'Cannot change solver type on an initialized system')
         else:
             self.solver_type = SolverType.KINEMATICS
 
@@ -88,15 +97,17 @@ class SystemRP:
 
                 self.solver_type = SolverType.DYNAMICS
                 self.tol = 1e-3 if self.tol == None else self.tol
+
+            self.g_cons.initialize()
         if self.solver_type == SolverType.DYNAMICS:
             if self.nc > 6*self.nb:
                 logging.warning('System is overconstrained')
 
             self.tol = 1e-3 if self.tol == None else self.tol
 
+            self.g_cons.initialize()
             self.initialize_dynamics()
 
-        self.g_cons.initialize()
         self.is_initialized = True
 
     def initialize_dynamics(self):
@@ -144,7 +155,8 @@ class SystemRP:
                     break
 
                 if self.k >= self.max_iters:
-                    raise RuntimeError('Newton-Raphson not converging at t: {:.3f}, k: {:>2d}'.format(t, self.max_iters))
+                    raise RuntimeError(
+                        'Newton-Raphson not converging at t: {:.3f}, k: {:>2d}'.format(t, self.max_iters))
 
             kin_Φq = self.g_cons.get_phi_q(t_start)
 
@@ -247,11 +259,19 @@ class SystemRP:
         # Setup and do Newton-Raphson Iteration
         self.k = 0
         while True:
-            for body in self.bodies:
+            for j, body in enumerate(self.bodies):
                 body.r = body.C_r + self.bdf.β**2 * self.h**2 * body.ddr
                 body.p = body.C_p + self.bdf.β**2 * self.h**2 * body.ddp
                 body.dr = body.C_dr + self.bdf.β*self.h*body.ddr
                 body.dp = body.C_dp + self.bdf.β*self.h*body.ddp
+
+                # Conceptually these go lower, but we'd like to only loop over bodies once
+                self.Jp[4*j:4*(j+1), 4*j:4*(j+1)] = body.get_j()
+                self.P[4*j:4*(j+1), j:j] = body.p
+
+                self.τ[4*j:4*(j+1)] = body.get_tau()
+                self.ddr[3*j:3*(j+1)] = body.ddr
+                self.ddp[4*j:4*(j+1)] = body.ddp
 
             # Compute values needed for the g matrix
             # We can't move this outside the loop since the g_cons
@@ -260,17 +280,9 @@ class SystemRP:
             self.Φ_r = self.g_cons.get_phi_r(t)
             self.Φ_p = self.g_cons.get_phi_p(t)
 
-            self.Jp = block_mat([body.get_j() for body in self.bodies])
-            self.P = block_mat([body.p for body in self.bodies])
-
-            τ = np.vstack([body.get_tau() for body in self.bodies])
-
-            ddr = np.vstack([body.ddr for body in self.bodies])
-            ddp = np.vstack([body.ddp for body in self.bodies])
-
             # Form g matrix
-            g0 = self.M @ ddr + self.Φ_r.T @ self.λ - self.F_ext
-            g1 = self.Jp @ ddp + self.Φ_p.T @ self.λ + self.P @ self.λp - τ
+            g0 = self.M @ self.ddr + self.Φ_r.T @ self.λ - self.F_ext
+            g1 = self.Jp @ self.ddp + self.Φ_p.T @ self.λ + self.P @ self.λp - self.τ
             g2 = 1/(self.bdf.β**2 * self.h**2) * \
                 np.vstack([e_con.get_phi(t) for e_con in self.e_cons])
             g3 = 1/(self.bdf.β**2 * self.h**2) * self.Φ
@@ -328,7 +340,8 @@ class SystemRP:
                 break
 
             if self.k >= self.max_iters:
-                raise RuntimeError('Newton-Raphson not converging at t: {:.3f}, k: {:>2d}'.format(t, self.max_iters))
+                raise RuntimeError(
+                    'Newton-Raphson not converging at t: {:.3f}, k: {:>2d}'.format(t, self.max_iters))
 
         self.Φq = self.g_cons.get_phi_q(t)
         Φq_lu = lu_factor(self.Φq)
