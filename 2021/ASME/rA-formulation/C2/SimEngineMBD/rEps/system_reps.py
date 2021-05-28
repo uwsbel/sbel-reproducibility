@@ -13,15 +13,17 @@ class SystemREps:
         self.bodies = bodies
         self.g_cons = constraints
         self.solver_type = SolverType.KINEMATICS
-        self.solver_order = 2
+        self.solver_order = 1
 
         self.nc = self.g_cons.nc
         self.nb = self.g_cons.nb
 
         assert self.nb == len(self.bodies), "Mismatch on number of bodies"
 
+        # Acceleration due to Gravity
         self.g_acc = np.zeros((3, 1))
 
+        # This is changed after a call to SystemREps.initialize
         self.is_initialized = False
 
         # Set solver parameters
@@ -63,7 +65,10 @@ class SystemREps:
 
     @classmethod
     def init_from_file(cls, filename):
+        # Pull the "bodies" and "consraints" structures from a json file
         file_info = read_model_file(filename)
+
+        # Process these into objects
         return cls(*process_system(*file_info))
 
     def set_g_acc(self, g=-9.81*Z_AXIS):
@@ -79,14 +84,20 @@ class SystemREps:
         return self.g_cons.get_gamma(t)
 
     def initialize(self):
+        """
+        Prepares many constants that the system needs in order to run. Simulation it not allowed to start before this
+        function is called, and no changes should be made to the system after this function is called.
+        """
 
         for body in self.bodies:
             body.F += body.m * self.g_acc
 
+        # Assembled per-body matrices needed in simulation
         self.M = np.diagflat([[body.m] * 3 for body in self.bodies])
         self.Jε = block_mat([body.get_J_term() for body in self.bodies])
         self.F_ext = np.vstack([body.F for body in self.bodies])
 
+        # Branch into separate initialization for kinematics vs. dynamics
         if self.solver_type == SolverType.KINEMATICS:
             if self.nc == 6*self.nb:
                 # Set tighter tolerance for kinematics
@@ -107,6 +118,9 @@ class SystemREps:
         self.is_initialized = True
 
     def initialize_dynamics(self):
+        """
+        Initial kinematics step to setup the acceleration-level values
+        """
 
         logging.info('Initializing system for dynamics')
 
@@ -118,8 +132,8 @@ class SystemREps:
 
         # Quantities for the right-hand side:
         # Fg is constant, defined above
-        τ = np.vstack([body.get_tau() for body in self.bodies])
-        γ = self.get_gamma(t_start)
+        τ = np.vstack([body.get_tau() for body in self.bodies])         # τ is a torque-like quantity
+        γ = self.get_gamma(t_start)                                     # γ is the RHS of the kinematic's acc eqn
 
         self.Jε = block_mat([body.get_J_term() for body in self.bodies])
         G = np.block([[self.M, np.zeros((3*self.nb, 3*self.nb)), self.Φ_r.T], [np.zeros((3*self.nb, 3*self.nb)), self.Jε, self.Φ_ε.T],
@@ -138,6 +152,7 @@ class SystemREps:
         self.λ = z[6*self.nb:]
 
     def do_step(self, i, t):
+        # Profiling showed no difference between this branch-every-time version and forcing the user to specify
         if self.solver_type == SolverType.KINEMATICS:
             self.do_kinematics_step(i, t)
         else:
@@ -145,15 +160,18 @@ class SystemREps:
 
     def do_dynamics_step(self, i, t):
 
-        assert self.is_initialized, "Cannot dyn_step before system initialization"
+        assert self.is_initialized, "Cannot do dynamics step before system initialization"
 
         if i == 0:
             return
 
+        # Check for bifurcations in the designated driving constraints
         self.g_cons.maybe_swap_gcons(t)
 
+        # Set the order of our bdf solver
         self.bdf = bdf1 if (i == 1 or self.solver_order == 1) else bdf2
 
+        # Specific to rε, check for Gimbal Lock
         for body in self.bodies:
             if body.near_singular:
                 logging.info(
@@ -163,17 +181,21 @@ class SystemREps:
                 body.ε = value
                 self.g_cons.flip_gcons(body.id, flip_mat)
 
+                # If we're in gimbal lock, we need to revert to a first-order method for a step
                 self.bdf = bdf1
 
+        # Update the coefficients used for higher-order integration
         for body in self.bodies:
             body.update_bdf_coeffs(self.bdf, self.h)
 
+        # Refresh quantities needed in the pseudo-Jacobian
         self.Φ_r = self.g_cons.get_phi_r(t)
         self.Φ_ε = self.g_cons.get_phi_eps(t)
+        self.Jε = block_mat([body.get_J_term() for body in self.bodies])
 
+        # Assemble the pseudo-Jacobian
         G_rω = np.zeros((3*self.nb, 3*self.nb))
         G_ωr = np.zeros((3*self.nb, 3*self.nb))
-        self.Jε = block_mat([body.get_J_term() for body in self.bodies])
         G = np.block([[self.M, G_rω, self.Φ_r.T], [G_ωr, self.Jε, self.Φ_ε.T],
                       [self.Φ_r, self.Φ_ε, np.zeros((self.nc, self.nc))]])
 
@@ -187,6 +209,8 @@ class SystemREps:
         # Setup and do Newton-Raphson Iteration
         self.k = 0
         while True:
+
+            # Initial integration step
             for j, body in enumerate(self.bodies):
                 body.r = body.C_r + self.bdf.β**2 * self.h**2 * body.ddr
                 body.ε = body.C_ε + self.bdf.β**2 * self.h**2 * body.ddε
@@ -214,6 +238,7 @@ class SystemREps:
 
             δ = lu_solve(G_lu, -g)
 
+            # Apply corrections to each body
             for j, body in enumerate(self.bodies):
                 body.ddr += δ[3*j:3*(j+1)]
                 body.ddε += δ[3*(self.nb + j):3*(self.nb + j+1)]
@@ -234,8 +259,10 @@ class SystemREps:
 
     def do_kinematics_step(self, i, t):
 
+        # Check for bifurcations in the designated driving constraints
         self.g_cons.maybe_swap_gcons(t)
 
+        # Specific to rε, check for Gimbal Lock
         for body in self.bodies:
             if body.near_singular:
                 value, flip_mat = body.compute_new_frame()
@@ -252,6 +279,7 @@ class SystemREps:
 
             Δq = lu_solve(Φq_lu, -self.Φ)
 
+            # Apply corrections to the bodies
             for j, body in enumerate(self.bodies):
                 Δr = Δq[3*j:3*(j+1)]
                 Δε = Δq[3*(self.nb + j):3*(self.nb + j+1)]
@@ -270,14 +298,17 @@ class SystemREps:
                 raise RuntimeError(
                     'Newton-Raphson not converging at t: {:.3f}, k: {:>2d}'.format(t, self.max_iters))
 
+        # Compute a new Jacobian now that we have position-level info
         self.Φq = self.g_cons.get_phi_q(t)
         Φq_lu = lu_factor(self.Φq)
 
+        # Solve the velocity equation
         dq = lu_solve(Φq_lu, self.g_cons.get_nu(t))
         for j, body in enumerate(self.bodies):
             body.dr = dq[3*j:3*(j+1), :]
             body.dε = dq[3*(self.nb + j):3*(self.nb + (j+1)), :]
 
+        # Solve the acceleration equation
         ddq = lu_solve(Φq_lu, self.get_gamma(t))
         for j, body in enumerate(self.bodies):
             body.ddr = ddq[3*j:3*(j+1), :]
