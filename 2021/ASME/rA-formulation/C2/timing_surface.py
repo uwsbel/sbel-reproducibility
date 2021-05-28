@@ -1,6 +1,7 @@
 import pickle
 from multiprocessing import Pool
 import os
+import warnings
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -40,6 +41,7 @@ def save_data():
 
         for i, M in enumerate(M_vals):
             for j, step in enumerate(step_sizes):
+                warnings.filterwarnings('error')
                 try:
                     times = np.zeros(timing_runs)
                     tol = M / step**2
@@ -52,6 +54,8 @@ def save_data():
 
                 except RuntimeError:
                     print('{}-{}, step: {}, tol: {} failed to converge'.format(form, pretty_name, str(step), str(tol)))
+                except RuntimeWarning:
+                    print('{}-{}, step: {}, tol: {} overflowed'.format(form, pretty_name, str(step), str(tol)))
 
         save_name = '{}_{}_timing.pickle'.format(pretty_name, form)
         info = (pretty_name, pretty_form[form])
@@ -84,7 +88,7 @@ def generate_plots():
             
             continue
 
-        if f.endswith('.pickle') and f.startswith('Four_Link'):
+        if f.endswith('.pickle') and f.startswith('Single_Pendulum'):
             files.append(f)
 
     for file_name in files:
@@ -100,3 +104,6 @@ def generate_plots():
         ax.set(xlabel='log( Step Size )', ylabel='log( (Step Size)^2 * Θ )')
 
     plt.show()
+
+if __name__ == '__main__':
+    generate_plots()

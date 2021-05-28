@@ -110,8 +110,7 @@ class Body:
             dr = np.array([dict[JS_rdot]]).T
 
             A = Rot.from_matrix(np.array(dict[JS_A]))
-            ε = A.as_euler(ZXZ, degrees=False)
-            ε = np.asmatrix(ε).T
+            ε = A.as_euler(ZXZ, degrees=False).reshape((3, 1))
 
             assert np.linalg.norm(A.as_matrix() - euler_to_rot(ε)) < 1e-12
 

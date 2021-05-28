@@ -14,7 +14,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import sympy as sp
 
-from ..utils.physics import Y_AXIS, Z_AXIS
+from ..utils.physics import Z_AXIS
 from ..utils.tools import standard_setup, profiler, print_profiling
 
 π = np.pi

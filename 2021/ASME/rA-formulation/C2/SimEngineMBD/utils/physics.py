@@ -135,8 +135,6 @@ def B(p, a):
     """
     Computes the B matrix from a given orientation vector (unit quaternion) and position vector. Expects column vectors
     but will noisily transpose row vectors.
-
-    TODO: Write down what B actually means...
     """
     if __debug__:
         p = check_vector(p, 4)

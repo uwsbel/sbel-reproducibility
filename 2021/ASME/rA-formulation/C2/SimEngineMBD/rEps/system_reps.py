@@ -13,7 +13,7 @@ class SystemREps:
         self.bodies = bodies
         self.g_cons = constraints
         self.solver_type = SolverType.KINEMATICS
-        self.solver_order = 1
+        self.solver_order = 2
 
         self.nc = self.g_cons.nc
         self.nb = self.g_cons.nb
@@ -188,11 +188,10 @@ class SystemREps:
         self.k = 0
         while True:
             for j, body in enumerate(self.bodies):
-                body.dr = body.dr_prev + self.h*body.ddr
-                body.dε = body.dε_prev + self.h*body.ddε
-
-                body.r = body.r_prev + self.h*body.dr
-                body.ε = body.ε_prev + self.h*body.dε
+                body.r = body.C_r + self.bdf.β**2 * self.h**2 * body.ddr
+                body.ε = body.C_ε + self.bdf.β**2 * self.h**2 * body.ddε
+                body.dr = body.C_dr + self.bdf.β*self.h*body.ddr
+                body.dε = body.C_dε + self.bdf.β*self.h*body.ddε
 
                 # Conceptually these go lower, but we'd like to only loop on bodies once
                 self.ddr[3*j:3*(j+1)] = body.ddr

@@ -9,12 +9,12 @@ from SimEngineMBD.example_models.four_link import run_four_link
 from SimEngineMBD.example_models.slider_crank import run_slider_crank
 
 # For 'production'
-# step_sizes = np.array([1e-3, 2e-3, 4e-3, 8e-3, 1e-2, 2e-2, 4e-2, 8e-2, 1e-1])
-# M_vals = np.array([1e-8, 1e-9, 1e-10, 1e-11, 1e-12, 1e-13])
+step_sizes = np.array([1e-3, 2e-3, 4e-3, 8e-3, 1e-2, 2e-2, 4e-2, 8e-2, 1e-1])
+M_vals = np.array([1e-8, 1e-9, 1e-10, 1e-11, 1e-12, 1e-13])
 
-# # For testing
-step_sizes = np.array([2e-2, 4e-2, 8e-2])
-M_vals = np.array([1e-8, 1e-9])
+# For testing
+# step_sizes = np.array([2e-2, 4e-2, 8e-2])
+# M_vals = np.array([1e-8, 1e-9])
 
 dir_path = './output/surf/'
 
@@ -28,7 +28,7 @@ with open(dir_path + 'mesh_params.pickle', 'wb') as handle:
 def run_model(args):
     form, model_fn, num_bodies = args
 
-    pos_exact, vel_exact, acc_exact, _, _ = model_fn(['--form', form, '--mode', 'kinematics', '--tol', '1e-12'])
+    pos_exact, vel_exact, acc_exact, _, _ = model_fn(['--form', form, '--mode', 'kinematics', '--step_size', str(1e-4), '--tol', '1e-12'])
 
     # run_some_model_name -> Some_Model_Name
     pretty_name = '_'.join([word.capitalize() for word in model_fn.__name__[4:].split('_')])
@@ -72,9 +72,9 @@ def run_model(args):
 
 tasks = []
 
-for model_fn in [run_single_pendulum, run_four_link, run_slider_crank]:
+for model_fn in [run_four_link]:#[run_single_pendulum, run_four_link, run_slider_crank]:
     num_bodies = 1 if model_fn.__name__ == 'run_single_pendulum' else 3
-    
+
     for form in ['rA']:
         tasks.append((form, model_fn, num_bodies))
 
