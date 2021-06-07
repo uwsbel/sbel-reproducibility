@@ -2,6 +2,7 @@ import pickle
 import time
 from multiprocessing import Pool
 import warnings
+import os
 
 import numpy as np
 
@@ -18,6 +19,9 @@ tols = [1e-10 / step**2 for step in step_sizes]
 
 to_xyz = 'xyz'
 pretty_form = {'rp': 'rp', 'rA': 'rA', 'reps': 'rε'}
+
+if not os.path.isdir(dir_path):
+    os.makedirs(dir_path)
 
 with open(dir_path + 'steps.pickle', 'wb') as handle:
     pickle.dump(step_sizes, handle, protocol=pickle.HIGHEST_PROTOCOL)
@@ -67,11 +71,11 @@ for model_fn in [run_four_link, run_slider_crank]: #[run_single_pendulum, run_fo
 
 # for task in tasks:
 #     run_model(task)
+if __name__ == '__main__':
+    start = time.time()
 
-start = time.time()
+    pool = Pool()
+    pool.map(run_model, tasks)
+    pool.close()
 
-pool = Pool()
-pool.map(run_model, tasks)
-pool.close()
-
-print('Wall clock time: {}'.format(time.time() - start))
+    print('Wall clock time: {}'.format(time.time() - start))

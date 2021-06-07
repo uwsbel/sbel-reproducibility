@@ -1,7 +1,7 @@
 import itertools
 from multiprocessing import Pool
 import pickle
-
+import os
 import numpy as np
 
 from SimEngineMBD.example_models.single_pendulum import run_single_pendulum
@@ -17,6 +17,8 @@ M_vals = np.array([1e-8, 1e-9, 1e-10, 1e-11, 1e-12, 1e-13])
 # M_vals = np.array([1e-8, 1e-9])
 
 dir_path = './output/surf/'
+if not os.path.isdir(dir_path):
+    os.makedirs(dir_path)
 
 to_xyz = 'xyz'
 pretty_form = {'rp': 'rp', 'rA': 'rA', 'reps': 'rε'}
@@ -80,7 +82,7 @@ for model_fn in [run_four_link]:#[run_single_pendulum, run_four_link, run_slider
 
 # for task in tasks:
 #     run_model(task)
-
-pool = Pool()
-pool.map(run_model, tasks)
-pool.close()
+if __name__ == '__main__':
+    pool = Pool()
+    pool.map(run_model, tasks)
+    pool.close()
