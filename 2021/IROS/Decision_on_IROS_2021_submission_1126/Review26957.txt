@@ -1,0 +1,70 @@
+Reviewer 11 of IROS 2021 submission 1126
+
+Comments to the author
+======================
+
+This paper proposes a framework for control policy learning
+that relies on multi-modal sensors (camera, GPS, inertial)
+for end-to-end navigation. A contribution to this work, in
+comparison to previous work, is the applicability of their
+algorithms (and training environment) to off-road
+navigation (as opposed to urban driving scenes). Testing is
+performed exclusively in the Chronos simulation engine. The
+authors provide a clear and comprehensive review of the
+improvements made to the paper since the past submission. 
+
+- The paper is in general well written and clear; however,
+some parts could benefit from less bluntness and greater
+flow. The abstract in particular should provide greater
+context to motivate the problem. Several pieces probably
+also do not justify placement in central parts of the paper
+(such as the abstract) For example, "The library has a
+Python API for interfacing with existing Machine Learning
+frameworks." -- this is not a key contribution of the work,
+not novel compared to other AV simulation environments, and
+is not necessarily important from the context of the main
+contributions (the learning algorithm, testing on off-road
+scenarios, etc).
+
+- I felt like there is still a large disconnect between the
+claims the authors make and their testing to evaluate and
+validate these claims. For example, several discussions of
+the photorealism of the Chornos simulation engine aiding
+the sim-to-real transfer (despite sim-to-real not being a
+contribution). I would suggest the authors either (1) tone
+back some of the contributions to be more accurate to what
+is shown in this work and/or (2) potentially demonstrate
+their algorithm on a simple real-world test environment.
+One very nice aspect of this work being focussed on
+off-road environments is the ability to test on simple
+miniature RC cars without the need for full-scale hardware.
+For example, see the experiments performed in Codevilla,
+Felipe, et al. "End-to-end driving via conditional
+imitation learning." 
+
+- Some of the references have minor errors/mistakes that
+should be addressed in the camera-ready version: 
+  * [1,2] consider making these footnotes instead of
+references since they are not pointing to previous work,
+but rather supporting materials to the proposed work
+  * [9] Amini et al. The arXiv link given is incorrect
+(links to a different paper). Should also cite the
+newer/official ICRA 2019 version instead of arXiv. 
+  * [12] Matas et al. Should point to the official CoRL
+2018 version. 
+
+
+Comments on the ICRA-21 Paper Attachment
+========================================
+
+Very comprehensive and transparent discussion of the
+changes made (as well as those which have not been made
+yet). 
+
+Comments on the Video Attachment
+================================
+
+Useful from the point of view of seeing diversity of the
+scenes. This is discussed briefly in the paper but much
+clearer in the video. Additional guiding visualization
+would be helpful (e.g. target annotations in the scene). 

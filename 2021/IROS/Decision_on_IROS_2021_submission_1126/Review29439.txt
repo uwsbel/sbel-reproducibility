@@ -1,0 +1,68 @@
+Reviewer 14 of IROS 2021 submission 1126
+
+Comments to the author
+======================
+
+Summary:
+This paper deals with 
+
+end-to-end learning of off-road navigation policies in
+deformable terrain using the Chrono simulator.
+
+Strengths:
+
+- The main strength of the paper is the use of the Chrono
+simulator to represent more realistic physics of off-road
+terrains. Chrono is one of the best choices when dealing
+with off-road situations. For starters, it is open-source,
+which is an advantage with respect to its main competitor,
+the MAVS simulator. Secondly, it implements complex soil
+models and terramechanics, which are typically not
+available in other AV simulators such as CARLA, LGSVL, and
+many others.
+
+Weaknesses:
+
+- The structure of the paper is its main weakness. The
+paper attempts to move in two different directions. On one
+hand, it tries to motivate the benefits of Chrono, as a
+simulation platform. However, Chrono has already been
+introduced in other papers, such as “Chrono: Multi-physics
+simulation engine, Astrophysics Source Code Library.
+September 2020”. This takes away a lot of crucial space for
+the main idea of the paper, i.e., end-to-end learning of
+off-road navigation policies in deformable terrain. Due to
+this, the authors had to sacrifice much of the contents
+related to the application. The experimental setup
+described in the paper can’t be discussed in depth. The
+metrics are barely discussed either. There is no
+justification for the selected architecture and ablations
+are not provided at all. Overall, it feels like the two
+main ideas/parts of the paper are fighting for space,
+leading to a situation where both ideas seem to be missing
+relevant details. 
+			
+Overall:
+
+I like Chrono, and I believe in its value as a
+high-fidelity off-road simulator. I would love to see a
+paper discussing the complexities and nuances of learning
+driving policies in off-road environments. However, this is
+not such a paper. This paper just touches the surface of
+that topic, due to the space dedicated to re-introduce the
+Chrono simulator. For these reasons, I lean towards a low
+borderline. I would recommend authors consider these
+comments for the benefit of their work. 
+
+
+Comments on the ICRA-21 Paper Attachment
+========================================
+
+Thanks for the ICRA context. It is sad that IROS is even
+more restricted in terms of page limit.
+
+Comments on the Video Attachment
+================================
+
+The video is good enough to understand (from a qualitative
+perspective) the behavior of the policy in off-road scenes.
