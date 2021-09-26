@@ -1,96 +1,106 @@
 import sys
 import pathlib as pl
-src_folder = pl.Path('tests/iterations/')
+src_folder = pl.Path('tests')
 sys.path.append(str(src_folder))
 
 import numpy as np
-import pickle
+import matplotlib.pyplot as plt
+plt.rc('xtick', labelsize=12)
+plt.rc('ytick', labelsize=12)
 
-import itertools
-from multiprocessing import Pool
-from four_link_iterations import four_link
+from four_link import four_link
+from slider_crank import slider_crank
+from single_pendulum import single_pendulum
 
-# For 'production'
-step_sizes = np.array([1e-3, 2e-3, 4e-3, 8e-3, 1e-2, 2e-2, 4e-2, 8e-2, 1e-1])
-M_vals = np.array([1e-8, 1e-9, 1e-10, 1e-11, 1e-12, 1e-13])
+step_sizes = np.array([1e-3, 2e-3, 4e-3, 8e-3, 1e-2, 2e-2])
+# testing
+# step_sizes = np.array([1e-2, 2e-2, 1e-2, 2e-2, 1e-2, 2e-2])
+# step_sizes = np.array([1e-2, 2e-2])
 
-# # For testing
-# step_sizes = np.array([2e-2, 4e-2, 8e-2])
-# M_vals = np.array([1e-8, 1e-9])
-
-dir_path = './output/surf/'
-
-to_xyz = 'xyz'
 pretty_form = {'rp': 'rp', 'rA': 'rA', 'reps': 'rε'}
-
-ss, MM = np.meshgrid(step_sizes, M_vals)
-with open(dir_path + 'mesh_params.pickle', 'wb') as handle:
-    pickle.dump((ss, MM), handle, protocol=pickle.HIGHEST_PROTOCOL)
-
+# We leave the NaNs in if it fails to converge and they don't get plotted
+conv_iters_kinematics = np.full([3, len(step_sizes)], np.nan)
+conv_iters_dynamics = np.full([3, len(step_sizes)], np.nan)
 
 def run_model(args):
     form, model_fn, num_bodies = args
-
-    # pos_exact, vel_exact, acc_exact, _, _ = model_fn(['--form', form, '--mode', 'kinematics', '--tol', '1e-12'])
+    if form == 'rA':
+        form_index = 0
+    if form == 'rp':
+        form_index = 1
+    if form == 'reps':
+        form_index = 2
 
     pretty_name = '_'.join([word.capitalize() for word in model_fn.__name__.split('_')])
 
-    # We leave the NaNs in if it fails to converge and they don't get plotted
-    # pos_diff = np.full((len(M_vals), len(step_sizes), num_bodies, 3), np.nan)
-    # vel_diff = np.full((len(M_vals), len(step_sizes), num_bodies, 3), np.nan)
-    # acc_diff = np.full((len(M_vals), len(step_sizes), num_bodies, 3), np.nan)
-    conv_iters = np.full((len(M_vals), len(step_sizes)), np.nan)
+    for j, step in enumerate(step_sizes):
+        try:
+            _, _, _, iters = model_fn(['--form', form, '--mode', 'kinematics', '--tol', '1e-10', '--step_size', str(step)])
 
-    for i, M in enumerate(M_vals):
-        for j, step in enumerate(step_sizes):
-            try:
-                tol = M / step ** 2
+            conv_iters_kinematics[form_index, j] = iters
+        except RuntimeError:
+            print('{}-{}, step: {}, tol: {} failed to converge'.format(form, pretty_name, str(step), '1e-10'))
+        except ValueError:
+            print('{}-{}, step: {}, tol: {} raised value error'.format(form, pretty_name, str(step), '1e-10'))
+            raise
 
-                iters = model_fn(
-                    ['--form', form, '--mode', 'dynamics', '--tol', str(tol), '--step_size', str(step)])
-                # pos, vel, acc, iters, _ = model_fn(
-                #     ['--form', form, '--mode', 'dynamics', '--tol', str(tol), '--step_size', str(step)])
-                #
-                # pos_diff[i, j, :, :] = np.abs(pos_exact[:, :, -1] - pos[:, :, -1])
-                # vel_diff[i, j, :, :] = np.abs(vel_exact[:, :, -1] - vel[:, :, -1])
-                # acc_diff[i, j, :, :] = np.abs(acc_exact[:, :, -1] - acc[:, :, -1])
+    for j, step in enumerate(step_sizes):
+        try:
+            tol = 1e-11 / step ** 2
+            # tol = 1e-3
 
-                conv_iters[i, j] = 1 / np.mean(iters)
-            except RuntimeError:
-                print('{}-{}, step: {}, tol: {} failed to converge'.format(form, pretty_name, str(step), str(tol)))
+            _, _, _, iters = model_fn(
+                ['--form', form, '--mode', 'dynamics', '--tol', str(tol), '--step_size', str(step)])
 
-    with open(dir_path + '{}_{}_iterations.pickle'.format(pretty_name, form), 'wb') as handle:
-        pickle.dump(((pretty_name, pretty_form[form]), conv_iters), handle, protocol=pickle.HIGHEST_PROTOCOL)
+            conv_iters_dynamics[form_index, j] = iters
+        except RuntimeError:
+            print('{}-{}, step: {}, tol: {} failed to converge'.format(form, pretty_name, str(step), str(tol)))
+        except ValueError:
+            print('{}-{}, step: {}, tol: {} raised value error'.format(form, pretty_name, str(step), str(tol)))
+            raise
 
-    # for body in range(0, num_bodies):
-    #     for component in range(0, 3):
-    #         save_name = '{}_{}_OA_Body_{}_{}.pickle'.format(pretty_name, form, body, to_xyz[component])
-    #         info = (pretty_name, pretty_form[form], body, to_xyz[component])
-    #
-    #         with open(dir_path + save_name, 'wb') as handle:
-    #             pickle.dump((info, pos_diff[:, :, body, component], vel_diff[:, :, body, component],
-    #                          acc_diff[:, :, body, component]), handle, protocol=pickle.HIGHEST_PROTOCOL)
-    #
-    # print('Completed {} {} Analysis'.format(pretty_name, pretty_form[form]))
-
+    print('Completed {} {} Analysis'.format(pretty_name, pretty_form[form]))
 
 tasks = []
-
-# for model_fn in [single_pendulum, four_link, slider_crank]:
-#     num_bodies = 1 if model_fn.__name__ == 'single_pendulum' else 3
-#
-#     for form in ['rA']:
-#         tasks.append((form, model_fn, num_bodies))
-
-for model_fn in [four_link]:
+for model_fn in [single_pendulum, four_link, slider_crank]:
     num_bodies = 1 if model_fn.__name__ == 'single_pendulum' else 3
 
-    for form in ['rA']:
+    for form in ['rA', 'rp', 'reps']:
         tasks.append((form, model_fn, num_bodies))
 
 for task in tasks:
     run_model(task)
+    # plotting kinematics
+    title = '{} Kinematics: Iterations to Convergence'.format(task[1].__name__)
+    ind = np.arange(len(step_sizes))
+    width = 0.15
+    fig = plt.subplots(figsize=(9, 6))
+    plt.bar(ind - width, conv_iters_kinematics[0], width, label='rA')
+    plt.bar(ind, conv_iters_kinematics[1], width, label='rp')
+    plt.bar(ind + width, conv_iters_kinematics[2], width, label='rε')
+    plt.title(title, fontsize=16)
+    plt.ylabel('Average Iterations to Convergence', fontsize=12)
+    plt.xlabel('Step Size', fontsize=12)
+    plt.xticks(ind, (
+        r"$1\times 10^{-3}$", r"$2\times 10^{-3}$", r"$4\times 10^{-3}$", r"$8\times 10^{-3}$", r"$1\times 10^{-2}$",
+        r"$2\times 10^{-2}$"))
+    plt.legend(loc='best', prop={'size': 12})
+    plt.gcf().set_size_inches(20, 12)
+    plt.savefig('./output/convergence/{}_Convergence.png'.format(task[1].__name__))
 
-# pool = Pool()
-# pool.map(run_model, tasks)
-# pool.close()
+    # plotting dynamics
+    title = '{} Dynamics: Iterations to Convergence'.format(task[1].__name__)
+    fig = plt.subplots(figsize=(9, 6))
+    plt.bar(ind - width, conv_iters_dynamics[0], width, label='rA')
+    plt.bar(ind, conv_iters_dynamics[1], width, label='rp')
+    plt.bar(ind + width, conv_iters_dynamics[2], width, label='rε')
+    plt.title(title, fontsize=16)
+    plt.ylabel('Average Iterations to Convergence', fontsize=12)
+    plt.xlabel('Step Size', fontsize=12)
+    plt.xticks(ind, (
+        r"$1\times 10^{-3}$", r"$2\times 10^{-3}$", r"$4\times 10^{-3}$", r"$8\times 10^{-3}$", r"$1\times 10^{-2}$",
+        r"$2\times 10^{-2}$"))
+    plt.legend(loc='best', prop={'size': 12})
+    plt.gcf().set_size_inches(20, 12)
+    plt.savefig('./output/convergence/{}_Convergence.png'.format(task[1].__name__))
+
