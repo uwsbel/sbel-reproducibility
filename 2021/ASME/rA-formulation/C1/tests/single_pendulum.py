@@ -43,7 +43,7 @@ def single_pendulum(args):
         body.J = np.diag([J_xx, J_yz, J_yz])
 
     if args[3] == 'dynamics':
-        sys.dynamics_solver(2)
+        sys.dynamics_solver()
     else:
         sys.kinematics_solver()
     iterations = sys.avg_iterations

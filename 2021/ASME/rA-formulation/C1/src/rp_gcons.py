@@ -1,16 +1,12 @@
 #!/usr/bin/env python3
 
 """Implementations of the primitive GCons
-
-@TODO: provide file description here
-@TODO: additional function descriptions
 """
 
 import numpy as np
-
-#@TODO: think of better way to handle numpy objects in eval()
 from numpy import cos, sin, pi
 
+I3 = np.eye(3)
 
 # ------------------------------------- Utility functions -----------------------------------------
 def skew(vector):
@@ -18,66 +14,6 @@ def skew(vector):
     return np.array([[0, -vector.item(2), vector.item(1)],
                      [vector.item(2), 0, -vector.item(0)],
                      [-vector.item(1), vector.item(0), 0]])
-
-
-def rotation(p):
-    """ Function to create a rotation matrix from the Euler parameters """
-    e_0 = p[0][0]
-    e = np.array([[p[1][0]],
-                  [p[2][0]],
-                  [p[3][0]]])
-    e_tilde = skew(e)
-    return (e_0 ** 2 - e.T @ e) * np.eye(3) + 2 * (e @ e.T + e_0 * e_tilde)
-
-def omega(p, p_ddot):
-    E = e_mat(p)
-    return 2 * (E @ p_ddot)
-
-def omega_bar(p, p_dot):
-    G = g_mat(p)
-    return 2 * (G @ p_dot)
-
-def e_mat(p):
-    e_0 = p[0][0]
-    e = np.array([[p[1][0]],
-                  [p[2][0]],
-                  [p[3][0]]])
-    e_tilde = skew(e)
-    return np.concatenate((-e, e_tilde + e_0 * np.eye(3)), axis=1)
-
-def to_scalar_first(q):
-    """
-    Swaps from scalar last to scalar first storage of a quaternion
-    """
-    return np.array([[q[3, 0], q[0, 0], q[1, 0], q[2, 0]]]).T
-
-def g_mat(p):
-    """ Function to create a G matrix from the Euler parameters """
-    e_0 = p[0][0]
-    e = np.array([[p[1][0]],
-                  [p[2][0]],
-                  [p[3][0]]])
-    e_tilde = skew(e)
-    return np.concatenate((-e, -e_tilde+e_0*np.eye(3)), axis=1)
-
-def g_dot_mat(p_dot):
-    e_dot_0 = p_dot[0][0]
-    e_dot = np.array([[p_dot[1][0]],
-                      [p_dot[2][0]],
-                      [p_dot[3][0]]])
-    e_dot_tilde = skew(e_dot)
-    return np.concatenate((-e_dot, -e_dot_tilde+e_dot_0*np.eye(3)), axis=1)
-
-def b_mat(p, a_bar):
-    e_0 = p[0][0]
-    e = np.array([[p[1][0]],
-                  [p[2][0]],
-                  [p[3][0]]])
-    e_tilde = skew(e)
-    a_bar_tilde = skew(a_bar)
-    column_1 = (e_0 * np.eye(3) + e_tilde) @ a_bar
-    column_2 = e @ a_bar.T - (e_0 * np.eye(3) + e_tilde) @ a_bar_tilde
-    return np.concatenate((2 * column_1, 2 * column_2), axis=1)
 
 
 # ------------------------------------- Driving Constraint -----------------------------------------
@@ -116,8 +52,12 @@ class GConDP1:
                                                 constraint_dict['f_ddot'])
 
     def phi(self, t):
-        A_i = rotation(self.body_i.p)
-        A_j = rotation(self.body_j.p)
+        p_i = self.body_i.p
+        p_j = self.body_j.p
+        A_i = (p_i[0] ** 2 - p_i[1:].T @ p_i[1:]) * I3 + 2 * (
+                p_i[1:] @ p_i[1:].T + p_i[0] * skew(p_i[1:]))
+        A_j = (p_j[0] ** 2 - p_j[1:].T @ p_j[1:]) * I3 + 2 * (
+                p_j[1:] @ p_j[1:].T + p_j[0] * skew(p_j[1:]))
         return self.a_bar_i.T @ A_i.T @ A_j @ self.a_bar_j - self.prescribed_val.f(t)
 
     def nu(self, t):
@@ -126,15 +66,44 @@ class GConDP1:
 
     def gamma(self, t):
         # calculate gamma, the RHS of the accel. equation
-        A_i = rotation(self.body_i.p)
-        A_j = rotation(self.body_j.p)
-        a_i = A_i @ self.a_bar_i
-        a_j = A_j @ self.a_bar_j
-        a_dot_i = b_mat(self.body_i.p, self.a_bar_i) @ self.body_i.p_dot
-        a_dot_j = b_mat(self.body_j.p, self.a_bar_j) @ self.body_j.p_dot
+        p_i = self.body_i.p
+        e_tilde_i = skew(p_i[1:])
+        a_bar_i = self.a_bar_i
+        a_bar_tilde_i = skew(a_bar_i)
+        b_mat_i = np.concatenate((2 * ((p_i[0] * I3 + e_tilde_i) @ a_bar_i),
+                                  2 * (p_i[1:] @ a_bar_i.T - (p_i[0] * I3 + e_tilde_i) @ a_bar_tilde_i)), axis=1)
 
-        return - a_i.T @ b_mat(self.body_j.p_dot, self.a_bar_j) @ self.body_j.p_dot \
-               - a_j.T @ b_mat(self.body_i.p_dot, self.a_bar_i) @ self.body_i.p_dot \
+        p_j = self.body_j.p
+        e_tilde_j = skew(p_j[1:])
+        a_bar_j = self.a_bar_j
+        a_bar_tilde_j = skew(a_bar_j)
+        b_mat_j = np.concatenate((2 * ((p_j[0] * I3 + e_tilde_j) @ a_bar_j),
+                                  2 * (p_j[1:] @ a_bar_j.T - (
+                                          p_j[0] * I3 + e_tilde_j) @ a_bar_tilde_j)), axis=1)
+
+        p_dot_i = self.body_i.p_dot
+        e_tilde_dot_i = skew(p_dot_i[1:])
+        b_mat_dot_i = np.concatenate((2 * ((p_dot_i[0] * I3 + e_tilde_dot_i) @ a_bar_i),
+                                      2 * (p_dot_i[1:] @ a_bar_i.T - (
+                                              p_dot_i[0] * I3 + e_tilde_dot_i) @ a_bar_tilde_i)), axis=1)
+
+        p_dot_j = self.body_j.p_dot
+        e_tilde_dot_j = skew(p_dot_j[1:])
+        b_mat_dot_j = np.concatenate((2 * ((p_dot_j[0] * I3 + e_tilde_dot_j) @ a_bar_j),
+                                      2 * (p_dot_j[1:] @ a_bar_j.T - (
+                                              p_dot_j[0] * I3 + e_tilde_dot_j) @ a_bar_tilde_j)), axis=1)
+
+        A_i = (p_i[0] ** 2 - p_i[1:].T @ p_i[1:]) * I3 + 2 * (
+                p_i[1:] @ p_i[1:].T + p_i[0] * skew(p_i[1:]))
+        A_j = (p_j[0] ** 2 - p_j[1:].T @ p_j[1:]) * I3 + 2 * (
+                p_j[1:] @ p_j[1:].T + p_j[0] * skew(p_j[1:]))
+        a_i = A_i @ a_bar_i
+        a_j = A_j @ a_bar_j
+        a_dot_i = b_mat_i @ p_dot_i
+        a_dot_j = b_mat_j @ p_dot_j
+
+        return - a_i.T @ b_mat_dot_j @ p_dot_j \
+               - a_j.T @ b_mat_dot_i @ p_dot_i \
                - 2 * (a_dot_i.T @ a_dot_j) + self.prescribed_val.f_ddot(t)
 
     def partial_r(self):
@@ -149,17 +118,35 @@ class GConDP1:
 
     def partial_p(self):
         # calculate partial_phi/partial_p
-        A_i = rotation(self.body_i.p)
-        A_j = rotation(self.body_j.p)
-        a_i = A_i @ self.a_bar_i
-        a_j = A_j @ self.a_bar_j
-        phi_p_i = a_j.T @ b_mat(self.body_i.p, self.a_bar_i)
-        phi_p_j = a_i.T @ b_mat(self.body_j.p, self.a_bar_j)
+        p_i = self.body_i.p
+        e_tilde_i = skew(p_i[1:])
+        a_bar_i = self.a_bar_i
+        a_bar_tilde_i = skew(a_bar_i)
+        b_mat_i = np.concatenate((2 * ((p_i[0] * I3 + e_tilde_i) @ a_bar_i),
+                                  2 * (p_i[1:] @ a_bar_i.T - (p_i[0] * I3 + e_tilde_i) @ a_bar_tilde_i)), axis=1)
+
+        p_j = self.body_j.p
+        e_tilde_j = skew(p_j[1:])
+        a_bar_j = self.a_bar_j
+        a_bar_tilde_j = skew(a_bar_j)
+        b_mat_j = np.concatenate((2 * ((p_j[0] * I3 + e_tilde_j) @ a_bar_j),
+                                  2 * (p_j[1:] @ a_bar_j.T - (
+                                          p_j[0] * I3 + e_tilde_j) @ a_bar_tilde_j)), axis=1)
+
+        A_i = (p_i[0] ** 2 - p_i[1:].T @ p_i[1:]) * I3 + 2 * (
+                p_i[1:] @ p_i[1:].T + p_i[0] * skew(p_i[1:]))
+        A_j = (p_j[0] ** 2 - p_j[1:].T @ p_j[1:]) * I3 + 2 * (
+                p_j[1:] @ p_j[1:].T + p_j[0] * skew(p_j[1:]))
+        a_i = A_i @ a_bar_i
+        a_j = A_j @ a_bar_j
+        phi_p_i = a_j.T @ b_mat_i
+        phi_p_j = a_i.T @ b_mat_j
         if self.body_i.is_ground:
             return phi_p_j
         if self.body_j.is_ground:
             return phi_p_i
         return [phi_p_i, phi_p_j]
+
 
 # ------------------------------------- DP2 Constraint --------------------------------------------
 class GConDP2:
@@ -184,14 +171,20 @@ class GConDP2:
 
     def d_ij(self):
         # calculate d_ij, the distance between point P and point Q
-        A_i = rotation(self.body_i.p)
-        A_j = rotation(self.body_j.p)
+        p_i = self.body_i.p
+        p_j = self.body_j.p
+        A_i = (p_i[0] ** 2 - p_i[1:].T @ p_i[1:]) * I3 + 2 * (
+                p_i[1:] @ p_i[1:].T + p_i[0] * skew(p_i[1:]))
+        A_j = (p_j[0] ** 2 - p_j[1:].T @ p_j[1:]) * I3 + 2 * (
+                p_j[1:] @ p_j[1:].T + p_j[0] * skew(p_j[1:]))
         r_p = self.body_i.r + A_i @ self.s_bar_p_i
         r_q = self.body_j.r + A_j @ self.s_bar_q_j
         return r_q - r_p
 
     def phi(self, t):
-        A_i = rotation(self.body_i.p)
+        p_i = self.body_i.p
+        A_i = (p_i[0] ** 2 - p_i[1:].T @ p_i[1:]) * I3 + 2 * (
+                p_i[1:] @ p_i[1:].T + p_i[0] * skew(p_i[1:]))
         return self.a_bar_i.T @ A_i.T @ self.d_ij() - self.prescribed_val.f(t)
 
     def nu(self, t):
@@ -200,21 +193,63 @@ class GConDP2:
 
     def gamma(self, t):
         # calculate gamma, the RHS of the accel. equation
-        A_i = rotation(self.body_i.p)
-        a_i = A_i @ self.a_bar_i
-        a_dot_i = b_mat(self.body_i.p, self.a_bar_i) @ self.body_i.p_dot
-        d_dot_ij = self.body_j.r_dot + b_mat(self.body_j.p, self.s_bar_q_j) @ self.body_j.p_dot \
-                   - self.body_i.r_dot - b_mat(self.body_i.p, self.s_bar_p_i) @ self.body_i.p_dot
+        p_i = self.body_i.p
+        e_tilde_i = skew(p_i[1:])
+        a_bar_i = self.a_bar_i
+        a_bar_tilde_i = skew(a_bar_i)
+        b_mat_i = np.concatenate((2 * ((p_i[0] * I3 + e_tilde_i) @ a_bar_i),
+                                  2 * (p_i[1:] @ a_bar_i.T - (p_i[0] * I3 + e_tilde_i) @ a_bar_tilde_i)), axis=1)
 
-        return - a_i.T @ b_mat(self.body_j.p_dot, self.s_bar_q_j) @ self.body_j.p_dot \
-               + a_i.T @ b_mat(self.body_i.p_dot, self.s_bar_p_i) @ self.body_i.p_dot \
-               - self.d_ij().T @ b_mat(self.body_i.p_dot, self.a_bar_i) @ self.body_i.p_dot \
+        A_i = (p_i[0] ** 2 - p_i[1:].T @ p_i[1:]) * I3 + 2 * (
+                p_i[1:] @ p_i[1:].T + p_i[0] * skew(p_i[1:]))
+
+        p_dot_i = self.body_i.p_dot
+        e_dot_tilde_i = skew(p_dot_i[1:])
+        a_bar_i_s = self.s_bar_p_i
+        a_bar_tilde_i_s = skew(a_bar_i_s)
+        b_mat_dot_i = np.concatenate((2 * ((p_dot_i[0] * I3 + e_dot_tilde_i) @ a_bar_i_s),
+                                      2 * (p_dot_i[1:] @ a_bar_i_s.T - (
+                                                  p_dot_i[0] * I3 + e_dot_tilde_i) @ a_bar_tilde_i_s)), axis=1)
+
+        p_dot_j = self.body_j.p_dot
+        e_dot_tilde_j = skew(p_dot_j[1:])
+        a_bar_j_s = self.s_bar_q_j
+        a_bar_tilde_j_s = skew(a_bar_j_s)
+        b_mat_dot_j = np.concatenate((2 * ((p_dot_j[0] * I3 + e_dot_tilde_j) @ a_bar_j_s),
+                                      2 * (p_dot_j[1:] @ a_bar_j_s.T - (
+                                              p_dot_j[0] * I3 + e_dot_tilde_j) @ a_bar_tilde_j_s)), axis=1)
+
+        b_mat_i_s = np.concatenate((2 * ((p_i[0] * I3 + e_tilde_i) @ a_bar_i_s),
+                                  2 * (p_i[1:] @ a_bar_i_s.T - (p_i[0] * I3 + e_tilde_i) @ a_bar_tilde_i_s)), axis=1)
+
+        p_j = self.body_j.p
+        e_tilde_j = skew(p_j[1:])
+        b_mat_j_s = np.concatenate((2 * ((p_j[0] * I3 + e_tilde_j) @ a_bar_j_s),
+                                  2 * (p_j[1:] @ a_bar_j_s.T - (p_j[0] * I3 + e_tilde_j) @ a_bar_tilde_j_s)), axis=1)
+
+        b_mat_dot_i_a = np.concatenate((2 * ((p_dot_i[0] * I3 + e_dot_tilde_i) @ a_bar_i),
+                                      2 * (p_dot_i[1:] @ a_bar_i.T - (
+                                                  p_dot_i[0] * I3 + e_dot_tilde_i) @ a_bar_tilde_i)), axis=1)
+
+        a_i = A_i @ a_bar_i
+        a_dot_i = b_mat_i @ p_dot_i
+        d_dot_ij = self.body_j.r_dot + b_mat_j_s @ p_dot_j \
+                   - self.body_i.r_dot - b_mat_i_s @ p_dot_i
+
+
+        return - a_i.T @ b_mat_dot_j @ p_dot_j \
+               + a_i.T @ b_mat_dot_i @ p_dot_i \
+               - self.d_ij().T @ b_mat_dot_i_a @ p_dot_i \
                - 2 * a_dot_i.T @ d_dot_ij + self.prescribed_val.f_ddot(t)
 
     def partial_r(self):
         # calculate partial_phi/partial_r
-        phi_r_i = -self.a_bar_i.T @ rotation(self.body_i.p).T
-        phi_r_j = self.a_bar_i.T @ rotation(self.body_i.p).T
+        p_i = self.body_i.p
+        A_i = (p_i[0] ** 2 - p_i[1:].T @ p_i[1:]) * I3 + 2 * (
+                p_i[1:] @ p_i[1:].T + p_i[0] * skew(p_i[1:]))
+        a_bar_i = self.a_bar_i
+        phi_r_i = -a_bar_i.T @ A_i.T
+        phi_r_j = a_bar_i.T @ A_i.T
         if self.body_i.is_ground:
             return phi_r_j
         if self.body_j.is_ground:
@@ -223,9 +258,29 @@ class GConDP2:
 
     def partial_p(self):
         # calculate partial_phi/partial_p
-        phi_p_i = self.d_ij().T @ b_mat(self.body_i.p, self.a_bar_i) \
-                - self.a_bar_i.T @ rotation(self.body_i.p).T @ b_mat(self.body_i.p, self.s_bar_p_i)
-        phi_p_j = self.a_bar_i.T @ rotation(self.body_i.p).T @ b_mat(self.body_j.p, self.s_bar_q_j)
+        p_i = self.body_i.p
+        p_j = self.body_j.p
+        A_i = (p_i[0] ** 2 - p_i[1:].T @ p_i[1:]) * I3 + 2 * (
+                p_i[1:] @ p_i[1:].T + p_i[0] * skew(p_i[1:]))
+
+        e_tilde_i = skew(p_i[1:])
+        a_bar_i = self.a_bar_i
+        a_bar_tilde_i = skew(a_bar_i)
+        b_mat_i = np.concatenate((2 * ((p_i[0] * I3 + e_tilde_i) @ a_bar_i),
+                                  2 * (p_i[1:] @ a_bar_i.T - (p_i[0] * I3 + e_tilde_i) @ a_bar_tilde_i)), axis=1)
+        a_bar_i_s = self.s_bar_p_i
+        a_bar_tilde_i_s = skew(a_bar_i_s)
+        b_mat_i_s = np.concatenate((2 * ((p_i[0] * I3 + e_tilde_i) @ a_bar_i_s),
+                                    2 * (p_i[1:] @ a_bar_i_s.T - (p_i[0] * I3 + e_tilde_i) @ a_bar_tilde_i_s)), axis=1)
+        e_tilde_j = skew(p_j[1:])
+        a_bar_j_s = self.s_bar_q_j
+        a_bar_tilde_j_s = skew(a_bar_j_s)
+        b_mat_j_s = np.concatenate((2 * ((p_j[0] * I3 + e_tilde_j) @ a_bar_j_s),
+                                    2 * (p_j[1:] @ a_bar_j_s.T - (p_j[0] * I3 + e_tilde_j) @ a_bar_tilde_j_s)), axis=1)
+
+        phi_p_i = self.d_ij().T @ b_mat_i \
+                  - a_bar_i.T @ A_i.T @ b_mat_i_s
+        phi_p_j = a_bar_i.T @ A_i.T @ b_mat_j_s
         if self.body_i.is_ground:
             return phi_p_j
         if self.body_j.is_ground:
@@ -255,14 +310,19 @@ class GConD:
 
     def d_ij(self):
         # calculate d_ij, the distance between point P and point Q
-        A_i = rotation(self.body_i.p)
-        A_j = rotation(self.body_j.p)
+        p_i = self.body_i.p
+        p_j = self.body_j.p
+        A_i = (p_i[0] ** 2 - p_i[1:].T @ p_i[1:]) * I3 + 2 * (
+                p_i[1:] @ p_i[1:].T + p_i[0] * skew(p_i[1:]))
+        A_j = (p_j[0] ** 2 - p_j[1:].T @ p_j[1:]) * I3 + 2 * (
+                p_j[1:] @ p_j[1:].T + p_j[0] * skew(p_j[1:]))
         r_p = self.body_i.r + A_i @ self.s_bar_p_i
         r_q = self.body_j.r + A_j @ self.s_bar_q_j
         return r_q - r_p
 
     def phi(self, t):
-        return self.d_ij().T @ self.d_ij() - self.prescribed_val.f(t)
+        d_ij = self.d_ij()
+        return d_ij.T @ d_ij - self.prescribed_val.f(t)
 
     def nu(self, t):
         # calculate nu, the RHS of the velocity equation
@@ -270,16 +330,45 @@ class GConD:
 
     def gamma(self, t):
         # calculate gamma, the RHS of the accel. equation
-        d_dot_ij = self.body_j.r_dot + b_mat(self.body_j.p, self.s_bar_q_j) @ self.body_j.p_dot \
-                   - self.body_i.r_dot - b_mat(self.body_i.p, self.s_bar_p_i) @ self.body_i.p_dot
-        return - 2 * self.d_ij().T @ b_mat(self.body_j.p_dot, self.s_bar_q_j) @ self.body_j.p_dot \
-               + 2 * self.d_ij().T @ b_mat(self.body_i.p_dot, self.s_bar_p_i) @ self.body_i.p_dot \
+        p_i = self.body_i.p
+        e_tilde_i = skew(p_i[1:])
+        a_bar_i = self.s_bar_p_i
+        a_bar_tilde_i = skew(a_bar_i)
+        b_mat_i = np.concatenate((2 * ((p_i[0] * I3 + e_tilde_i) @ a_bar_i),
+                                  2 * (p_i[1:] @ a_bar_i.T - (p_i[0] * I3 + e_tilde_i) @ a_bar_tilde_i)), axis=1)
+
+        p_j = self.body_j.p
+        e_tilde_j = skew(p_j[1:])
+        a_bar_j = self.s_bar_q_j
+        a_bar_tilde_j = skew(a_bar_j)
+        b_mat_j = np.concatenate((2 * ((p_j[0] * I3 + e_tilde_j) @ a_bar_j),
+                                  2 * (p_j[1:] @ a_bar_j.T - (
+                                          p_j[0] * I3 + e_tilde_j) @ a_bar_tilde_j)), axis=1)
+
+        p_dot_i = self.body_i.p_dot
+        e_tilde_dot_i = skew(p_dot_i[1:])
+        b_mat_dot_i = np.concatenate((2 * ((p_dot_i[0] * I3 + e_tilde_dot_i) @ a_bar_i),
+                                      2 * (p_dot_i[1:] @ a_bar_i.T - (
+                                              p_dot_i[0] * I3 + e_tilde_dot_i) @ a_bar_tilde_i)), axis=1)
+
+        p_dot_j = self.body_j.p_dot
+        e_tilde_dot_j = skew(p_dot_j[1:])
+        b_mat_dot_j = np.concatenate((2 * ((p_dot_j[0] * I3 + e_tilde_dot_j) @ a_bar_j),
+                                      2 * (p_dot_j[1:] @ a_bar_j.T - (
+                                              p_dot_j[0] * I3 + e_tilde_dot_j) @ a_bar_tilde_j)), axis=1)
+
+        d_ij = self.d_ij()
+        d_dot_ij = self.body_j.r_dot + b_mat_j @ p_dot_j \
+                   - self.body_i.r_dot - b_mat_i @ p_dot_i
+        return - 2 * d_ij.T @ b_mat_dot_j @ p_dot_j \
+               + 2 * d_ij.T @ b_mat_dot_i @ p_dot_i \
                - 2 * d_dot_ij.T @ d_dot_ij + self.prescribed_val.f_ddot(t)
 
     def partial_r(self):
         # calculate partial_phi/partial_r
-        phi_r_i = -2 * self.d_ij().T
-        phi_r_j = 2 * self.d_ij().T
+        d_ij = self.d_ij()
+        phi_r_i = -2 * d_ij.T
+        phi_r_j = 2 * d_ij.T
         if self.body_i.is_ground:
             return phi_r_j
         if self.body_j.is_ground:
@@ -288,8 +377,24 @@ class GConD:
 
     def partial_p(self):
         # calculate partial_phi/partial_p
-        phi_p_i = -2 * self.d_ij().T @ b_mat(self.body_i.p, self.s_bar_p_i)
-        phi_p_j = 2 * self.d_ij().T @ b_mat(self.body_j.p, self.s_bar_q_j)
+        p_i = self.body_i.p
+        e_tilde_i = skew(p_i[1:])
+        a_bar_i = self.s_bar_p_i
+        a_bar_tilde_i = skew(a_bar_i)
+        b_mat_i = np.concatenate((2 * ((p_i[0] * I3 + e_tilde_i) @ a_bar_i),
+                                  2 * (p_i[1:] @ a_bar_i.T - (p_i[0] * I3 + e_tilde_i) @ a_bar_tilde_i)), axis=1)
+
+        p_j = self.body_j.p
+        e_tilde_j = skew(p_j[1:])
+        a_bar_j = self.s_bar_q_j
+        a_bar_tilde_j = skew(a_bar_j)
+        b_mat_j = np.concatenate((2 * ((p_j[0] * I3 + e_tilde_j) @ a_bar_j),
+                                  2 * (p_j[1:] @ a_bar_j.T - (
+                                          p_j[0] * I3 + e_tilde_j) @ a_bar_tilde_j)), axis=1)
+
+        d_ij = self.d_ij()
+        phi_p_i = -2 * d_ij.T @ b_mat_i
+        phi_p_j = 2 * d_ij.T @ b_mat_j
         if self.body_i.is_ground:
             return phi_p_j
         if self.body_j.is_ground:
@@ -321,8 +426,12 @@ class GConCD:
 
     def d_ij(self):
         # calculate d_ij, the distance between point P and point Q
-        A_i = rotation(self.body_i.p)
-        A_j = rotation(self.body_j.p)
+        p_i = self.body_i.p
+        p_j = self.body_j.p
+        A_i = (p_i[0] ** 2 - p_i[1:].T @ p_i[1:]) * I3 + 2 * (
+                p_i[1:] @ p_i[1:].T + p_i[0] * skew(p_i[1:]))
+        A_j = (p_j[0] ** 2 - p_j[1:].T @ p_j[1:]) * I3 + 2 * (
+                p_j[1:] @ p_j[1:].T + p_j[0] * skew(p_j[1:]))
         r_p = self.body_i.r + A_i @ self.s_bar_p_i
         r_q = self.body_j.r + A_j @ self.s_bar_q_j
         return r_q - r_p
@@ -336,14 +445,32 @@ class GConCD:
 
     def gamma(self, t):
         # calculate gamma, the RHS of the accel. equation
-        return self.c.T @ b_mat(self.body_i.p_dot, self.s_bar_p_i) @ self.body_i.p_dot \
-               - self.c.T @ b_mat(self.body_j.p_dot, self.s_bar_q_j) @ self.body_j.p_dot \
+        p_dot_i = self.body_i.p_dot
+        e_tilde_i = skew(p_dot_i[1:])
+        a_bar_i = self.s_bar_p_i
+        a_bar_tilde_i = skew(a_bar_i)
+        b_mat_dot_i = np.concatenate((2 * ((p_dot_i[0] * I3 + e_tilde_i) @ a_bar_i),
+                                      2 * (p_dot_i[1:] @ a_bar_i.T - (
+                                                  p_dot_i[0] * I3 + e_tilde_i) @ a_bar_tilde_i)), axis=1)
+
+        p_dot_j = self.body_j.p_dot
+        e_tilde_j = skew(p_dot_j[1:])
+        a_bar_j = self.s_bar_q_j
+        a_bar_tilde_j = skew(a_bar_j)
+        b_mat_dot_j = np.concatenate((2 * ((p_dot_j[0] * I3 + e_tilde_j) @ a_bar_j),
+                                      2 * (p_dot_j[1:] @ a_bar_j.T - (
+                                              p_dot_j[0] * I3 + e_tilde_j) @ a_bar_tilde_j)), axis=1)
+
+        c = self.c
+        return c.T @ b_mat_dot_i @ p_dot_i \
+               - c.T @ b_mat_dot_j @ p_dot_j \
                + self.prescribed_val.f_ddot(t)
 
     def partial_r(self):
         # calculate partial_phi/partial_r
-        phi_r_i = -self.c.T
-        phi_r_j = self.c.T
+        c = self.c
+        phi_r_i = -c.T
+        phi_r_j = c.T
         if self.body_i.is_ground:
             return phi_r_j
         if self.body_j.is_ground:
@@ -352,8 +479,23 @@ class GConCD:
 
     def partial_p(self):
         # calculate partial_phi/partial_p
-        phi_p_i = -self.c.T @ b_mat(self.body_i.p, self.s_bar_p_i)
-        phi_p_j = self.c.T @ b_mat(self.body_j.p, self.s_bar_q_j)
+        p_i = self.body_i.p
+        e_tilde_i = skew(p_i[1:])
+        a_bar_i = self.s_bar_p_i
+        a_bar_tilde_i = skew(a_bar_i)
+        b_mat_i = np.concatenate((2 * ((p_i[0] * I3 + e_tilde_i) @ a_bar_i),
+                                  2 * (p_i[1:] @ a_bar_i.T - (p_i[0] * I3 + e_tilde_i) @ a_bar_tilde_i)), axis=1)
+
+        p_j = self.body_j.p
+        e_tilde_j = skew(p_j[1:])
+        a_bar_j = self.s_bar_q_j
+        a_bar_tilde_j = skew(a_bar_j)
+        b_mat_j = np.concatenate((2 * ((p_j[0] * I3 + e_tilde_j) @ a_bar_j),
+                                  2 * (p_j[1:] @ a_bar_j.T - (
+                                          p_j[0] * I3 + e_tilde_j) @ a_bar_tilde_j)), axis=1)
+        c = self.c
+        phi_p_i = -c.T @ b_mat_i
+        phi_p_j = c.T @ b_mat_j
         if self.body_i.is_ground:
             return phi_p_j
         if self.body_j.is_ground:

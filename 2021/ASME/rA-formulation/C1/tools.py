@@ -8,10 +8,15 @@ import argparse as arg
 import logging
 
 import cProfile
+import pstats
+import io
+from pstats import SortKey
 
 from rA_sim_engine_3d import rASimEngine3D
 from rp_sim_engine_3d import rpSimEngine3D
 from reps_sim_engine_3d import repsSimEngine3D
+
+profiler = cProfile.Profile()
 
 
 def standard_setup(parser, model_files, args=None):
@@ -23,6 +28,7 @@ def standard_setup(parser, model_files, args=None):
     parser.add_argument('--form', choices=['rp', 'rA', 'reps'], default='rp')
     parser.add_argument('--mode', choices=['kin', 'dyn', 'kinematics', 'dynamics'], default='kinematics')
     parser.add_argument('--tol', type=float)
+    parser.add_argument('-t', '--end_time', type=float, default=3, dest='t_end')
     parser.add_argument('--step_size', type=float, default=1e-3, dest='h')
 
     parser.add_argument('-l', '--log', choices=['debug', 'info', 'warning', 'error'], default='info')
@@ -49,3 +55,14 @@ def standard_setup(parser, model_files, args=None):
     logging.basicConfig(filename=out_args.output, level=getattr(logging, out_args.log.upper()), format='%(message)s')
 
     return sys, out_args
+
+def print_profiling(profiler):
+    """
+    Prints out profiling information, based on suggestions here https://docs.python.org/3/library/profile.html#module-cProfile
+    """
+    s = io.StringIO()
+    sortby = 'tottime'
+    ps = pstats.Stats(profiler, stream=s).sort_stats(sortby)
+    #ps.strip_dirs()
+    ps.print_stats()
+    print(s.getvalue())

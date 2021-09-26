@@ -50,7 +50,7 @@ def four_link(args):
                                                                 "-pi*sin(pi*t)",
                                                                 "-pi**2*cos(pi*t)")
     if args[3] == 'dynamics':
-        sys.dynamics_solver(2)
+        sys.dynamics_solver()
     else:
         sys.kinematics_solver()
     iterations = sys.avg_iterations

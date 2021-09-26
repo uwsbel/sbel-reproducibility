@@ -97,8 +97,8 @@ class GConDP1:
         # for readability
         a_bar_j = self.a_bar_j
         a_bar_i = self.a_bar_i
-        a_bar_i_tilde = skew(self.a_bar_i)
-        a_bar_j_tilde = skew(self.a_bar_j)
+        a_bar_i_tilde = skew(a_bar_i)
+        a_bar_j_tilde = skew(a_bar_j)
         A_i = self.body_i.A
         A_j = self.body_j.A
 
@@ -167,7 +167,7 @@ class GConDP2:
         A_i = self.body_i.A
         A_j = self.body_j.A
         omega_i = self.body_i.omega
-        omega_tilde_i = skew(self.body_i.omega)
+        omega_tilde_i = skew(omega_i)
         omega_tilde_j = skew(self.body_j.omega)
         r_dot_i = self.body_i.r_dot
         r_dot_j = self.body_j.r_dot
@@ -195,7 +195,7 @@ class GConDP2:
         """Return the sensitivity of phi with respect to theta."""
         # for readability
         a_bar_i = self.a_bar_i
-        a_bar_i_tilde = skew(self.a_bar_i)
+        a_bar_i_tilde = skew(a_bar_i)
         s_bar_q_j = self.s_bar_q_j
         s_bar_p_i = self.s_bar_p_i
         A_i = self.body_i.A
@@ -246,7 +246,8 @@ class GConD:
 
     def phi(self, t):
         """Return phi(t), the expression for the constraint."""
-        return self.d_ij().T @ self.d_ij() - self.prescribed_val.f(t)
+        d_ij = self.d_ij()
+        return d_ij.T @ d_ij - self.prescribed_val.f(t)
 
     def nu(self, t):
         """Return nu, the RHS of the velocity equation."""
@@ -259,8 +260,10 @@ class GConD:
         A_j = self.body_j.A
         r_dot_i = self.body_i.r_dot
         r_dot_j = self.body_j.r_dot
-        omega_tilde_i = skew(self.body_i.omega)
-        omega_tilde_j = skew(self.body_j.omega)
+        omega_i = self.body_i.omega
+        omega_j = self.body_j.omega
+        omega_tilde_i = skew(omega_i)
+        omega_tilde_j = skew(omega_j)
         s_bar_p_i = self.s_bar_p_i
         s_bar_q_j = self.s_bar_q_j
 
@@ -268,16 +271,17 @@ class GConD:
                + 2 * s_bar_q_j.T @ omega_tilde_j @ omega_tilde_j @ s_bar_q_j \
                + 2 * s_bar_p_i.T @ omega_tilde_i @ omega_tilde_i @ s_bar_p_i \
                - 4 * s_bar_q_j.T @ omega_tilde_j @ A_j.T @ A_i @ omega_tilde_i @ s_bar_p_i \
-               + 4 * (r_dot_j - r_dot_i).T @ (A_j @ skew(s_bar_q_j) @ self.body_j.omega
-                                              - A_i @ skew(s_bar_p_i) @ self.body_i.omega) \
-               - 2 * self.d_ij().T @ (A_i @ omega_tilde_i @ skew(s_bar_p_i) @ self.body_i.omega
-                                      - A_j @ omega_tilde_j @ skew(s_bar_q_j) @ self.body_j.omega) \
+               + 4 * (r_dot_j - r_dot_i).T @ (A_j @ skew(s_bar_q_j) @ omega_j
+                                              - A_i @ skew(s_bar_p_i) @ omega_i) \
+               - 2 * self.d_ij().T @ (A_i @ omega_tilde_i @ skew(s_bar_p_i) @ omega_i
+                                      - A_j @ omega_tilde_j @ skew(s_bar_q_j) @ omega_j) \
                + self.prescribed_val.f_ddot(t)
 
     def r_sensitivity(self):
         """Return the sensitivity of phi with respect to r."""
-        r_sensitivity_i = -2 * self.d_ij().T
-        r_sensitivity_j = 2 * self.d_ij().T
+        d_ij = self.d_ij()
+        r_sensitivity_i = -2 * d_ij.T
+        r_sensitivity_j = 2 * d_ij.T
         if self.body_i.is_ground:
             return r_sensitivity_j
         if self.body_j.is_ground:
@@ -287,8 +291,9 @@ class GConD:
 
     def theta_sensitivity(self):
         """Return the sensitivity of phi with respect to theta."""
-        theta_sensitivity_i = 2 * self.d_ij().T @ self.body_i.A @ skew(self.s_bar_p_i)
-        theta_sensitivity_j = -2 * self.d_ij().T @ self.body_j.A @ skew(self.s_bar_q_j)
+        d_ij = self.d_ij()
+        theta_sensitivity_i = 2 * d_ij.T @ self.body_i.A @ skew(self.s_bar_p_i)
+        theta_sensitivity_j = -2 * d_ij.T @ self.body_j.A @ skew(self.s_bar_q_j)
         if self.body_i.is_ground:
             return theta_sensitivity_j
         if self.body_j.is_ground:
@@ -357,8 +362,9 @@ class GConCD:
 
     def r_sensitivity(self):
         """Return the sensitivity of phi with respect to r."""
-        r_sensitivity_i = -self.c.T
-        r_sensitivity_j = self.c.T
+        c = self.c
+        r_sensitivity_i = -c.T
+        r_sensitivity_j = c.T
         if self.body_i.is_ground:
             return r_sensitivity_j
         if self.body_j.is_ground:
@@ -368,8 +374,9 @@ class GConCD:
 
     def theta_sensitivity(self):
         """Return the sensitivity of phi with respect to theta."""
-        theta_sensitivity_i = self.c.T @ self.body_i.A @ skew(self.s_bar_p_i)
-        theta_sensitivity_j = -self.c.T @ self.body_j.A @ skew(self.s_bar_q_j)
+        c = self.c
+        theta_sensitivity_i = c.T @ self.body_i.A @ skew(self.s_bar_p_i)
+        theta_sensitivity_j = -c.T @ self.body_j.A @ skew(self.s_bar_q_j)
         if self.body_i.is_ground:
             return theta_sensitivity_j
         if self.body_j.is_ground:
