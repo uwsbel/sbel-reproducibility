@@ -144,9 +144,11 @@ class rpSimEngine3D:
                 body.p_ddot = q_ddot[3 * nb + idx * 4:3 * nb + idx * 4 + 4, :]
 
             # store solution in array for plotting
-            self.r_sol[i, (body.body_id - 1) * 3:(body.body_id - 1) * 3 + 3] = body.r.T
-            self.r_dot_sol[i, (body.body_id - 1) * 3:(body.body_id - 1) * 3 + 3] = body.r_dot.T
-            self.r_ddot_sol[i, (body.body_id - 1) * 3:(body.body_id - 1) * 3 + 3] = body.r_ddot.T
+            for body in self.bodies_list:
+                # store solution in array for plotting
+                self.r_sol[i, (body.body_id - 1) * 3:(body.body_id - 1) * 3 + 3] = body.r.T
+                self.r_dot_sol[i, (body.body_id - 1) * 3:(body.body_id - 1) * 3 + 3] = body.r_dot.T
+                self.r_ddot_sol[i, (body.body_id - 1) * 3:(body.body_id - 1) * 3 + 3] = body.r_ddot.T
 
         self.duration = time.process_time() - start
         self.avg_iterations = np.mean(iterations)
