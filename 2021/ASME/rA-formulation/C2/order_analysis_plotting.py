@@ -13,10 +13,9 @@ for f in os.listdir(dir_path):
     if f == 'steps.pickle':
         with open(dir_path + f, 'rb') as handle:
             step_sizes = pickle.load(handle)
-        
         continue
 
-    if f.endswith('.pickle') and f.startswith('Slider_Crank'):
+    if f.endswith('.pickle') and (f.startswith('Four_Link') or f.startswith('Slider_Crank')):
         files.append(f)
 
 for file_name in files:
@@ -24,7 +23,8 @@ for file_name in files:
         info, pos_diff, vel_diff, acc_diff = pickle.load(handle)
 
     name, form, body, component = info
-    title = '{} {} Order Analysis: Body {}, {}'.format(name, form, body, component)
+    title_name = ' '.join(name.split('_'))
+    title = '{} {} Order Analysis: Body {}, {}'.format(title_name, form, body, component)
 
     _, ax = plt.subplots()
     ax.loglog(step_sizes, [2*step for step in step_sizes], label='Order 2 trendline', markersize=15, linewidth=7)
@@ -37,4 +37,7 @@ for file_name in files:
 
     plt.gcf().set_size_inches(20, 12)
 
-plt.show()
+    filename = '{}_{}_Order_Analysis_Body_{}_{}'.format(name, form, body, component)
+    plt.savefig(filename)
+
+# plt.show()

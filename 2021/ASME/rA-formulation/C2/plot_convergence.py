@@ -15,7 +15,7 @@ for f in os.listdir(dir_path):
         
         continue
 
-    if f.endswith('.pickle') and f.startswith('Slider_Crank'):
+    if f.endswith('.pickle'):# and f.startswith('Slider_Crank'):
         files.append(f)
 
 for file_name in files:
@@ -27,9 +27,11 @@ for file_name in files:
 
         fig = plt.figure()
         fig.suptitle(title + ': 1/Iterations to Convergence')
-        ax = fig.gca(projection='3d')
-        surf = ax.plot_surface(np.log10(ss), np.log10(MM), conv_iters)
-        ax.set(xlabel='log( Step Size )', ylabel='log( (Step Size)^2 * Θ )')
+        for i, series in enumerate(conv_iters):
+            plt.plot(np.log10(ss[0, :]), series, label=str(np.log10(MM[i, 0])))
+        plt.xlabel('log( Step Size )')
+        plt.ylabel('1 / iterations to convergence')
+        plt.legend()
 
         continue
 

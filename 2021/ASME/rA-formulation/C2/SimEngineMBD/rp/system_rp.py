@@ -14,7 +14,7 @@ class SystemRP:
         self.g_cons = constraints
         self.e_cons = [EulerCon(body) for body in self.bodies]
         self.solver_type = SolverType.KINEMATICS
-        self.solver_order = 1
+        self.solver_order = 2
 
         self.nc = self.g_cons.nc
         self.nb = self.g_cons.nb

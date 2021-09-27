@@ -1,0 +1,26 @@
+Reviewer 5 of IROS 2021 submission 1126
+
+Comments to the author
+======================
+
+Project Chrono seems a very promising simulator for
+learning of off-road vehicles. It is an interesting paper,
+but there are some doubts that could be addressed:
+
+1) From reading the paper, it is not clear that modeling
+the ground is important for learning the policies. It would
+be important to show that modeling the ground using a
+heightfield (as is common in other simulators) is not
+sufficient.
+
+2) Other physics engines, such as MuJoCo and certainly
+PyBullet can simulate vehicles.  I've seen running models
+of a Husky and racecar with Ackerman steering, LIDAR and
+cameras in PyBullet RL environments. Those engines can
+model unstructured terrain with heightfields and irregular
+triangle meshes, with some degree of soft contact.
+
+3) it would be important to show that the policy transfers
+from simulation to the real world, and show that training a
+policy in a regular rigid body simulator (MuJoCo, PyBullet,
+Gazebo) doesn't tranfer as well.

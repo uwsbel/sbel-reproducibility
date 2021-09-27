@@ -1,0 +1,31 @@
+Comments to author (Associate Editor)
+=====================================
+
+The paper presents an end-to-end strategy to learn the
+policy for the navigation in complex off-road scenarios; to
+this purpose, it is used the so-called Chrono simulator.
+
+The work is considered interesting and the presented
+simulator relevant for the considered application.
+
+However, the main concerns regard the novelty and
+contribution of the work. The presented simulator could be
+better claimed with respect to the other existing
+simulators and what is already presented in other
+publications. The learning architecture could be further
+described and evaluated.
+
+For the details, please refer to the comments provided by
+the Reviewers.
+
+
+
+----------------------------------------
+Comments on Video Attachment:
+
+[None found]
+
+----------------------------------------
+Comments on ICRA-21 Paper Attachment:
+
+[None found]
