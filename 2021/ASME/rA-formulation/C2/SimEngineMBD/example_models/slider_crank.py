@@ -35,6 +35,9 @@ def setup_slider_crank(args=None):
     # Get system and change some settings
     sys, params = standard_setup(parser, model_file, args)
     sys.set_g_acc(-9.81 * Z_AXIS)
+    sys.h = params.h
+    sys.tol = params.tol
+    sys.solver_order = 1
 
     # See Haug p. 456 for properties
     # Crank
@@ -111,42 +114,42 @@ def run_slider_crank(args=None):
 
     if params.plot:
         _, ax1 = plt.subplots()
-        ax1.plot(t_grid, pos_data[2, 0, :], 'k')
+        ax1.plot(t_grid, pos_data[2, 0, :].T, 'k')
         ax1.set(xlabel='time [s]', ylabel='position [m]',
-                title='Position of slider')
-        plt.xticks(np.arange(0, 1.2, 0.2))
-        plt.yticks(np.arange(0, 0.35, 0.05))
+                title='x Position of slider')
+        # plt.xticks(np.arange(0, 1.2, 0.2))
+        # plt.yticks(np.arange(0, 0.35, 0.05))
 
         _, ax2 = plt.subplots()
-        ax2.plot(t_grid, vel_data[2, 0, :], 'k')
+        ax2.plot(t_grid, vel_data[2, 0, :].T, 'k')
         ax2.set(xlabel='time [s]', ylabel='velocity [m/s]',
-                title='Velocity of slider')
-        plt.xticks(np.arange(0, 1.2, 0.2))
-        plt.yticks(np.arange(-0.6, 0.7, 0.1))
+                title='x Velocity of slider')
+        # plt.xticks(np.arange(0, 1.2, 0.2))
+        # plt.yticks(np.arange(-0.6, 0.7, 0.1))
 
         _, ax3 = plt.subplots()
-        ax3.plot(t_grid, acc_data[2, 0, :], 'k')
+        ax3.plot(t_grid, acc_data[2, 0, :].T, 'k')
         ax3.set(xlabel='time [s]', ylabel='acceleration [m/s²]',
-                title='Acceleration of slider')
-        plt.xticks(np.arange(0, 1.2, 0.2))
-        plt.yticks(np.arange(-3, 16.2, 3.2))
+                title='x Acceleration of slider')
+        # plt.xticks(np.arange(0, 1.2, 0.2))
+        # plt.yticks(np.arange(-3, 16.2, 3.2))
 
-        _, ax4 = plt.subplots()
-        ax4.plot(t_grid, crank_rot[:, :])
-        ax4.set(xlabel='time [s]', ylabel='ω [rad/s]',
-                title='Angular velocity of crank')
-        plt.yticks(np.arange(-2*π, 2.5*π, π/4))
-        # plt.ylim([-2.5*π, 2.5*π])
+        # _, ax4 = plt.subplots()
+        # ax4.plot(t_grid, crank_rot[:, :])
+        # ax4.set(xlabel='time [s]', ylabel='ω [rad/s]',
+        #         title='Angular velocity of crank')
+        # plt.yticks(np.arange(-2*π, 2.5*π, π/4))
+        # # plt.ylim([-2.5*π, 2.5*π])
 
-        _, ax5 = plt.subplots()
-        ax5.plot(t_grid, acc_data[1, :, :].T)
-        ax5.set(xlabel='time [s]', ylabel='acceleration [m/s²]',
-                title='Acceleration of rod')
-
-        _, ax5 = plt.subplots()
-        ax5.plot(t_grid, acc_data[0, :, :].T)
-        ax5.set(xlabel='time [s]', ylabel='acceleration [m/s²]',
-                title='Acceleration of crank')
+        # _, ax5 = plt.subplots()
+        # ax5.plot(t_grid, acc_data[1, :, :].T)
+        # ax5.set(xlabel='time [s]', ylabel='acceleration [m/s²]',
+        #         title='Acceleration of rod')
+        #
+        # _, ax5 = plt.subplots()
+        # ax5.plot(t_grid, acc_data[0, :, :].T)
+        # ax5.set(xlabel='time [s]', ylabel='acceleration [m/s²]',
+        #         title='Acceleration of crank')
 
         plt.show()
 
