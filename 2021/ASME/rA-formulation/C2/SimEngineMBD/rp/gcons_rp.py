@@ -180,7 +180,7 @@ class Body:
         return 4*self.G.T @ self.J @ self.G
 
     def get_tau(self):
-        return 8*self.dG.T @ self.J @ self.G @ self.dp
+        return 8*self.dG.T @ self.J @ self.dG @ self.p
 
     @property
     def dG(self):
