@@ -45,15 +45,15 @@ double height = std::min_element(m_trimesh_shape->GetMesh()->getCoordsVertices()
 ```
 
 #### GymChrono
-Commit: [8d636c6](https://github.com/Benatti1991/gym-chrono/tree/8d636c62d0a5d4b529162891ea783e8eb34c77cf)
+Commit: [8d636c6](https://github.com/projectchrono/gym-chrono/tree/8d636c62d0a5d4b529162891ea783e8eb34c77cf)
 
 To clone:
 ```bash
-$ git clone https://github.com/Benatti1991/gym-chrono.git && cd gym-chrono
+$ git clone https://github.com/projectchrono/gym-chrono.git && cd gym-chrono
 $ git checkout 8d636c62d0a5d4b529162891ea783e8eb34c77cf
 ```
 
-To install GymChrono, please follow the installation guide found at the bottom of the README ([link](https://github.com/Benatti1991/gym-chrono/tree/8d636c62d0a5d4b529162891ea783e8eb34c77cf#installation)).
+To install GymChrono, please follow the installation guide found at the bottom of the README ([link](https://github.com/projectchrono/gym-chrono/tree/8d636c62d0a5d4b529162891ea783e8eb34c77cf#installation)).
 
 #### Additional Requirements
 
