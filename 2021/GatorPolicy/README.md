@@ -4,7 +4,7 @@ _Last Update_: Saturday, November 27th, 2021
 
 ## Table of Contents
 - [Setup Guide](#setup-guide)
-  - [Publications Data](#publications-data)
+  - [Public Metadata](#public-metadata)
   - [ProjectChrono](#projectchrono-and-pychrono)
   - [GymChrono](#gymchrono)
   - [Additional Requirements](#additional-requirements)
@@ -17,11 +17,11 @@ The results presented in the aforementioned paper utilized [ProjectChrono](http:
 
 Python3.6 is required, as it is the only version compatible with the version of PyChrono, PyTorch and Stable Baselines we will be using. _Recommendation_: Use an [Anaconda](https://anaconda.org/) environment.
 
-#### Publications Data
+#### Public Metadata
 
 To clone:
 ```bash
-$ git clone https://github.com/uwsbel/publications-data.git
+$ git clone https://github.com/uwsbel/public-metadata.git
 ```
 
 #### ProjectChrono and PyChrono
@@ -42,6 +42,7 @@ double height = std::min_element(m_trimesh_shape->GetMesh()->getCoordsVertices()
                                      [loc](const ChVector<>& a, const ChVector<>& b)           //
                                      { return (a - loc).Length() < (b - loc).Length(); })      //
                         ->z();
+return height;
 ```
 
 #### GymChrono
