@@ -7,8 +7,8 @@ dependencies:
   - pip
   - pytorch=1.3.1 
   - torchvision
-  - tensorflow-gpu==1.14
+  - tensorflow-gpu=1.14
   - pip:
-    - stable-baselines==2.10.2
-    - gym==0.15.7
+    - stable-baselines=2.10.2
+    - gym=0.15.7
 
