@@ -79,7 +79,7 @@ if __name__ == "__main__":
 
     # Load model file if it's present
     if os.path.isfile(modelpath):
-        model.load_state_dict(torch.load(modelpath))
+        model.load_state_dict(torch.load(modelpath, map_location=device))
 
     if train:
         ppo = PPO(model=model, envs=envs, device=device, lr=lr, modelpath=modelpath, tuple_ob=True)

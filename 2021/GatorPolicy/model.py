@@ -19,6 +19,10 @@ def outputSize(in_size, kernel_size, stride, padding):
 
     return(conv_size)
 
+class Flatten(nn.Module):
+    def forward(self, input):
+        return input.view(input.size(0), -1)
+
 class MultiSensorEarlyFusion(nn.Module):
     def __init__(self, input1_shape, input2_shape, num_outputs, std=-0.5):
         super(MultiSensorEarlyFusion, self).__init__()
@@ -34,7 +38,7 @@ class MultiSensorEarlyFusion(nn.Module):
             nn.Conv2d(32, 64, kernel_size=4, stride=2),
             nn.ReLU(),
             nn.Conv2d(64, 64, kernel_size=3, stride=1),
-            nn.Flatten(),
+            Flatten(),
             nn.ReLU(),
             nn.Linear(fc_size[0] * fc_size[1] * 64, num_outputs * 5),
 
@@ -51,7 +55,7 @@ class MultiSensorEarlyFusion(nn.Module):
             nn.Conv2d(32, 64, kernel_size=4, stride=2),
             nn.ReLU(),
             nn.Conv2d(64, 64, kernel_size=3, stride=1),
-            nn.Flatten(),
+            Flatten(),
             nn.ReLU(),
             nn.Linear(fc_size[0] * fc_size[1] * 64, num_outputs * 5),
 

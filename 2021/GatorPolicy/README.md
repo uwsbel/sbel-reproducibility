@@ -56,6 +56,8 @@ $ git checkout 8d636c62d0a5d4b529162891ea783e8eb34c77cf
 
 To install GymChrono, please follow the installation guide found at the bottom of the README ([link](https://github.com/projectchrono/gym-chrono/tree/8d636c62d0a5d4b529162891ea783e8eb34c77cf#installation)).
 
+**NOTE**: You will need version `0.15.7` of `gym`, i.e. run `pip install gym==0.15.7`.
+
 #### Additional Requirements
 
 - __PyTorch__: [Installation Guide](https://pytorch.org/)
