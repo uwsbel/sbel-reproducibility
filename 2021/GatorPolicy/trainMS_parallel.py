@@ -106,13 +106,13 @@ if __name__ == "__main__":
         exit()
 
     envs.set_attr('play_mode', True)
+    envs.set_attr('terrain_type', args.terrain_type)
+    envs.set_attr('max_terrain_height', args.max_height)
+    envs.set_attr('num_obstacles', args.num_obstacles)
     state = envs.reset()
     done = np.zeros(num_envs)
     total_reward = np.zeros(num_envs)
 
-    envs.set_attr('terrain_type', args.terrain_type)
-    envs.set_attr('max_terrain_height', args.max_height)
-    envs.set_attr('num_obstacles', args.num_obstacles)
 
     i_episode = np.zeros(num_envs)
 
