@@ -75,9 +75,6 @@ def make_env(env_id, rank, num_envs, seed=0):
         env.rank = rank
         env.num_envs = num_envs
         env.seed(seed + rank)
-        env.terrain_type = args.terrain_type
-        env.num_obstacles = args.num_obstacles
-        env.max_height = args.max_height
         return env
     set_global_seeds(seed)
     return _init
@@ -112,6 +109,10 @@ if __name__ == "__main__":
     state = envs.reset()
     done = np.zeros(num_envs)
     total_reward = np.zeros(num_envs)
+
+    envs.set_attr('terrain_type', args.terrain_type)
+    envs.set_attr('max_terrain_height', args.max_height)
+    envs.set_attr('num_obstacles', args.num_obstacles)
 
     i_episode = np.zeros(num_envs)
 
