@@ -31,6 +31,7 @@ parser.add_argument('--onnx_converter',action='store_true', default=False, dest=
 parser.add_argument("--terrain_type", type=str)
 parser.add_argument("--max_height", type=int)
 parser.add_argument("--num_obstacles", type=int)
+parser.add_argument("--save", action="store_true", default=False)
 
 args = parser.parse_args()
 
@@ -109,6 +110,7 @@ if __name__ == "__main__":
     envs.set_attr('terrain_type', args.terrain_type)
     envs.set_attr('max_terrain_height', args.max_height)
     envs.set_attr('num_obstacles', args.num_obstacles)
+    envs.set_attr('_save', args.save)
     state = envs.reset()
     done = np.zeros(num_envs)
     total_reward = np.zeros(num_envs)
@@ -137,7 +139,7 @@ if __name__ == "__main__":
                 total_reward[i] = 0
                 i_episode[i] += 1
 
-                if sum(i_episode) > max_episodes:
+                if sum(i_episode) >= max_episodes:
                     print('Exceeded maximum of episodes.')
                     exit()
 
