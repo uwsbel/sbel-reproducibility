@@ -83,17 +83,24 @@ class rpSimEngine3D:
         iterations = np.zeros((self.N, 1))
         start = time.process_time()
         for i, t in enumerate(self.t_grid):
-            # check for driving constraint singularity
+            iterations[i] = self.kinematics_step(i, t)
+        self.duration = time.process_time() - start
+        self.avg_iterations = np.mean(iterations)
+        logging.info('Avg. iterations: {}'.format(self.avg_iterations))
+        logging.info('Simulation time: {}'.format(self.duration))
+
+    def kinematics_step(self, i, t):
+        # check for driving constraint singularity
             if np.abs(np.abs(self.constraint_list[-1].prescribed_val.f(t)) - 1) < 0.1:
                 logging.info("Switching to alternative constraint. Time = {}".format(t))
                 if self.alternative_driver is None:
                     logging.warning("Alternative driving constraint not defined.")
-                    break
+                    return
                 self.constraint_list[-1], self.alternative_driver = self.alternative_driver, self.constraint_list[-1]
 
             Phi_q = self.get_phi_q()
             Phi_q_lu = lu_factor(Phi_q)
-            iteration = 0
+            iterations = 0
             while True:
                 Phi_K = np.concatenate([con.phi(t) for con in self.constraint_list], axis=0)
                 Phi_euler = np.concatenate([0.5 * body.p.T @ body.p - 0.5 for body in self.bodies_list], axis=0)
@@ -104,17 +111,14 @@ class rpSimEngine3D:
                     body.r = body.r + delta_q[idx * 3:(idx * 3) + 3, :]
                     body.p = body.p + delta_q[3 * self.nb + idx * 4:3 * self.nb + idx * 4 + 4, :]
 
-                iteration += 1
-                if iteration >= self.max_iters:
+                iterations += 1
+                if iterations >= self.max_iters:
                     logging.warning("Newton-Raphson self.has not converged after {} iterations. "
                                     "Stopping at time {}".format(self.max_iters, t))
                     break
                 
                 if np.linalg.norm(delta_q) < self.tol:
                     break
-            
-            logging.info("Newton-Raphson took {} iterations to converge.".format(iteration))
-            iterations[i] = iteration
 
             Phi_q = self.get_phi_q()
             Phi_q_lu = lu_factor(Phi_q)
@@ -141,10 +145,7 @@ class rpSimEngine3D:
             for body in self.bodies_list:
                 self.store_data(i, body)
 
-        self.duration = time.process_time() - start
-        self.avg_iterations = np.mean(iterations)
-        logging.info('Avg. iterations: {}'.format(self.avg_iterations))
-        logging.info('Simulation time: {}'.format(self.duration))
+            return iterations
 
     def dynamics_solver(self, order=1):
         self.initialize_dynamics()

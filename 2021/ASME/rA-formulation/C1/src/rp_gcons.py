@@ -18,9 +18,7 @@ def skew(vector):
 
 # ------------------------------------- Driving Constraint -----------------------------------------
 class DrivingConstraint:
-    """This class defines a driving function and its first and second derivatives
-
-    This class stores the driving constraint function f(t) and its first and
+    """ This class stores the driving constraint function f(t) and its first and
     second derivatives as lambda functions.
     """
 
