@@ -9,17 +9,16 @@ from scipy.spatial.transform import Rotation as Rot
 
 import rp_gcons as gcons
 
-I3 = np.eye(3)
-
 
 class rpSimEngine3D:
     def __init__(self, filename):
         self.bodies_list = []
         self.bodies_full = []
-        self.nb = 0  # number of bodies that don't include the ground!
+        self.nb = 0  # number of bodies that don't include the ground
         self.constraint_list = []
         self.nc = 0
 
+        # solver parameters
         self.h = 0.001
         self.t_start = 0
         self.t_end = 3
@@ -32,6 +31,8 @@ class rpSimEngine3D:
         self.avg_iterations = 0
 
         self.init_system(filename)
+        self.dynamics_initialized = False
+        self.kinematics_initialized = False
 
         self.alternative_driver = None
 
@@ -76,33 +77,22 @@ class rpSimEngine3D:
                 logging.warning("Incorrect geometric constraint type given.")
         self.nc = len(self.constraint_list)
 
-    def initialize_plotting(self):
-        self.tspan = self.t_end - self.t_start
-        self.N = int(self.tspan / self.h)
-        self.t_grid = np.linspace(self.t_start, self.t_end, self.N, endpoint=True)
-        self.r_sol = np.zeros((self.N, 3 * self.nb))
-        self.r_dot_sol = np.zeros((self.N, 3 * self.nb))
-        self.r_ddot_sol = np.zeros((self.N, 3 * self.nb))
-
     def kinematics_solver(self):
-        # logging.info("Number of bodies counted:", self.nb)
         self.initialize_plotting()
-        nb = self.nb
-        iterations = np.zeros((self.N, 1))
 
+        iterations = np.zeros((self.N, 1))
         start = time.process_time()
         for i, t in enumerate(self.t_grid):
             # check for driving constraint singularity
             if np.abs(np.abs(self.constraint_list[-1].prescribed_val.f(t)) - 1) < 0.1:
-                # logging.info("Switching to alternative constraint. Time = ", t)
+                logging.info("Switching to alternative constraint. Time = {}".format(t))
                 if self.alternative_driver is None:
-                    # logging.warning("Alternative driving constraint not defined.")
+                    logging.warning("Alternative driving constraint not defined.")
                     break
                 self.constraint_list[-1], self.alternative_driver = self.alternative_driver, self.constraint_list[-1]
 
             Phi_q = self.get_phi_q()
             Phi_q_lu = lu_factor(Phi_q)
-
             iteration = 0
             while True:
                 Phi_K = np.concatenate([con.phi(t) for con in self.constraint_list], axis=0)
@@ -112,19 +102,23 @@ class rpSimEngine3D:
 
                 for idx, body in enumerate(self.bodies_list):
                     body.r = body.r + delta_q[idx * 3:(idx * 3) + 3, :]
-                    body.p = body.p + delta_q[3 * nb + idx * 4:3 * nb + idx * 4 + 4, :]
+                    body.p = body.p + delta_q[3 * self.nb + idx * 4:3 * self.nb + idx * 4 + 4, :]
 
                 iteration += 1
                 if iteration >= self.max_iters:
-                    # logging.warning("Newton-Raphson self.has not converged after", str(self.max_iters), "iterations. Stopping at time ", str(t))
+                    logging.warning("Newton-Raphson self.has not converged after {} iterations. "
+                                    "Stopping at time {}".format(self.max_iters, t))
                     break
+                
                 if np.linalg.norm(delta_q) < self.tol:
                     break
-            # logging.info("Newton-Raphson took", str(iteration), "iterations to converge.")
+            
+            logging.info("Newton-Raphson took {} iterations to converge.".format(iteration))
             iterations[i] = iteration
 
             Phi_q = self.get_phi_q()
             Phi_q_lu = lu_factor(Phi_q)
+            
             # calculate velocity
             nu_G = np.concatenate([con.nu(t) for con in self.constraint_list], axis=0)
             nu_euler = np.zeros((self.nb, 1))
@@ -132,7 +126,7 @@ class rpSimEngine3D:
             q_dot = lu_solve(Phi_q_lu, nu)
             for idx, body in enumerate(self.bodies_list):
                 body.r_dot = q_dot[idx * 3:idx * 3 + 3, :]
-                body.p_dot = q_dot[3 * nb + idx * 4:3 * nb + idx * 4 + 4, :]
+                body.p_dot = q_dot[3 * self.nb + idx * 4:3 * self.nb + idx * 4 + 4, :]
 
             # calculate acceleration
             gamma_G = np.concatenate([con.gamma(t) for con in self.constraint_list], axis=0)
@@ -141,28 +135,33 @@ class rpSimEngine3D:
             q_ddot = lu_solve(Phi_q_lu, gamma)
             for idx, body in enumerate(self.bodies_list):
                 body.r_ddot = q_ddot[idx * 3:idx * 3 + 3, :]
-                body.p_ddot = q_ddot[3 * nb + idx * 4:3 * nb + idx * 4 + 4, :]
+                body.p_ddot = q_ddot[3 * self.nb + idx * 4:3 * self.nb + idx * 4 + 4, :]
 
-            # store solution in array for plotting
+            # store solution for plotting
             for body in self.bodies_list:
-                # store solution in array for plotting
-                self.r_sol[i, (body.body_id - 1) * 3:(body.body_id - 1) * 3 + 3] = body.r.T
-                self.r_dot_sol[i, (body.body_id - 1) * 3:(body.body_id - 1) * 3 + 3] = body.r_dot.T
-                self.r_ddot_sol[i, (body.body_id - 1) * 3:(body.body_id - 1) * 3 + 3] = body.r_ddot.T
+                self.store_data(i, body)
 
         self.duration = time.process_time() - start
         self.avg_iterations = np.mean(iterations)
-        # print('Avg. iterations: {}'.format(self.avg_iterations))
-        # print('Simulation time: {}'.format(self.duration))
+        logging.info('Avg. iterations: {}'.format(self.avg_iterations))
+        logging.info('Simulation time: {}'.format(self.duration))
 
     def dynamics_solver(self, order=1):
-        # logging.info("Number of bodies counted:", self.nb)
-        self.initialize_plotting()
-        nb = self.nb
-        nc = self.nc
-        h = self.h
+        self.initialize_dynamics()
+        iterations = np.zeros((self.N, 1))
+        start = time.process_time()
+        for i, t in enumerate(self.t_grid):
+            if i == 0:
+                continue
+            iterations[i] = self.dynamics_step(i, t)
+        self.duration = time.process_time() - start
+        self.avg_iterations = np.mean(iterations)
+        logging.info('Avg. iterations: {}'.format(self.avg_iterations))
+        logging.info('Simulation time: {}'.format(self.duration))
 
-        # build full RHS matrix
+    def initialize_dynamics(self):
+        self.initialize_plotting()
+        # build right hand side of equations of motion
         F = self.get_F_g()
         tau = self.get_tau()
         gamma_euler = np.concatenate([-body.p_dot.T @ body.p_dot for body in self.bodies_list], axis=0)
@@ -172,150 +171,121 @@ class rpSimEngine3D:
                             [gamma_euler],
                             [gamma]])
 
+        # solve to find initial accelerations and lagrange multipliers
+        z = np.linalg.solve(self.get_psi(), eom_rhs)
+        self.lam = z[8 * self.nb:]
+        self.lambda_p = z[7 * self.nb:8 * self.nb]
+        # initial conditions
+        for idx, body in enumerate(self.bodies_list):
+            body.r_ddot = z[idx * 3:idx * 3 + 3, :]
+            body.p_ddot = z[3 * self.nb + idx * 4:3 * self.nb + idx * 4 + 4, :]
+
+            # store solution in array for plotting
+            self.store_data(0, body)
+            
+            # cache previous data for integration
+            self.cache_prev(body)  
+
+        self.dynamics_initialized = True
+
+    def dynamics_step(self, i, t, order=1):
+        if not self.dynamics_initialized:
+            self.initialize_dynamics()
+        # check for driving constraint singularity
+        if np.abs(np.abs(self.constraint_list[-1].prescribed_val.f(t)) - 1) < 0.1:
+            logging.info("Switching to alternative constraint. Time = {}".format(t))
+            if self.alternative_driver is None:
+                logging.warning("Alternative driving constraint not defined.")
+                return
+            self.constraint_list[-1], self.alternative_driver = self.alternative_driver, self.constraint_list[-1]
+
+        if i == 1 or order == 1:
+            beta = 1
+            alphas = np.array([1, 0])
+        else:
+            beta = 2 / 3
+            alphas = np.array([4 / 3, -1 / 3])
+
+        for body in self.bodies_list:
+            body.c_r_dot = alphas[0] * body.r_dot + alphas[1] * body.r_dot_prev
+            body.c_p_dot = alphas[0] * body.p_dot + alphas[1] * body.p_dot_prev
+
+            body.c_r = alphas[0] * body.r + alphas[1] * body.r_prev + beta * self.h * body.c_r_dot
+            body.c_p = alphas[0] * body.p + alphas[1] * body.p_prev + beta * self.h * body.c_p_dot
+
+            # cache previous data for integration
+            self.cache_prev(body)
+
+        psi_lu = lu_factor(self.get_psi())
+        # Begin Newton Iteration
+        iterations = 0
+        delta_norm = 2 * self.tol  # initialize larger than tolerance so loop begins
+        while delta_norm > self.tol:
+            r_ddot_all = np.zeros((3*self.nb, 1))
+            p_ddot_all = np.zeros((4*self.nb, 1))
+            for idx, body in enumerate(self.bodies_list):
+                r_ddot = body.r_ddot
+                p_ddot = body.p_ddot
+                body.r = body.c_r + beta ** 2 * self.h ** 2 * r_ddot
+                body.r_dot = body.c_r_dot + beta * self.h * r_ddot
+                body.p = body.c_p + beta ** 2 * self.h ** 2 * p_ddot
+                body.p_dot = body.c_p_dot + beta * self.h * p_ddot
+
+                r_ddot_all[3*idx:3*(idx+1)] = r_ddot
+                p_ddot_all[4*idx:4*(idx+1)] = p_ddot
+
+            g = self.get_residual(t, beta, r_ddot_all, p_ddot_all)
+            delta = lu_solve(psi_lu, -g)
+
+            for idx, body in enumerate(self.bodies_list):
+                body.r_ddot = body.r_ddot + delta[idx * 3:(idx * 3) + 3, :]
+                body.p_ddot = body.p_ddot + delta[3 * self.nb + idx * 4:3 * self.nb + idx * 4 + 4, :]
+
+            self.lam += delta[8 * self.nb:]
+            self.lambda_p += delta[7 * self.nb:8 * self.nb]
+
+            delta_norm = np.linalg.norm(delta)
+            iterations += 1
+            if iterations >= self.max_iters:
+                logging.info("Solution has not converged after {} iterations. "
+                                "Stopping. Time = {}".format(self.max_iters, t))
+                break
+
+        for body in self.bodies_list:
+            # store solution in array for plotting
+            self.store_data(i, body)
+
+        return iterations
+
+    def initialize_plotting(self):
+        self.tspan = self.t_end - self.t_start
+        self.N = int(self.tspan / self.h)
+        self.t_grid = np.linspace(self.t_start, self.t_end, self.N, endpoint=True)
+        self.r_sol = np.zeros((self.N, 3 * self.nb))
+        self.r_dot_sol = np.zeros((self.N, 3 * self.nb))
+        self.r_ddot_sol = np.zeros((self.N, 3 * self.nb))
+
+    def store_data(self, time, body):
+        self.r_sol[time, (body.body_id - 1) * 3:(body.body_id - 1) * 3 + 3] = body.r.T
+        self.r_dot_sol[time, (body.body_id - 1) * 3:(body.body_id - 1) * 3 + 3] = body.r_dot.T
+        self.r_ddot_sol[time, (body.body_id - 1) * 3:(body.body_id - 1) * 3 + 3] = body.r_ddot.T
+
+    def cache_prev(self, body):
+        body.r_prev = body.r
+        body.p_prev = body.p
+        body.r_dot_prev = body.r_dot
+        body.p_dot_prev = body.p_dot    
+
+    def get_psi(self):
         # build Psi, our quasi-newton iteration matrix
-        M = self.get_M()    #constant
-        J_P = self.get_J_P()
         P = self.get_P()
         Phi_q = self.get_phi_q()
         Phi_r = Phi_q[0:self.nc, 0:3 * self.nb]
         Phi_p = Phi_q[0:self.nc, 3 * self.nb:]
-        zero_block_12 = np.zeros((3 * nb, 4 * nb))
-        zero_block_13 = np.zeros((3 * nb, nb))
-        zero_block_21 = np.zeros((4 * nb, 3 * nb))
-        zero_block_31 = np.zeros((nb, 3 * nb))
-        zero_block_33 = np.zeros((nb, nb))
-        zero_block_34 = np.zeros((nb, nc))
-        zero_block_43 = np.zeros((nc, nb))
-        zero_block_44 = np.zeros((nc, nc))
-        psi = np.block([[M, zero_block_12, zero_block_13, Phi_r.T],
-                        [zero_block_21, J_P, P.T, Phi_p.T],
-                        [zero_block_31, P, zero_block_33, zero_block_34],
-                        [Phi_r, Phi_p, zero_block_43, zero_block_44]])
-
-        # solve to find initial accelerations and lagrange multipliers, vector z
-        z = np.linalg.solve(psi, eom_rhs)
-        for idx, body in enumerate(self.bodies_list):
-            body.r_ddot = z[idx * 3:idx * 3 + 3, :]
-            body.p_ddot = z[3 * nb + idx * 4:3 * nb + idx * 4 + 4, :]
-
-            # store solution in array for plotting
-            self.r_sol[0, (body.body_id - 1) * 3:(body.body_id - 1) * 3 + 3] = body.r.T
-            self.r_dot_sol[0, (body.body_id - 1) * 3:(body.body_id - 1) * 3 + 3] = body.r_dot.T
-            self.r_ddot_sol[0, (body.body_id - 1) * 3:(body.body_id - 1) * 3 + 3] = body.r_ddot.T
-
-            body.r_prev = body.r
-            body.p_prev = body.p
-            body.r_dot_prev = body.r_dot
-            body.p_dot_prev = body.p_dot
-
-        self.lam = z[8 * nb:]
-        self.lambda_p = z[7 * nb:8 * nb]
-
-        iterations = np.zeros((self.N, 1))
-        start = time.process_time()
-        for i, t in enumerate(self.t_grid):
-            if i == 0:
-                continue
-            # check for driving constraint singularity
-            if np.abs(np.abs(self.constraint_list[-1].prescribed_val.f(t)) - 1) < 0.1:
-                # logging.info("Switching to alternative constraint. Time = ", t)
-                if self.alternative_driver is None:
-                    # logging.warning("Alternative driving constraint not defined.")
-                    break
-                self.constraint_list[-1], self.alternative_driver = self.alternative_driver, self.constraint_list[-1]
-
-            if i == 1 or order == 1:
-                beta = 1
-                alphas = np.array([1, 0])
-            else:
-                beta = 2 / 3
-                alphas = np.array([4 / 3, -1 / 3])
-
-            for body in self.bodies_list:
-                body.c_r_dot = alphas[0] * body.r_dot + alphas[1] * body.r_dot_prev
-                body.c_p_dot = alphas[0] * body.p_dot + alphas[1] * body.p_dot_prev
-
-                body.c_r = alphas[0] * body.r + alphas[1] * body.r_prev + beta * h * body.c_r_dot
-                body.c_p = alphas[0] * body.p + alphas[1] * body.p_prev + beta * h * body.c_p_dot
-
-                body.r_prev = body.r
-                body.p_prev = body.p
-                body.r_dot_prev = body.r_dot
-                body.p_dot_prev = body.p_dot
-
-            # build Psi, our quasi-newton iteration matrix
-            J_P = self.get_J_P()
-            P = self.get_P()
-            Phi_q = self.get_phi_q()
-            Phi_r = Phi_q[0:self.nc, 0:3 * self.nb]
-            Phi_p = Phi_q[0:self.nc, 3 * self.nb:]
-            psi = np.block([[M, zero_block_12, zero_block_13, Phi_r.T],
-                            [zero_block_21, J_P, P.T, Phi_p.T],
-                            [zero_block_31, P, zero_block_33, zero_block_34],
-                            [Phi_r, Phi_p, zero_block_43, zero_block_44]])
-            psi_lu = lu_factor(psi)
-
-            # Begin Newton Iteration
-            iteration = 0
-            delta_norm = 2 * self.tol  # initialize larger than tolerance so loop begins
-            while delta_norm > self.tol:
-                r_ddot_all = np.zeros((3*nb, 1))
-                p_ddot_all = np.zeros((4*nb, 1))
-                # Phi_euler = np.zeros((nc, 4*nb))
-                for idx, body in enumerate(self.bodies_list):
-                    r_ddot = body.r_ddot
-                    p_ddot = body.p_ddot
-                    body.r = body.c_r + beta ** 2 * h ** 2 * r_ddot
-                    body.r_dot = body.c_r_dot + beta * h * r_ddot
-                    body.p = body.c_p + beta ** 2 * h ** 2 * p_ddot
-                    body.p_dot = body.c_p_dot + beta * h * p_ddot
-
-                    r_ddot_all[3*idx:3*(idx+1)] = r_ddot
-                    p_ddot_all[4*idx:4*(idx+1)] = p_ddot
-
-                # build residual matrix
-                Phi = np.concatenate([con.phi(t) for con in self.constraint_list], axis=0)
-                Phi_euler = np.concatenate([0.5 * body.p.T @ body.p - 0.5 for body in self.bodies_list], axis=0)
-                Phi_q = self.get_phi_q()
-                Phi_r = Phi_q[0:self.nc, 0:3 * self.nb]
-                Phi_p = Phi_q[0:self.nc, 3 * self.nb:]
-                g_row1 = M @ r_ddot_all + Phi_r.T @ self.lam - F
-                g_row2 = self.get_J_P() @ p_ddot_all + Phi_p.T @ self.lam \
-                         + self.get_P().T @ self.lambda_p - self.get_tau()
-                g_row3 = 1 / (beta ** 2 * h ** 2) * Phi_euler
-                g_row4 = 1 / (beta ** 2 * h ** 2) * Phi
-                g = np.block([[g_row1],
-                              [g_row2],
-                              [g_row3],
-                              [g_row4]])
-
-                delta = lu_solve(psi_lu, -g)
-
-                for idx, body in enumerate(self.bodies_list):
-                    body.r_ddot = body.r_ddot + delta[idx * 3:(idx * 3) + 3, :]
-                    body.p_ddot = body.p_ddot + delta[3 * nb + idx * 4:3 * nb + idx * 4 + 4, :]
-
-                self.lam += delta[8 * nb:]
-                self.lambda_p += delta[7 * nb:8 * nb]
-
-                delta_norm = np.linalg.norm(delta)
-                iteration += 1
-                if iteration >= self.max_iters:
-                    # logging.warning("Solution self.has not converged after", str(self.max_iters), "iterations. Stopping.")
-                    break
-
-            iterations[i] = iteration
-
-            for body in self.bodies_list:
-                # store solution in array for plotting
-                self.r_sol[i, (body.body_id - 1) * 3:(body.body_id - 1) * 3 + 3] = body.r.T
-                self.r_dot_sol[i, (body.body_id - 1) * 3:(body.body_id - 1) * 3 + 3] = body.r_dot.T
-                self.r_ddot_sol[i, (body.body_id - 1) * 3:(body.body_id - 1) * 3 + 3] = body.r_ddot.T
-
-        self.duration = time.process_time() - start
-        self.avg_iterations = np.mean(iterations)
-        # print('Avg. iterations: {}'.format(self.avg_iterations))
-        # print('Simulation time: {}'.format(self.duration))
+        return np.block([[self.get_M(), np.zeros((3 * self.nb, 4 * self.nb)), np.zeros((3 * self.nb, self.nb)), Phi_r.T],
+                        [np.zeros((4 * self.nb, 3 * self.nb)), self.get_J_P(), P.T, Phi_p.T],
+                        [np.zeros((self.nb, 3 * self.nb)), P, np.zeros((self.nb, self.nb)), np.zeros((self.nb, self.nc))],
+                        [Phi_r, Phi_p, np.zeros((self.nc, self.nb)), np.zeros((self.nc, self.nc))]])
 
     def get_phi_q(self):
         jacobian = np.zeros((self.nc + self.nb, 7 * self.nb))
@@ -346,16 +316,33 @@ class rpSimEngine3D:
             row_euler += 1
         return jacobian
 
+    def get_residual(self, t, beta, r_ddot, p_ddot):
+        # build residual matrix
+        Phi = np.concatenate([con.phi(t) for con in self.constraint_list], axis=0)
+        Phi_euler = np.concatenate([0.5 * body.p.T @ body.p - 0.5 for body in self.bodies_list], axis=0)
+        Phi_q = self.get_phi_q()
+        Phi_r = Phi_q[0:self.nc, 0:3 * self.nb]
+        Phi_p = Phi_q[0:self.nc, 3 * self.nb:]
+        g_row1 = self.get_M() @ r_ddot + Phi_r.T @ self.lam - self.get_F_g()
+        g_row2 = self.get_J_P() @ p_ddot + Phi_p.T @ self.lam \
+                    + self.get_P().T @ self.lambda_p - self.get_tau()
+        g_row3 = 1 / (beta ** 2 *self.h** 2) * Phi_euler
+        g_row4 = 1 / (beta ** 2 *self.h** 2) * Phi
+        return np.block([[g_row1],
+                        [g_row2],
+                        [g_row3],
+                        [g_row4]])
+
     def get_M(self):
         m_mat = np.zeros((3 * self.nb, 3 * self.nb))
         for idx, body in enumerate(self.bodies_list):
-            m_mat[idx * 3:idx * 3 + 3, idx * 3:idx * 3 + 3] = body.m * I3
+            m_mat[idx * 3:idx * 3 + 3, idx * 3:idx * 3 + 3] = body.m * np.eye(3)
         return m_mat
 
     def get_J_P(self):
         j_p_mat = np.zeros((4 * self.nb, 4 * self.nb))
         for idx, body in enumerate(self.bodies_list):
-            G = np.concatenate((-body.p[1:], -gcons.skew(body.p[1:]) + body.p[0] * I3), axis=1)
+            G = np.concatenate((-body.p[1:], -gcons.skew(body.p[1:]) + body.p[0] * np.eye(3)), axis=1)
             j_p_mat[idx * 4:idx * 4 + 4, idx * 4:idx * 4 + 4] = 4 * G.T @ body.J @ G
         return j_p_mat
 
@@ -375,14 +362,14 @@ class rpSimEngine3D:
     def get_tau(self):
         tau = np.zeros((4 * self.nb, 1))
         for idx, body in enumerate(self.bodies_list):
-            G_dot = np.concatenate((-body.p_dot[1:], -gcons.skew(body.p_dot[1:]) + body.p_dot[0] * I3), axis=1)
+            G_dot = np.concatenate((-body.p_dot[1:], -gcons.skew(body.p_dot[1:]) + body.p_dot[0] * np.eye(3)), axis=1)
             tau[idx * 4:idx * 4 + 4] = 8 * G_dot.T @ body.J @ G_dot @ body.p
         return tau
 
-    def reaction_torque(self):
+    def get_reaction_torque(self):
         Phi_p = self.get_phi_q()[0:self.nc, 3:]
         for body in self.bodies_list:
-            e_mat = np.concatenate((-body.p[1:], gcons.skew(body.p[1:]) + body.p[0] * I3), axis=1)
+            e_mat = np.concatenate((-body.p[1:], gcons.skew(body.p[1:]) + body.p[0] * np.eye(3)), axis=1)
             pi = 1 / 2 * Phi_p @ e_mat.T
             torque = -pi.T @ self.lam
         return torque
@@ -425,7 +412,7 @@ class RigidBody:
             self.p = np.array([[quat[3, 0], quat[0, 0], quat[1, 0], quat[2, 0]]]).T
 
             omega = np.array([body_dict['omega']]).T
-            e_mat = np.concatenate((-self.p[1:], gcons.skew(self.p[1:]) + self.p[0] * I3), axis=1)
+            e_mat = np.concatenate((-self.p[1:], gcons.skew(self.p[1:]) + self.p[0] * np.eye(3)), axis=1)
             self.p_dot = 1 / 2 * e_mat.T @ omega
             self.p_ddot = np.zeros((4, 1))
 
