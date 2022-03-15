@@ -40,6 +40,8 @@ class repsSimEngine3D:
         self.r_dot_sol = None
         self.r_ddot_sol = None
 
+        self.plot = True
+
         # values needed for dynamics analysis
         self.lam = 0
         self.g = -9.81
@@ -61,10 +63,10 @@ class repsSimEngine3D:
             for body in self.bodies_full:
                 if body.body_id == con['body_i']:
                     body_i = body
-                    #logging.info("body_i found")
+                    # logging.info("body_i found")
                 if body.body_id == con['body_j']:
                     body_j = body
-                    #logging.info("body_j found")
+                    # logging.info("body_j found")
             if con['type'] == 'DP1':
                 self.constraint_list.append(gcons.GConDP1(con, body_i, body_j))
             elif con['type'] == 'DP2':
@@ -81,12 +83,13 @@ class repsSimEngine3D:
         self.tspan = self.t_end - self.t_start
         self.N = int(self.tspan / self.h)
         self.t_grid = np.linspace(self.t_start, self.t_end, self.N, endpoint=True)
-        self.r_sol = np.zeros((self.N, 3 * self.nb))
-        self.r_dot_sol = np.zeros((self.N, 3 * self.nb))
-        self.r_ddot_sol = np.zeros((self.N, 3 * self.nb))
+        if self.plot:
+            self.r_sol = np.zeros((self.N, 3 * self.nb))
+            self.r_dot_sol = np.zeros((self.N, 3 * self.nb))
+            self.r_ddot_sol = np.zeros((self.N, 3 * self.nb))
 
     def kinematics_solver(self):
-        #logging.info("Number of bodies counted:", self.nb)
+        # logging.info("Number of bodies counted:", self.nb)
         self.initialize_plotting()
         nb = self.nb
         iterations = np.zeros((self.N, 1))
@@ -102,9 +105,9 @@ class repsSimEngine3D:
                         con.flip_gcons(body.body_id, flip_mat)
             # check for driving constraint singularity
             if np.abs(np.abs(self.constraint_list[-1].prescribed_val.f(t)) - 1) < 0.1:
-                #logging.info("Switching to alternative constraint. Time = ", t)
+                logging.info("Switching to alternative constraint. Time = {}".format(t))
                 if self.alternative_driver is None:
-                    #logging.warning("Alternative driving constraint not defined.")
+                    # logging.warning("Alternative driving constraint not defined.")
                     break
                 self.constraint_list[-1], self.alternative_driver = self.alternative_driver, self.constraint_list[-1]
 
@@ -122,11 +125,12 @@ class repsSimEngine3D:
 
                 iteration += 1
                 if iteration >= self.max_iters:
-                    #logging.warning("Newton-Raphson self.has not converged after", str(self.max_iters), "iterations. Stopping at time ", str(t))
+                    logging.warning("Newton-Raphson self.has not converged after {} iterations. "
+                                    "Stopping at time {}".format(self.max_iters, t))
                     break
                 if np.linalg.norm(delta_q) < self.tol:
                     break
-            #logging.info("Newton-Raphson took", str(iteration), "iterations to converge.")
+            logging.info("Newton-Raphson took {} iterations to converge.".format(iteration))
             iterations[i] = iteration
 
             Phi_q = self.get_phi_q()
@@ -135,7 +139,7 @@ class repsSimEngine3D:
             nu = np.concatenate([con.nu(t) for con in self.constraint_list], axis=0)
             q_dot = lu_solve(Phi_q_lu, nu)
             for idx, body in enumerate(self.bodies_list):
-                body.r_dot = q_dot[idx* 3:idx * 3 + 3, :]
+                body.r_dot = q_dot[idx * 3:idx * 3 + 3, :]
                 body.eps_dot = q_dot[3 * nb + idx * 3:3 * nb + idx * 3 + 3, :]
 
             # calculate acceleration
@@ -145,15 +149,16 @@ class repsSimEngine3D:
                 body.r_ddot = q_ddot[idx * 3:idx * 3 + 3, :]
                 body.eps_ddot = q_ddot[3 * nb + idx * 3:3 * nb + idx * 3 + 3, :]
 
-                # store solution in array for plotting
-                self.r_sol[i, (body.body_id - 1) * 3:(body.body_id - 1) * 3 + 3] = body.r.T
-                self.r_dot_sol[i, (body.body_id - 1) * 3:(body.body_id - 1) * 3 + 3] = body.r_dot.T
-                self.r_ddot_sol[i, (body.body_id - 1) * 3:(body.body_id - 1) * 3 + 3] = body.r_ddot.T
+                if self.plot:
+                    # store solution in array for plotting
+                    self.r_sol[i, (body.body_id - 1) * 3:(body.body_id - 1) * 3 + 3] = body.r.T
+                    self.r_dot_sol[i, (body.body_id - 1) * 3:(body.body_id - 1) * 3 + 3] = body.r_dot.T
+                    self.r_ddot_sol[i, (body.body_id - 1) * 3:(body.body_id - 1) * 3 + 3] = body.r_ddot.T
 
         duration = time.process_time() - start
         self.avg_iterations = np.mean(iterations)
-        # logging.info('Avg. iterations: {}'.format(self.avg_iterations))
-        # print('Simulation time: {}'.format(duration))
+        logging.info('Avg. iterations: {}'.format(self.avg_iterations))
+        logging.info('Simulation time: {}'.format(duration))
 
     def dynamics_solver(self, order=1):
         # logging.info("Number of bodies counted:", self.nb)
@@ -189,10 +194,11 @@ class repsSimEngine3D:
             body.r_ddot = z[idx * 3:idx * 3 + 3, :]
             body.eps_ddot = z[3 * nb + idx * 3:3 * nb + idx * 3 + 3, :]
 
-            # store solution in array for plotting
-            self.r_sol[0, (body.body_id - 1) * 3:(body.body_id - 1) * 3 + 3] = body.r.T
-            self.r_dot_sol[0, (body.body_id - 1) * 3:(body.body_id - 1) * 3 + 3] = body.r_dot.T
-            self.r_ddot_sol[0, (body.body_id - 1) * 3:(body.body_id - 1) * 3 + 3] = body.r_ddot.T
+            if self.plot:
+                # store solution in array for plotting
+                self.r_sol[0, (body.body_id - 1) * 3:(body.body_id - 1) * 3 + 3] = body.r.T
+                self.r_dot_sol[0, (body.body_id - 1) * 3:(body.body_id - 1) * 3 + 3] = body.r_dot.T
+                self.r_ddot_sol[0, (body.body_id - 1) * 3:(body.body_id - 1) * 3 + 3] = body.r_ddot.T
 
             body.r_prev = body.r
             body.eps_prev = body.eps
@@ -216,12 +222,11 @@ class repsSimEngine3D:
                         con.flip_gcons(body.body_id, flip_mat)
             # check for driving constraint singularity
             if np.abs(np.abs(self.constraint_list[-1].prescribed_val.f(t)) - 1) < 0.1:
-                # logging.info("Switching to alternative constraint. Time = ", t)
+                logging.info("Switching to alternative constraint. Time = {}".format(t))
                 if self.alternative_driver is None:
-                    # logging.warning("Alternative driving constraint not defined.")
+                    logging.warning("Alternative driving constraint not defined.")
                     break
-                self.constraint_list[-1], self.alternative_driver = self.alternative_driver, self.constraint_list[
-                    -1]
+                self.constraint_list[-1], self.alternative_driver = self.alternative_driver, self.constraint_list[-1]
 
             if i == 1 or order == 1:
                 beta = 1
@@ -292,7 +297,8 @@ class repsSimEngine3D:
                 delta_norm = np.linalg.norm(delta)
                 iteration += 1
                 if iteration >= self.max_iters:
-                    # logging.info("Solution self.has not converged after", str(self.max_iters), "iterations. Stopping. Time = ", t)
+                    logging.info("Solution has not converged after {} iterations. "
+                                 "Stopping. Time = {}".format(self.max_iters, t))
                     break
 
             iterations[i] = iteration
@@ -301,15 +307,16 @@ class repsSimEngine3D:
                 if body.is_ground:
                     pass
                 else:
-                    # store solution in array for plotting
-                    self.r_sol[i, (body.body_id - 1) * 3:(body.body_id - 1) * 3 + 3] = body.r.T
-                    self.r_dot_sol[i, (body.body_id - 1) * 3:(body.body_id - 1) * 3 + 3] = body.r_dot.T
-                    self.r_ddot_sol[i, (body.body_id - 1) * 3:(body.body_id - 1) * 3 + 3] = body.r_ddot.T
+                    if self.plot:
+                        # store solution in array for plotting
+                        self.r_sol[i, (body.body_id - 1) * 3:(body.body_id - 1) * 3 + 3] = body.r.T
+                        self.r_dot_sol[i, (body.body_id - 1) * 3:(body.body_id - 1) * 3 + 3] = body.r_dot.T
+                        self.r_ddot_sol[i, (body.body_id - 1) * 3:(body.body_id - 1) * 3 + 3] = body.r_ddot.T
 
         self.duration = time.process_time() - start
         self.avg_iterations = np.mean(iterations)
-        # logging.info('Avg. iterations: {}'.format(self.avg_iterations))
-        print('Simulation time: {}'.format(self.duration))
+        logging.info('Avg. iterations: {}'.format(self.avg_iterations))
+        logging.info('Simulation time: {}'.format(self.duration))
 
     def get_phi_q(self):
         jacobian = np.zeros((self.nc, 6 * self.nb))
@@ -364,11 +371,13 @@ class repsSimEngine3D:
             tau[idx * 3:idx * 3 + 3] = term_1 - term_2
         return tau
 
+
 def from_eps(eps):
     """
     Deconstruct eps into our three angles
     """
     return eps[0, 0], eps[1, 0], eps[2, 0]
+
 
 class RigidBody:
     def __init__(self, body_dict):
@@ -376,14 +385,14 @@ class RigidBody:
             self.is_ground = True
             self.body_id = body_dict['id']
 
-            self.r = np.zeros((3,1))
-            self.r_dot = np.zeros((3,1))
-            self.r_ddot = np.zeros((3,1))
+            self.r = np.zeros((3, 1))
+            self.r_dot = np.zeros((3, 1))
+            self.r_ddot = np.zeros((3, 1))
 
-            eps = np.zeros((3,1))
+            eps = np.zeros((3, 1))
             self.eps = eps
-            self.eps_dot = np.zeros((3,1))
-            self.eps_ddot = np.zeros((3,1))
+            self.eps_dot = np.zeros((3, 1))
+            self.eps_ddot = np.zeros((3, 1))
 
             self.r_prev = self.r
             self.r_dot_prev = self.r_dot
@@ -398,7 +407,7 @@ class RigidBody:
             self.m = None
             self.J = None
 
-            self.A = np.eye(3,3)
+            self.A = np.eye(3, 3)
             self.A_dot = np.zeros((3, 3))
             self.A_ddot = np.zeros((3, 3))
         else:
@@ -407,7 +416,7 @@ class RigidBody:
 
             self.r = np.array([body_dict['r']]).T
             self.r_dot = np.array([body_dict['r_dot']]).T
-            self.r_ddot = np.zeros((3,1))
+            self.r_ddot = np.zeros((3, 1))
 
             self.A = Rot.from_matrix(np.array(body_dict['A']))
             eps = self.A.as_euler('ZXZ', degrees=False)
@@ -441,7 +450,7 @@ class RigidBody:
         return value, flip_mat
 
     def get_partials(self):
-        return (self.A_phi, self.A_theta, self.A_psi)
+        return self.A_phi, self.A_theta, self.A_psi
 
     def get_As(self):
         A1 = np.array([[self._cos_phi, -self._sin_phi, 0],
@@ -455,21 +464,21 @@ class RigidBody:
 
     def get_A_dots(self):
         A_dot1 = np.array([[-self._sin_phi, -self._cos_phi, 0],
-                        [self._cos_phi, -self._sin_phi, 0], [0, 0, 0]])
+                           [self._cos_phi, -self._sin_phi, 0], [0, 0, 0]])
         A_dot2 = np.array([[0, 0, 0], [0, -self._sin_theta, -self._cos_theta],
-                        [0, self._cos_theta, -self._sin_theta]])
+                           [0, self._cos_theta, -self._sin_theta]])
         A_dot3 = np.array([[-self._sin_psi, -self._cos_psi, 0],
-                        [self._cos_psi, -self._sin_psi, 0], [0, 0, 0]])
+                           [self._cos_psi, -self._sin_psi, 0], [0, 0, 0]])
 
         return A_dot1, A_dot2, A_dot3
 
     def get_A_ddots(self):
         A_ddot1 = np.array([[-self._cos_phi, self._sin_phi, 0],
-                         [-self._sin_phi, -self._cos_phi, 0], [0, 0, 0]])
+                            [-self._sin_phi, -self._cos_phi, 0], [0, 0, 0]])
         A_ddot2 = np.array([[0, 0, 0], [0, -self._cos_theta, self._sin_theta],
-                         [0, -self._sin_theta, -self._cos_theta]])
+                            [0, -self._sin_theta, -self._cos_theta]])
         A_ddot3 = np.array([[-self._cos_psi, self._sin_psi, 0],
-                         [-self._sin_psi, -self._cos_psi, 0], [0, 0, 0]])
+                            [-self._sin_psi, -self._cos_psi, 0], [0, 0, 0]])
 
         return A_ddot1, A_ddot2, A_ddot3
 
@@ -493,17 +502,30 @@ class RigidBody:
         """
 
         self.A_phi = np.array([[-self._sin_psi * self._cos_theta * self._cos_phi - self._sin_phi * self._cos_psi,
-                               self._sin_psi * self._sin_phi - self._cos_theta * self._cos_psi * self._cos_phi, self._sin_theta * self._cos_phi],
-                              [-self._sin_psi * self._sin_phi * self._cos_theta + self._cos_psi * self._cos_phi,
-                               -self._sin_psi * self._cos_phi - self._sin_phi * self._cos_theta * self._cos_psi, self._sin_theta * self._sin_phi], [0, 0, 0]])
-        self.A_theta = np.array([[self._sin_theta * self._sin_psi * self._sin_phi, self._sin_theta * self._sin_phi * self._cos_psi, self._sin_phi * self._cos_theta],
-                              [-self._sin_theta * self._sin_psi * self._cos_phi, -self._sin_theta * self._cos_psi * self._cos_phi, -self._cos_theta * self._cos_phi],
-                              [self._sin_psi * self._cos_theta, self._cos_theta * self._cos_psi, -self._sin_theta]])
+                                self._sin_psi * self._sin_phi - self._cos_theta * self._cos_psi * self._cos_phi,
+                                self._sin_theta * self._cos_phi],
+                               [-self._sin_psi * self._sin_phi * self._cos_theta + self._cos_psi * self._cos_phi,
+                                -self._sin_psi * self._cos_phi - self._sin_phi * self._cos_theta * self._cos_psi,
+                                self._sin_theta * self._sin_phi],
+                               [0, 0, 0]])
+        self.A_theta = np.array([[self._sin_theta * self._sin_psi * self._sin_phi,
+                                  self._sin_theta * self._sin_phi * self._cos_psi,
+                                  self._sin_phi * self._cos_theta],
+                                 [-self._sin_theta * self._sin_psi * self._cos_phi,
+                                  -self._sin_theta * self._cos_psi * self._cos_phi,
+                                  -self._cos_theta * self._cos_phi],
+                                 [self._sin_psi * self._cos_theta,
+                                  self._cos_theta * self._cos_psi,
+                                  -self._sin_theta]])
         self.A_psi = np.array([[-self._sin_psi * self._cos_phi - self._sin_phi * self._cos_theta * self._cos_psi,
-                               self._sin_psi * self._sin_phi * self._cos_theta - self._cos_psi * self._cos_phi, 0],
-                              [-self._sin_psi * self._sin_phi + self._cos_theta * self._cos_psi * self._cos_phi,
-                               -self._sin_psi * self._cos_theta * self._cos_phi - self._sin_phi * self._cos_psi, 0],
-                              [self._sin_theta * self._cos_psi, -self._sin_theta * self._sin_psi, 0]])
+                                self._sin_psi * self._sin_phi * self._cos_theta - self._cos_psi * self._cos_phi,
+                                0],
+                               [-self._sin_psi * self._sin_phi + self._cos_theta * self._cos_psi * self._cos_phi,
+                                -self._sin_psi * self._cos_theta * self._cos_phi - self._sin_phi * self._cos_psi,
+                                0],
+                               [self._sin_theta * self._cos_psi,
+                                -self._sin_theta * self._sin_psi,
+                                0]])
 
     def cache_time_derivs(self):
         """
@@ -561,20 +583,23 @@ class RigidBody:
     @property
     def B(self):
         B = np.array([[0, self._cos_phi, self._sin_theta * self._sin_phi],
-                      [0, self._sin_phi, -self._sin_theta * self._cos_phi], [1, 0, self._cos_theta]])
+                      [0, self._sin_phi, -self._sin_theta * self._cos_phi],
+                      [1, 0, self._cos_theta]])
         return B
 
     @property
     def B_dot(self):
         phi_dot, theta_dot, psi_dot = from_eps(self.eps_dot)
-
-        B_dot = np.array([[0, -phi_dot * self._sin_phi, theta_dot * self._cos_theta * self._sin_phi + phi_dot * self._sin_theta * self._cos_phi], [0,
-                                                                                                  phi_dot * self._sin_phi,
-                                                                                                  -theta_dot * self._cos_theta * self._cos_phi + phi_dot * self._sin_theta * self._sin_phi],
-                       [0, 0, -theta_dot * self._sin_theta]])
-        B_dot_bar = np.array([[psi_dot * self._cos_psi * self._sin_theta + theta_dot * self._sin_psi * self._cos_theta, -psi_dot * self._sin_psi, 0],
-                           [-psi_dot * self._sin_psi * self._sin_theta + theta_dot * self._cos_psi * self._cos_theta, -psi_dot * self._cos_psi, 0],
-                           [-theta_dot * self._sin_theta, 0, 0]])
+        B_dot = np.array([[0, -phi_dot * self._sin_phi,
+                           theta_dot * self._cos_theta * self._sin_phi + phi_dot * self._sin_theta * self._cos_phi],
+                          [0, phi_dot * self._sin_phi,
+                           -theta_dot * self._cos_theta * self._cos_phi + phi_dot * self._sin_theta * self._sin_phi],
+                          [0, 0, -theta_dot * self._sin_theta]])
+        B_dot_bar = np.array([[psi_dot * self._cos_psi * self._sin_theta + theta_dot * self._sin_psi * self._cos_theta,
+                               -psi_dot * self._sin_psi, 0],
+                              [-psi_dot * self._sin_psi * self._sin_theta + theta_dot * self._cos_psi * self._cos_theta,
+                               -psi_dot * self._cos_psi, 0],
+                              [-theta_dot * self._sin_theta, 0, 0]])
         return B_dot_bar
 
     @property

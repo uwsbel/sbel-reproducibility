@@ -35,7 +35,7 @@ def double_pendulum(args):
     w = 0.05
     rho = 7800
     b_len = [2 * L, L]
-    for j, body in enumerate(sys.bodies_full[1:2]):
+    for j, body in enumerate(sys.bodies_list):
         V = b_len[j] * w ** 2
         body.m = rho * V
         J_xx = 1 / 6 * body.m * w ** 2
@@ -59,4 +59,4 @@ def double_pendulum(args):
                 vel[(body.body_id - 1), :, t] = sys.r_dot_sol[t, (body.body_id - 1) * 3:(body.body_id - 1) * 3 + 3].T
                 acc[(body.body_id - 1), :, t] = sys.r_ddot_sol[t, (body.body_id - 1) * 3:(body.body_id - 1) * 3 + 3].T
 
-    return pos, vel, acc, iterations
+    return pos, vel, acc, iterations, sys.t_grid

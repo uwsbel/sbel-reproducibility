@@ -35,12 +35,12 @@ def single_pendulum(args):
     w = 0.05
     rho = 7800
     b_len = [2 * L]
-    for j, body in enumerate(sys.bodies_full[1:2]):
-        V = b_len[j] * w ** 2
-        body.m = rho * V
-        J_xx = 1 / 6 * body.m * w ** 2
-        J_yz = 1 / 12 * body.m * (w ** 2 + b_len[j] ** 2)
-        body.J = np.diag([J_xx, J_yz, J_yz])
+
+    V = b_len[0] * w ** 2
+    sys.bodies_full[1].m = rho * V
+    J_xx = 1 / 6 * sys.bodies_full[1].m * w ** 2
+    J_yz = 1 / 12 * sys.bodies_full[1].m * (w ** 2 + b_len[0] ** 2)
+    sys.bodies_full[1].J = np.diag([J_xx, J_yz, J_yz])
 
     if args[3] == 'dynamics':
         sys.dynamics_solver()
@@ -55,8 +55,27 @@ def single_pendulum(args):
             if body.is_ground:
                 pass
             else:
-                pos[(body.body_id - 1), :, t] = sys.r_sol[t, (body.body_id - 1) * 3:((body.body_id - 1) * 3) + 3]
+                pos[(body.body_id - 1), :, t] = sys.r_sol[t, (body.body_id - 1) * 3:((body.body_id - 1) * 3) + 3].T
                 vel[(body.body_id - 1), :, t] = sys.r_dot_sol[t, (body.body_id - 1) * 3:(body.body_id - 1) * 3 + 3].T
                 acc[(body.body_id - 1), :, t] = sys.r_ddot_sol[t, (body.body_id - 1) * 3:(body.body_id - 1) * 3 + 3].T
 
-    return pos, vel, acc, iterations
+    t_grid = sys.t_grid
+
+    _, ax1 = plt.subplots()
+    ax1.plot(t_grid, pos[0, :, :].T)
+    ax1.set(xlabel='time [s]', ylabel='position [m]',
+            title='Position')
+
+    _, ax2 = plt.subplots()
+    ax2.plot(t_grid, acc[0, :, :].T)
+    ax2.set(xlabel='time [s]', ylabel='acceleration [m/s²]',
+            title='Acceleration')
+
+    _, ax3 = plt.subplots()
+    ax3.plot(t_grid, vel[0, :, :].T)
+    ax3.set(xlabel='time [s]', ylabel='velocity [m/s]',
+            title='Velocity')
+
+    plt.show()
+
+    return pos, vel, acc, iterations, sys.t_grid
