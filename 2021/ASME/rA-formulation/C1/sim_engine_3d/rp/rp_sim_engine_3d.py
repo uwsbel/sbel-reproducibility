@@ -7,7 +7,7 @@ import logging
 from scipy.linalg import lu_factor, lu_solve
 from scipy.spatial.transform import Rotation as Rot
 
-import rp_gcons as gcons
+import rp.rp_gcons as gcons
 
 
 class rpSimEngine3D:

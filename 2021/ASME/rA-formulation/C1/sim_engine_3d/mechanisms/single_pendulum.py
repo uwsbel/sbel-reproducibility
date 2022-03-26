@@ -1,24 +1,22 @@
 #!/usr/bin/env python3
 
+""" Run simulation of the single pendulum mechanism.
 
-import sys
-import pathlib as pl
-src_folder = pl.Path('./src/')
-sys.path.append(str(src_folder))
+This module runs solvers using the single pendulum model and solver parameters specified by tools.standard_setup().
+
+Functions:
+
+    single_pendulum(args)
+
+"""
 
 import numpy as np
-from copy import copy
-import matplotlib.pyplot as plt
-
-import logging
 import argparse as arg
 
-from rA_sim_engine_3d import rASimEngine3D
-from rp_sim_engine_3d import rpSimEngine3D
-from reps_sim_engine_3d import repsSimEngine3D
-
-import reps_gcons as gcons
-from tools import standard_setup
+from rA.rA_sim_engine_3d import rASimEngine3D
+from rp.rp_sim_engine_3d import rpSimEngine3D
+from reps.reps_sim_engine_3d import repsSimEngine3D
+from utils.tools import standard_setup
 
 def single_pendulum(args):
     parser = arg.ArgumentParser(description='Simulation of a single pendulum mechanism')
@@ -46,10 +44,12 @@ def single_pendulum(args):
         sys.dynamics_solver()
     else:
         sys.kinematics_solver()
+
     iterations = sys.avg_iterations
     pos = np.zeros((sys.nb, 3, sys.N))
     vel = np.zeros((sys.nb, 3, sys.N))
     acc = np.zeros((sys.nb, 3, sys.N))
+
     for t in range(sys.N):
         for body in sys.bodies_list:
             if body.is_ground:
@@ -59,23 +59,5 @@ def single_pendulum(args):
                 vel[(body.body_id - 1), :, t] = sys.r_dot_sol[t, (body.body_id - 1) * 3:(body.body_id - 1) * 3 + 3].T
                 acc[(body.body_id - 1), :, t] = sys.r_ddot_sol[t, (body.body_id - 1) * 3:(body.body_id - 1) * 3 + 3].T
 
-    t_grid = sys.t_grid
-
-    _, ax1 = plt.subplots()
-    ax1.plot(t_grid, pos[0, :, :].T)
-    ax1.set(xlabel='time [s]', ylabel='position [m]',
-            title='Position')
-
-    _, ax2 = plt.subplots()
-    ax2.plot(t_grid, acc[0, :, :].T)
-    ax2.set(xlabel='time [s]', ylabel='acceleration [m/s²]',
-            title='Acceleration')
-
-    _, ax3 = plt.subplots()
-    ax3.plot(t_grid, vel[0, :, :].T)
-    ax3.set(xlabel='time [s]', ylabel='velocity [m/s]',
-            title='Velocity')
-
-    plt.show()
 
     return pos, vel, acc, iterations, sys.t_grid

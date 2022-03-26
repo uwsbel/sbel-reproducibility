@@ -1,24 +1,24 @@
 #!/usr/bin/env python3
 
+""" Run simulation of the four link mechanism.
 
-import sys
-import pathlib as pl
-src_folder = pl.Path('./src/')
-sys.path.append(str(src_folder))
+This module runs solvers using the four link model and solver parameters specified by tools.standard_setup().
+
+Functions:
+
+    four_link(args)
+
+"""
 
 import numpy as np
 from copy import copy
-import matplotlib.pyplot as plt
-
-import logging
 import argparse as arg
 
-from rA_sim_engine_3d import rASimEngine3D
-from rp_sim_engine_3d import rpSimEngine3D
-from reps_sim_engine_3d import repsSimEngine3D
-
-import reps_gcons as gcons
-from tools import standard_setup
+from rA.rA_sim_engine_3d import rASimEngine3D
+from rp.rp_sim_engine_3d import rpSimEngine3D
+from reps.reps_sim_engine_3d import repsSimEngine3D
+import reps.reps_gcons as gcons
+from utils.tools import standard_setup
 
 def four_link(args):
     parser = arg.ArgumentParser(description='Simulation of Haug\'s four-link mechanism')
@@ -53,10 +53,12 @@ def four_link(args):
         sys.dynamics_solver()
     else:
         sys.kinematics_solver()
+
     iterations = sys.avg_iterations
     pos = np.zeros((sys.nb, 3, sys.N))
     vel = np.zeros((sys.nb, 3, sys.N))
     acc = np.zeros((sys.nb, 3, sys.N))
+    
     for t in range(sys.N):
         for body in sys.bodies_list:
             if body.is_ground:

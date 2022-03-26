@@ -1,12 +1,9 @@
 #!/usr/bin/env python3
 
-import reps_gcons as gcons
+import reps.reps_gcons as gcons
 
 import json as js
 import numpy as np
-import matplotlib.pyplot as plt
-from copy import copy
-
 import time
 import logging
 

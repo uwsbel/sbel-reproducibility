@@ -1,16 +1,13 @@
-import sys
-import pathlib as pl
-src_folder = pl.Path('tests')
-sys.path.append(str(src_folder))
+#!/usr/bin/env python3
 
 import numpy as np
 import matplotlib.pyplot as plt
 plt.rc('xtick', labelsize=12)
 plt.rc('ytick', labelsize=12)
 
-from four_link import four_link
-from slider_crank import slider_crank
-from single_pendulum import single_pendulum
+from mechanisms.four_link import four_link
+from mechanisms.slider_crank import slider_crank
+from mechanisms.single_pendulum import single_pendulum
 
 step_sizes = np.array([1e-3, 2e-3, 4e-3, 8e-3, 1e-2, 2e-2])
 # testing

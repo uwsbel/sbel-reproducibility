@@ -1,10 +1,12 @@
+#!/usr/bin/env python3
+
 import pickle
 import os
 import numpy as np
 
 import matplotlib.pyplot as plt
 
-dir_path = './output/oa/'
+dir_path = './output/oaDyn/'
 
 plt.rcParams.update({'font.size': 30})
 
@@ -17,7 +19,7 @@ for f in os.listdir(dir_path):
 
         continue
 
-    if f.endswith('.pickle') and f.startswith('Four Link'):
+    if f.endswith('.pickle') and f.startswith('Double Pendulum'):
         files.append(f)
 
 for file_name in files:
@@ -28,6 +30,7 @@ for file_name in files:
     title = '{} {} Order Analysis: Body {}, {}'.format(name, form, body, component)
 
     fig, ax = plt.subplots()
+    ax.loglog(step_sizes, [step for step in step_sizes], label='Order 1 trendline', markersize=15, linewidth=7)
     ax.loglog(step_sizes, [step*step for step in step_sizes], label='Order 2 trendline', markersize=15, linewidth=7)
     ax.loglog(step_sizes, pos_diff, label='Position', marker='o', linestyle='-', markersize=15, linewidth=7)
     ax.loglog(step_sizes, vel_diff, label='Velocity', marker='x', linestyle='-', markersize=15, linewidth=7)
@@ -37,6 +40,6 @@ for file_name in files:
     ax.legend(loc='lower right', prop={'size': 24})
 
     plt.gcf().set_size_inches(20, 12)
-    plt.savefig('./output/oa/Four_Link_{}_OrderAnalysis_Body_{}_{}.png'.format(form, body, component))
+    plt.savefig('./output/oaDyn/Double_Pendulum_{}_Order2Analysis_Body_{}_{}.png'.format(form, body, component))
 
 #plt.show()

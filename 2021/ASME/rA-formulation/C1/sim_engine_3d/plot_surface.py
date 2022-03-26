@@ -1,7 +1,4 @@
-import sys
-import pathlib as pl
-src_folder = pl.Path('tests/timing/')
-sys.path.append(str(src_folder))
+#!/usr/bin/env python3
 
 import pickle
 import os

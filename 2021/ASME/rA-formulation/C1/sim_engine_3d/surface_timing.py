@@ -1,14 +1,11 @@
-import sys
-import pathlib as pl
-src_folder = pl.Path('tests/timing/')
-sys.path.append(str(src_folder))
+#!/usr/bin/env python3import numpy as np
 
 import numpy as np
 import pickle
 
 import itertools
 from multiprocessing import Pool
-from four_link_timing import four_link
+from mechanisms.four_link import four_link
 
 # For 'production'
 step_sizes = np.array([1e-3, 2e-3, 4e-3, 8e-3, 1e-2, 2e-2, 4e-2, 8e-2, 1e-1])

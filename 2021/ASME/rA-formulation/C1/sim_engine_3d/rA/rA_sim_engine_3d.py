@@ -1,14 +1,9 @@
-import sys
-import pathlib as pl
+#!/usr/bin/env python3
 
-src_folder = pl.Path('./src/')
-sys.path.append(str(src_folder))
-
-import rA_gcons as gcons
+import rA.rA_gcons as gcons
 
 import json as js
 import numpy as np
-import matplotlib.pyplot as plt
 import time
 import logging
 from scipy.linalg import lu_factor, lu_solve
