@@ -22,7 +22,7 @@ def double_pendulum(args):
     
     parser = arg.ArgumentParser(description='Simulation of a double pendulum mechanism')
 
-    model_files = "./models/double_pendulum.mdl"
+    model_files = "./sim_engine_3d/models/double_pendulum.mdl"
 
     sys, params = standard_setup(parser, model_files, args)
     sys.h = params.h
@@ -45,19 +45,5 @@ def double_pendulum(args):
         sys.dynamics_solver()
     else:
         sys.kinematics_solver()
-    
-    iterations = sys.avg_iterations
-    pos = np.zeros((sys.nb, 3, sys.N))
-    vel = np.zeros((sys.nb, 3, sys.N))
-    acc = np.zeros((sys.nb, 3, sys.N))
-    
-    for t in range(sys.N):
-        for body in sys.bodies_list:
-            if body.is_ground:
-                pass
-            else:
-                pos[(body.body_id - 1), :, t] = sys.r_sol[t, (body.body_id - 1) * 3:((body.body_id - 1) * 3) + 3]
-                vel[(body.body_id - 1), :, t] = sys.r_dot_sol[t, (body.body_id - 1) * 3:(body.body_id - 1) * 3 + 3].T
-                acc[(body.body_id - 1), :, t] = sys.r_ddot_sol[t, (body.body_id - 1) * 3:(body.body_id - 1) * 3 + 3].T
 
-    return pos, vel, acc, iterations, sys.t_grid
+    return sys.r_sol, sys.r_dot_sol, sys.r_ddot_sol, sys.avg_iterations, sys.t_grid

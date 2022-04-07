@@ -23,7 +23,7 @@ from utils.tools import standard_setup
 def four_link(args):
     parser = arg.ArgumentParser(description='Simulation of Haug\'s four-link mechanism')
 
-    model_files = "./models/four_link_rotated.mdl"
+    model_files = "./sim_engine_3d/models/four_link_rotated.mdl"
 
     sys, params = standard_setup(parser, model_files, args)
     sys.h = params.h
@@ -54,18 +54,4 @@ def four_link(args):
     else:
         sys.kinematics_solver()
 
-    iterations = sys.avg_iterations
-    pos = np.zeros((sys.nb, 3, sys.N))
-    vel = np.zeros((sys.nb, 3, sys.N))
-    acc = np.zeros((sys.nb, 3, sys.N))
-    
-    for t in range(sys.N):
-        for body in sys.bodies_list:
-            if body.is_ground:
-                pass
-            else:
-                pos[(body.body_id - 1), :, t] = sys.r_sol[t, (body.body_id - 1) * 3:((body.body_id - 1) * 3) + 3]
-                vel[(body.body_id - 1), :, t] = sys.r_dot_sol[t, (body.body_id - 1) * 3:(body.body_id - 1) * 3 + 3].T
-                acc[(body.body_id - 1), :, t] = sys.r_ddot_sol[t, (body.body_id - 1) * 3:(body.body_id - 1) * 3 + 3].T
-
-    return pos, vel, acc, iterations
+    return sys.r_sol, sys.r_dot_sol, sys.r_ddot_sol, sys.avg_iterations, sys.t_grid
