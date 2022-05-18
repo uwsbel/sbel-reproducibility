@@ -1,0 +1,7 @@
+This demo is running using below repository and commit:
+chrono-dev (chrono-internal)
+feature/FSI
+Add kernel integration criterion to fix the random moving issue of SPH particle
+827a236c57e14dcea780f516d6dd0e757eb3c358
+
+
