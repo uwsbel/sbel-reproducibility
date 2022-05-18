@@ -1,0 +1,78 @@
+{
+
+  "Output Folder": "Curiosity",
+
+
+  "Physical Properties of Fluid":
+  {
+    "Density":                1700,
+    "Viscosity":              0.0,
+    "Gravity":                [0.0,  0.0, -3.721]
+  },
+
+  "SPH Parameters":
+  {
+    "Method":                         "WCSPH",
+    "Kernel h":                       0.01,
+    "Initial Spacing":                0.01,
+    "Epsilon":                        0.01,
+    "Maximum Velocity":               1.0,
+    "XSPH Coefficient":               0.5,
+    "Viscous damping":                0.0,
+    "Shifting Coefficient":           1.0,
+    "Density Reinitialization":       1000000000
+  },
+
+  "Time Stepping":
+  {
+    "Adaptive Time stepping":        false,
+    "CFL number":                    0.2,
+    "Beta":                          0.0,
+    "Fluid time step":               2.5e-4,
+    "Solid time step":               2.5e-4,
+    "Maximum time step":             2.5e-4,
+    "End time":                      40.0,
+    "Write frame per second":        20
+  },
+
+  "Elastic SPH":
+  {
+    "Poisson ratio":                0.3,
+    "Young modulus":                1.0e6,
+    "Artificial stress":            0.0,
+    "Artificial viscosity alpha":   0.5,
+    "Artificial viscosity beta":    0.0,
+    "I0":                           0.04,
+    "mu_s":                         0.9,
+    "mu_2":                         0.9,
+    "particle diameter":            0.001,
+    "kernel threshold":             0.8
+  },
+
+  "Geometry Inf":
+  {
+    "BoxDimensionX":               12.0,
+    "BoxDimensionY":                3.2,
+    "BoxDimensionZ":                0.2,
+    "FluidDimensionX":              6.6,
+    "FluidDimensionY":              3.2,
+    "FluidDimensionZ":              1.5
+  },
+
+  "Body Inf":
+  {
+    "BodyDimensionX":               0.0,
+    "BodyDimensionY":               0.0,
+    "BodyDimensionZ":               0.0,
+    "BodyIniPosX":                  4.8,
+    "BodyIniPosY":                  0.0,
+    "BodyIniPosZ":                  0.15,
+    "BodyIniVelX":                  0.0,
+    "BodyIniVelY":                  0.0,
+    "BodyIniVelZ":                  0.0,
+    "BodyIniAngVel":                0.0,
+    "BodyMass":                     0.0,
+    "BodyDensity":                  2879.0
+  }
+
+}
