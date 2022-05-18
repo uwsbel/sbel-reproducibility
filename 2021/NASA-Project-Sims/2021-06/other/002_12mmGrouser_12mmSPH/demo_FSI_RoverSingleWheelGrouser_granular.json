@@ -1,0 +1,80 @@
+{
+
+  "Output Folder": "Wheel_slip_N0.1",
+
+
+  "Physical Properties of Fluid":
+  {
+    "Density":                1700,
+    "Viscosity":              0.0,
+    "Body Force":             [0.0,  0.0,  0.0],
+    "Gravity":                [0.0,  0.0, -9.81]
+  },
+
+  "SPH Parameters":
+  {
+    "Method":                         "WCSPH",
+    "Kernel h":                       0.012,
+    "Initial Spacing":                0.012,
+    "Epsilon":                        0.01,
+    "XSPH Coefficient":               0.5,
+    "Viscous damping":                0.0,
+    "Shifting Coefficient":           1.0,
+    "Density Reinitialization":       1000000000
+  },
+
+  "Time Stepping":
+  {
+    "Adaptive Time stepping":        false,
+    "Beta":                          0.0,
+    "CFL number":                    0.2,
+    "Fluid time step":               2.5e-4,
+    "Solid time step":               2.5e-4,
+    "Maximum time step":             2.5e-4,
+    "End time":                      40.0,
+    "Write frame per second":        10
+  },
+
+  "Elastic SPH":
+  {
+    "Poisson ratio":                0.3,
+    "Young modulus":                1.0e6,
+    "Artificial stress":            0.0,
+    "Artificial viscosity alpha":   0.5,
+    "Artificial viscosity beta":    0.0,
+    "I0":     0.3,
+    "mu_s":   0.9,
+    "mu_2":   0.9,
+    "particle diameter":     0.005,
+    "frictional angle":      0.0,
+    "dilate angle":          0.0,
+    "cohesion coefficient":  0.0,
+    "kernel threshold":      0.9
+  },
+
+  "Geometry Inf":
+  {
+    "BoxDimensionX":                4.0,
+    "BoxDimensionY":                0.4,
+    "BoxDimensionZ":                0.12,
+    "FluidDimensionX":              4.0,
+    "FluidDimensionY":              0.4,
+    "FluidDimensionZ":              0.1
+  },
+
+  "Body Inf":
+  {
+    "BodyRadius":                   0.28,
+    "BodyLength":                   0.25,
+    "BodyIniPosX":                 -1.75,
+    "BodyIniPosY":                  0.0,
+    "BodyIniPosZ":                  0.29,
+    "BodyIniVelX":                  0.0,
+    "BodyIniVelY":                  0.0,
+    "BodyIniVelZ":                  0.0,
+    "BodyIniAngVel":                0.192,
+    "BodyMass":                     17.5,
+    "BodyDensity":                  1.0
+  }
+
+}
