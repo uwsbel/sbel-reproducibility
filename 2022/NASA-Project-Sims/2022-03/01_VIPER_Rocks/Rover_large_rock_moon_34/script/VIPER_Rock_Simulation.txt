@@ -1,0 +1,24 @@
+=============================================================================
+For NASA project. 
+VIPER simulation on SPH terrain with rock.
+Add a blade in front of the rover.
+Start from the code for IROS paper.
+=============================================================================
+
+
+=============================================================================
+Repo: 		chrono
+Branch: 	feature/fsi
+Commit:	    1530513bbd945b772cd329f7b90344c03f8fb56a
+Message:	Merge branch 'develop' into feature/fsi
+=============================================================================
+ 
+ 
+=============================================================================
+step1, go to ./viper_sim
+step2, ccmake ./
+step3, specify the chrono cmake directory as: ../chrono_build/cmake
+step4, c (configure) and g (genetrate)
+step5, make -j 20
+step6, use script chrono_FSI.sh to submit the job: sbatch chrono_FSI.sh
+=============================================================================
