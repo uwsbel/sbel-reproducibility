@@ -1,0 +1,86 @@
+{
+
+  "Output Folder": "Rover_rock_41",
+
+
+  "Physical Properties of Fluid": {
+    "Density": 1700,
+    "Viscosity": 0.0,
+    "Body Force": [ 0.0, 0.0, 0.0 ],
+    "Gravity": [ 0.0, 0.0, -9.81 ],
+    "Surface Tension Kappa": 0.0,
+    "Characteristic Length": 1.0
+  },
+
+  "SPH Parameters": {
+    "Method": "WCSPH",
+    "Kernel h": 0.01,
+    "Initial Spacing": 0.01,
+    "Epsilon": 0.01,
+    "Maximum Velocity": 1.0,
+    "XSPH Coefficient": 0.5,
+    "Viscous damping": 0.0e-5,
+    "Shifting Coefficient": 1.0,
+    "Density Reinitialization": 1000000000,
+    "Conservative Discretization": true,
+    "Gradient Discretization Type": 1,
+    "Laplacian Discretization Type": 1
+  },
+
+  "Time Stepping": {
+    "Adaptive Time stepping": false,
+    "CFL number": 0.2,
+    "Beta": 0.0,
+    "Fluid time step": 2.5e-4,
+    "Solid time step": 2.5e-4,
+    "Maximum time step": 2.5e-4,
+    "End time": 30.0,
+    "Write frame per second": 20
+  },
+
+  "Elastic SPH": {
+    "Poisson ratio": 0.3,
+    "Young modulus": 1.0e6,
+    "Artificial stress": 0.0,
+    "Artificial viscosity alpha": 0.5,
+    "Artificial viscosity beta": 0.0,
+    "I0": 0.04,
+    "mu_s": 0.7,
+    "mu_2": 0.7,
+    "particle diameter": 0.005,
+    "frictional angle": 0.0,
+    "dilate angle": 0.0,
+    "cohesion coefficient": 0.0,
+    "kernel threshold":0.8
+  },
+
+  "Geometry Inf": {
+    "BoxDimensionX": 10.0,
+    "BoxDimensionY": 10.0,
+    "BoxDimensionZ": 0.12,
+    "FluidDimensionX": 10.0,
+    "FluidDimensionY": 10.0,
+    "FluidDimensionZ": 0.08
+  },
+
+  "Body Inf": {
+    "BodyDimensionX": 0.03,
+    "BodyDimensionY": 0.5,
+    "BodyDimensionZ": 0.26,
+    "BodyRadius": 0.0,
+    "BodyLength": 0.0,
+    "BodyIniPosX": -3.5,
+    "BodyIniPosY": 3.5,
+    "BodyIniPosZ": 0.46,
+    "BodyIniVelX": 0.0,
+    "BodyIniVelY": 0.0,
+    "BodyIniVelZ": 0.0,
+    "BodyIniAngVel": 0.0,
+    "BodyMass": 0.0,
+    "BodyDensity": 2000.0
+  },
+
+  "Body Active Domain": [ 0.5, 0.5, 0.5 ],
+  "Settling Time": 2.0
+
+}
