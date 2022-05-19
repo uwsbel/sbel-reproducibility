@@ -1,0 +1,47 @@
+// Sample GRANULAR_SPH terrain specification file for co-simulation
+{
+    "Type": "GRANULAR_SPH",
+
+    "Patch dimensions": {
+        "Length": 3,
+        "Width": 0.4
+    },
+
+    "Granular material": {
+        "Radius": 0.005,
+        "Density": 1700,
+        "Depth": 0.12
+    },
+
+    "Output Folder": "demo_tire_rig",
+
+    "SPH Parameters": {
+        "Method": "WCSPH",
+        "Epsilon": 0.001,
+        "XSPH Coefficient": 0.5,
+        "Shifting Coefficient": 1.0,
+        "Density Reinitialization": 100000000,
+        "Consistent Discretization for Gradient": false,
+        "Consistent Discretization for Laplacian": false
+    },
+
+    "Time Stepping": {
+        "Adaptive Time stepping": false,
+        "Beta": 0.0,
+        "CFL number": 0.2
+    },
+
+    "Elastic SPH": {
+        "Poisson ratio": 0.3,
+        "Young modulus": 2.0e6,
+        "Artificial viscosity alpha": 0.5,
+        "Artificial viscosity beta": 0.0,
+        "I0": 0.04,
+        "mu_s": 0.9,
+        "mu_2": 0.9,
+        "particle diameter": 0.001,
+        "kernel threshold": 0.8
+    },
+
+    "Body Active Domain": [ 0.4, 0.3, 0.4 ]
+}
