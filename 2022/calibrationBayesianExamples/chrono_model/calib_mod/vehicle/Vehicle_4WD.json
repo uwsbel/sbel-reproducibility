@@ -1,0 +1,47 @@
+{
+  "Name": "Calibration Vehicle",
+  "Type": "Vehicle",
+  "Template": "WheeledVehicle",
+
+  "Chassis": {
+    "Input File": "calib_mod/chassis/Chassis.json"
+  },
+
+  "Axles": [
+    {
+      "Suspension Input File": "calib_mod/suspension/DoubleWishboneFront.json",
+      "Suspension Location": [ 1.688965, 0, 0 ],
+      "Steering Index": 0,
+      "Left Wheel Input File": "calib_mod/wheel/Wheel.json",
+      "Right Wheel Input File": "calib_mod/wheel/Wheel.json",
+      "Left Brake Input File": "calib_mod/brake/BrakeSimple_Front.json",
+      "Right Brake Input File": "calib_mod/brake/BrakeSimple_Front.json"
+    },
+
+    {
+      "Suspension Input File": "calib_mod/suspension/DoubleWishboneFront.json",
+      "Suspension Location": [ -1.688965, 0, 0 ],
+      "Left Wheel Input File": "calib_mod/wheel/Wheel.json",
+      "Right Wheel Input File": "calib_mod/wheel/Wheel.json",
+      "Left Brake Input File": "calib_mod/brake/BrakeSimple_Rear.json",
+      "Right Brake Input File": "calib_mod/brake/BrakeSimple_Rear.json"
+    }
+  ],
+
+  "Steering Subsystems": [
+    {
+      "Input File": "calib_mod/steering/RackPinion.json",
+      "Location": [ 1.24498, 0, 0.101322 ],
+      "Orientation": [ 0.98699637, 0, 0.16074256, 0 ]
+    }
+  ],
+
+  "Wheelbase": 3.378,
+  "Minimum Turning Radius": 7.62,
+  "Maximum Steering Angle": 30.23,
+
+  "Driveline": {
+    "Input File": "calib_mod/driveline/Driveline4WD.json",
+    "Suspension Indexes": [ 0, 1 ]
+  }
+}
