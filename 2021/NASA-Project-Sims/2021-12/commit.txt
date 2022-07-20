@@ -1,0 +1,18 @@
+For 12-25-2021 NASA report, single wheel test with 10mm grouser, DEM simulation using the co-sim.
+
+
+=============================================================================
+Repo: 		chrono
+Branch: 	feature/fsi
+Commit:	5d67ba64cebc4193f45034032221448f96412b6c
+Message:	Modify the SPH terrain and the corresponding JSON file in the 
+		co-simulation code to reflect the latest changes related to 
+		performance in Chrono::FSI
+=============================================================================
+ 
+ 
+=============================================================================
+Make one change in the source code, then build!!!!
+ChVehicleCosimTerrainNodeGranularGPU.cpp
+m_systemGPU->SetCohesionRatio(0)  ===>>>> m_systemGPU->SetCohesionRatio(2.0);
+=============================================================================

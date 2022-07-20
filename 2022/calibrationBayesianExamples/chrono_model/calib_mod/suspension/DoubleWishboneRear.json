@@ -1,0 +1,78 @@
+{
+  "Name":                       "HMMWV DoubleWishbone Rear",
+  "Type":                       "Suspension",
+  "Template":                   "DoubleWishbone",
+
+  "Vehicle-Frame Inertia":      false,
+
+  "Spindle" :
+  {
+    "Mass":                     15.91,
+    "COM":                      [0.036, 0.910, -0.026],
+    "Inertia":                  [2, 4, 2],
+    "Radius":                   0.15,
+    "Width":                    0.06
+  },
+
+  "Upright":
+  {
+    "Mass":                     27.27,
+    "COM":                      [0.036, 0.751, -0.026],
+    "Moments of Inertia":       [5, 5, 5],
+    "Products of Inertia":      [0, 0, 0],
+    "Radius":                   0.025
+  },
+
+  "Upper Control Arm":
+  {
+    "Mass":                     5.45,
+    "COM":                      [0.124, 0.589, 0.221],
+    "Moments of Inertia":       [2, 2, 2],
+    "Products of Inertia":      [0, 0, 0],
+    "Radius":                   0.02,
+    "Location Chassis Front":   [0.349, 0.462, 0.228],
+    "Location Chassis Back":    [0.077, 0.462, 0.224],
+    "Location Upright":         [0.036, 0.716, 0.216]
+  },
+
+  "Lower Control Arm":
+  {
+    "Mass":                     16.36,
+    "COM":                      [0.000, 0.547, -0.059],
+    "Moments of Inertia":       [3, 3, 3],
+    "Products of Inertia":      [0, 0, 0],
+    "Radius":                   0.03,
+    "Location Chassis Front":   [0.223, 0.307, 0.000],
+    "Location Chassis Back":    [-0.223, 0.307, 0.000],
+    "Location Upright":         [0.036, 0.787, -0.118]
+  },
+
+  "Tierod":
+  {
+    "Location Chassis":         [0.223, 0.416, 0.059],
+    "Location Upright":         [0.170, 0.821, -0.009]
+  },
+
+  "Spring":
+  {
+    "Location Chassis":         [-0.104, 0.502, 0.256],
+    "Location Arm":             [-0.097, 0.543, -0.047],
+    "Minimum Length":       0.15,
+    "Maximum Length":      0.35,
+    "Spring Coefficient": 150000.0,
+    "Free Length":              0.382
+  },
+
+  "Shock":
+  {
+    "Location Chassis":         [-0.104, 0.498, 0.323],
+    "Location Arm":             [-0.097, 0.544, -0.038],
+    "Damping Coefficient":      19015.5692
+// "Damping Coefficient": 60068.000
+  },
+
+  "Axle":
+  {
+    "Inertia":                  0.4
+  }
+}

@@ -1,0 +1,7 @@
+This demo is running using below repository and commit:
+chrono-dev (chrono-internal)
+feature/FSI
+Minor changes of demo for the CMAME revised paper
+72f728144e22c4809888a6679d520fb5fa2e85c8
+
+
