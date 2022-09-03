@@ -55,6 +55,8 @@ class Body:
         self.A_prev = self.A
         self.dr_prev = self.dr
         self.ω_prev = self.ω
+        
+        self.F_applied = np.zeros((3,1))
 
     @classmethod
     def init_from_dict(cls, dict, is_ground=False):

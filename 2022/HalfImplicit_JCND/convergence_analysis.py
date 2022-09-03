@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from SimEngineMBD.example_models.double_pendulum import run_double_pendulum
+
 from matplotlib import ticker
 
 

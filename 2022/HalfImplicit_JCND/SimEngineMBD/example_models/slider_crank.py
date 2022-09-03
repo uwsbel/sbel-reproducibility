@@ -88,6 +88,10 @@ def run_slider_crank(args=None):
     pos_data = np.zeros((sys.nb, 3, t_steps))
     vel_data = np.zeros((sys.nb, 3, t_steps))
     acc_data = np.zeros((sys.nb, 3, t_steps))
+    
+    translation_joint_normal_F  = np.zeros((1, t_steps))
+    rotational_crank_torque = np.zeros((1, t_steps))
+
 
     crank_rot = np.zeros((t_steps, 3))
 
@@ -98,6 +102,10 @@ def run_slider_crank(args=None):
     for i, t in enumerate(t_grid):
         sys.do_step(i, t)
 
+        # get reaction force and torque array
+        reaction_force = sys.compute_joint_force_on_body(t, 2, 2, -5)
+        reaction_torque = sys.compute_joint_torque_on_body(t, 0, 0, -1)
+
         # Save stuff for this timestep
         num_iters[i] = sys.k
 
@@ -105,9 +113,18 @@ def run_slider_crank(args=None):
             pos_data[j, :, i] = body.r.T
             vel_data[j, :, i] = body.dr.T
             acc_data[j, :, i] = body.ddr.T
+            translation_joint_normal_F[0, i]  = reaction_force
+            rotational_crank_torque[0, i] = reaction_torque
 
         crank_rot[i] = sys.bodies[0].ω.T
+        
+        
+        
     Δt = process_time() - start
+    
+    
+    
+    
     logging.info('Simulation Ended')
 
     logging.info('Avg. iterations: {}'.format(np.mean(num_iters)))
@@ -156,7 +173,7 @@ def run_slider_crank(args=None):
 
         plt.show()
 
-    return pos_data, vel_data, acc_data, num_iters, t_grid
+    return pos_data, vel_data, acc_data, F_joint_data, Tr_joint_data, num_iters, t_grid
 
 
 def time_slider_crank(args=None):

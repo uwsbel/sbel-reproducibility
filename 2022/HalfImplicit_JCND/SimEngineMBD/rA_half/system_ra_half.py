@@ -160,6 +160,9 @@ class SystemRA_half:
 
         self.g_cons.maybe_swap_gcons(t)
 
+
+        # this is where friction force should go 
+
         Phi_r_old = self.g_cons.get_phi_r(t)
         Pi_old = self.g_cons.get_pi(t)
         
@@ -203,7 +206,11 @@ class SystemRA_half:
 
         # Setup and do Newton-Raphson Iteration
         self.k = 0
+        lambda_old = np.array(self.λ_hat)
+        # lambda_old = self.λ_hat
+
         while True:
+            
             # solving for current r theta_bar and previous lambda_hat
             # Form right hand side e matrix g = [e0, e1, e2]
             e0 = self.M @ solver_r + Phi_r_old.T @ self.λ_hat + solver_bn
@@ -215,7 +222,9 @@ class SystemRA_half:
             δ = lu_solve(G_lu, -e)
             
             solver_r += δ[0:3*self.nb]
-            solver_theta_bar += δ[3*self.nb:6*self.nb]                
+            solver_theta_bar += δ[3*self.nb:6*self.nb]
+                                  
+            # do not update lambda when iteration i = 1
             self.λ_hat += δ[6*self.nb: len(δ)]
                         
             # logging.debug('t: {:.3f}, k: {:>2d}, norm: {:6.6e}'.format(
@@ -245,6 +254,8 @@ class SystemRA_half:
             body.ω = solver_theta_bar[3*j: 3*(j+1), :]/self.h
             body.A = body.A_prev @ exp(self.h * skew(body.ω))
 
+        if i == 1:
+            self.λ_hat = lambda_old
 
         self.update_ddr(Phi_r_old)
         self.update_dω(Pi_old)
@@ -309,6 +320,29 @@ class SystemRA_half:
         for j, body in enumerate(self.bodies):
             body.ddr = ddq[3*j:3*(j+1), :]
             body.dω = ddq[3*(self.nb + j):3*(self.nb + j+1), :]
+            
+            
+    def compute_reaction_forces(self, t):
+        Phi_r_old = self.g_cons.get_phi_r(t)
+        return Phi_r_old.T @ self.λ
+
+    def compute_reaction_torques(self, t):
+        Pi_old = self.g_cons.get_pi(t)
+        return Pi_old.T @ self.λ
+    
+    def compute_joint_force_on_body(self, body_id, idx, nc_id ,t):
+        """
+        return joint force from constraint nc_id applied to body body_id (start from 0) in direction of idx (x-0, y-1, z-2)
+        """
+        Phi_r_old = self.g_cons.get_phi_r(t)
+        return Phi_r_old[3*(body_id) + idx] @ self.λ[nc_id]
+
+    def compute_joint_torque_on_body(self, body_id, idx, nc_id ,t):
+        """
+        return joint force from constraint nc_id applied to body body_id in direction of idx (x-0, y-1, z-2)
+        """
+        Pi_old = self.g_cons.get_phi_r(t)
+        return Pi_old[3*(body_id) + idx] @ self.λ[nc_id]
     
 
 
