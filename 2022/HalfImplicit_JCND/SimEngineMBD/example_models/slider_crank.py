@@ -41,7 +41,8 @@ def setup_slider_crank(args=None):
     
     # See Haug p. 456 for properties
     # Crank
-    sys.bodies[0].m = 0.12
+    sys.bodies[0].m = 1.2
+
     sys.bodies[0].J = np.diag([1e-4, 1e-5, 1e-4])
     sys.bodies[0].J_inv = np.diag([1/1e-4, 1/1e-5, 1/1e-4])
 
@@ -91,7 +92,7 @@ def run_slider_crank(args=None):
     
     translation_joint_normal_F  = np.zeros((1, t_steps))
     rotational_crank_torque = np.zeros((1, t_steps))
-
+    slider_fric_data = np.zeros((1, t_steps))
 
     crank_rot = np.zeros((t_steps, 3))
 
@@ -100,11 +101,30 @@ def run_slider_crank(args=None):
     logging.info('Simulation started')
     start = process_time()
     for i, t in enumerate(t_grid):
+
+        
+        # apply frictional force
+        # first extract normal force at the joint
+        reaction_force = sys.compute_joint_force_on_body(2, 2, -5, t)
+        friction_force = params.mu * np.abs(reaction_force[0])
+        # get velocity of slider in x direction
+        slider_velo = sys.bodies[2].dr[0,0]
+        
+        if np.abs(slider_velo) < 1e-5:
+            friction_force = 0
+        else:
+            # oppose relative motion
+            friction_force = -friction_force * slider_velo/np.abs(slider_velo)
+
+        slider_fric_data[0, i] = friction_force
+        # print("friction force is {}".format(friction_force))
+
+
+        sys.apply_external_force(2, np.array([[friction_force],[0],[0]]))
         sys.do_step(i, t)
 
         # get reaction force and torque array
-        reaction_force = sys.compute_joint_force_on_body(t, 2, 2, -5)
-        reaction_torque = sys.compute_joint_torque_on_body(t, 0, 0, -1)
+        reaction_torque = sys.compute_joint_torque_on_body(0, 0, 0, t)
 
         # Save stuff for this timestep
         num_iters[i] = sys.k
@@ -113,8 +133,9 @@ def run_slider_crank(args=None):
             pos_data[j, :, i] = body.r.T
             vel_data[j, :, i] = body.dr.T
             acc_data[j, :, i] = body.ddr.T
-            translation_joint_normal_F[0, i]  = reaction_force
-            rotational_crank_torque[0, i] = reaction_torque
+
+        translation_joint_normal_F[0, i]  = reaction_force
+        rotational_crank_torque[0, i] = reaction_torque
 
         crank_rot[i] = sys.bodies[0].ω.T
         
@@ -173,7 +194,7 @@ def run_slider_crank(args=None):
 
         plt.show()
 
-    return pos_data, vel_data, acc_data, F_joint_data, Tr_joint_data, num_iters, t_grid
+    return pos_data, vel_data, acc_data, translation_joint_normal_F, rotational_crank_torque, slider_fric_data, num_iters, t_grid
 
 
 def time_slider_crank(args=None):

@@ -34,6 +34,8 @@ def standard_setup(parser, model_file, args=None):
     parser.add_argument('--save_data', default=False, action='store_true')
     parser.add_argument('--read_data', default=False, action='store_true')
 
+    parser.add_argument('--friction_coeff', type=float, default=0, dest='mu')
+
     out_args = parser.parse_args() if args is None else parser.parse_args(args)
 
     # Determine which formulation to use
@@ -57,7 +59,7 @@ def standard_setup(parser, model_file, args=None):
         raise ValueError('Unmapped mode {} encountered'.format(out_args.mode))
 
     logging.basicConfig(filename=out_args.output, level=getattr(logging, out_args.log.upper()), format='%(message)s')
-
+    
     return sys, out_args
 
 def plot_kinematics_analysis(grid, position, velocity, acceleration, title=''):

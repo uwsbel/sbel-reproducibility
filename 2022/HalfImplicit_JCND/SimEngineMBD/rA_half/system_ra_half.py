@@ -159,6 +159,9 @@ class SystemRA_half:
             return
 
         self.g_cons.maybe_swap_gcons(t)
+        
+        
+        self.F_ext = self.F_ext + np.vstack([body.F for body in self.bodies])
 
 
         # this is where friction force should go 
@@ -335,14 +338,18 @@ class SystemRA_half:
         return joint force from constraint nc_id applied to body body_id (start from 0) in direction of idx (x-0, y-1, z-2)
         """
         Phi_r_old = self.g_cons.get_phi_r(t)
-        return Phi_r_old[3*(body_id) + idx] @ self.λ[nc_id]
+        return Phi_r_old[nc_id, 3*(body_id) + idx] * self.λ[nc_id]
 
     def compute_joint_torque_on_body(self, body_id, idx, nc_id ,t):
         """
         return joint force from constraint nc_id applied to body body_id in direction of idx (x-0, y-1, z-2)
         """
         Pi_old = self.g_cons.get_phi_r(t)
-        return Pi_old[3*(body_id) + idx] @ self.λ[nc_id]
+        return Pi_old[nc_id, 3*(body_id) + idx] * self.λ[nc_id]
+    
+    def apply_external_force(self, body_id, F):
+        self.F_ext = np.zeros((3*self.nb, 1))
+        self.F_ext[3*body_id:3*body_id+3] += F 
     
 
 
