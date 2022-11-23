@@ -51,18 +51,42 @@ nc_data_fricti = az.from_netcdf(NC_File_Fricti)
 nc_data_janosi = az.from_netcdf(NC_File_Janosi)
 
 
-# extract the stats using the arviz function
+
+# # extract the stats using the arviz function
 stats_normal = az.summary(nc_data_normal,kind='diagnostics',round_to = 5)
 stats_fricti = az.summary(nc_data_fricti,kind='diagnostics',round_to = 5)
 stats_janosi = az.summary(nc_data_janosi,kind='diagnostics',round_to = 5)
 
 
-# drop the columns that are not required
+# Normalize the statistics with posterior mean
+means_normal = np.array([abs(np.mean(nc_data_normal['posterior']['K_c'].values)), \
+                    abs(np.mean(nc_data_normal['posterior']['K_phi'].values)), \
+                        abs(np.mean(nc_data_normal['posterior']['n'].values))])
+
+
+stats_normal.loc[:,'mcse_mean'] = stats_normal.loc[:,'mcse_mean'] / means_normal
+stats_normal.loc[:,'mcse_sd'] = stats_normal.loc[:,'mcse_sd'] / means_normal
+
+
+means_fricti = np.array([abs(np.mean(nc_data_fricti['posterior']['cohesion'].values)), \
+                    abs(np.mean(nc_data_fricti['posterior']['phi'].values))])
+
+stats_fricti.loc[:,'mcse_mean'] = stats_fricti.loc[:,'mcse_mean'] / means_fricti
+stats_fricti.loc[:,'mcse_sd'] = stats_fricti.loc[:,'mcse_sd'] / means_fricti
+
+
+means_janosi = np.array([abs(np.mean(nc_data_janosi['posterior']['K_s'].values))])
+
+stats_janosi.loc[:,'mcse_mean'] = stats_janosi.loc[:,'mcse_mean'] / means_janosi
+stats_janosi.loc[:,'mcse_sd'] = stats_janosi.loc[:,'mcse_sd'] / means_janosi
+
+
+# # drop the columns that are not required
 stats_normal = stats_normal.drop(['ess_bulk','ess_tail'], axis = 1)
 stats_fricti = stats_fricti.drop(['ess_bulk','ess_tail'], axis = 1)
 stats_janosi = stats_janosi.drop(['ess_bulk','ess_tail'], axis = 1)
 
-# print as latex code
-print(stats_normal.style.to_latex())
-print(stats_fricti.style.to_latex())
-print(stats_janosi.style.to_latex())
+# # print as latex code
+print(stats_normal)
+print(stats_fricti)
+print(stats_janosi)

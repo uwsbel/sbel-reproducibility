@@ -62,9 +62,17 @@ posterior_para_fricti = np.asarray(nc_data_fricti['posterior'].to_array())
 posterior_para_fricti = posterior_para_fricti.reshape(posterior_para_fricti.shape[0],-1).T
 
 
+# Normalize all the data
+means_normal = abs(np.mean(posterior_para_normal,axis=0))
+means_fricti = abs(np.mean(posterior_para_fricti,axis=0))
+
+posterior_para_normal = posterior_para_normal / means_normal
+posterior_para_fricti  =  posterior_para_fricti / means_fricti
+
 # rename the columns to latex for paper
 normal_cols = [r'$K_c$',r'$K_{\phi}$',r'$n$']
 normal = pd.DataFrame(posterior_para_normal,columns = normal_cols)
+
 
 fricti_cols = [r'$c$',r'$\phi$']
 fricti = pd.DataFrame(posterior_para_fricti,columns = fricti_cols)
@@ -88,8 +96,8 @@ sns.set_style(style='white')
 
 # plot the pairwise plot for normal
 g = sns.pairplot(normal,kind='kde')
-for ax in g.axes.flatten():
-    ax.ticklabel_format(style='sci', scilimits=(0,0), axis='both')
+# for ax in g.axes.flatten():
+#     ax.ticklabel_format(style='sci', scilimits=(0,0), axis='both')
 
 # save the plot
 png_name_normal = pairWise + "normal.png" 
@@ -100,7 +108,7 @@ mpl.savefig(png_name_normal, facecolor = 'w', dpi=dpi_png)
 g = sns.pairplot(fricti,kind='kde')
 
 
-# save the plot
+# # save the plot
 png_name_fricti = pairWise + "fricti.png" 
 mpl.savefig(png_name_fricti, facecolor = 'w', dpi=dpi_png)
 
