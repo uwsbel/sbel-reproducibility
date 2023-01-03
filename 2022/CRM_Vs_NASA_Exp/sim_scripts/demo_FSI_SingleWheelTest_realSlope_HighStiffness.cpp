@@ -83,7 +83,7 @@ int out_fps = 20;
 
 // Output directories and settings
 std::string out_dir = GetChronoOutputPath() 
-    + "Single_Wheel_Test_1222_OneWayDamp/01_Y1e7_alpha001/Mass106_Moon_Angvel0_8_GRC3_42deg/angle_";
+    + "Single_Wheel_Test_1222_OneWayDamp/01_Y1e8_alpha030/Mass106_Moon_Angvel0_8_GRC3_42deg/angle_";
 
 // Enable/disable run-time visualization (if Chrono::OpenGL is available)
 bool render = true;
@@ -288,7 +288,7 @@ void CreateSolidPhase(ChSystemSMC& sysMBS, ChSystemFsi& sysFSI) {
 
 int main(int argc, char* argv[]) {
     // Use the default input file or you may enter your input parameters as a command line argument
-    std::string inputJson = GetChronoDataFile("fsi/input_json/demo_FSI_SingleWheelTest.json");
+    std::string inputJson = GetChronoDataFile("fsi/input_json/demo_FSI_SingleWheelTest8.json");
     if (argc == 2) {
         slope_angle = (std::stod(argv[1]) * 5.0) / 180.0 * CH_C_PI;
         out_dir = out_dir + std::to_string(std::stoi(argv[1]) * 5) + "/";
