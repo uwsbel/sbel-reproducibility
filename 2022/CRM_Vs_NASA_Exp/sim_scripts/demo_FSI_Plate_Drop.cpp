@@ -243,9 +243,6 @@ int main(int argc, char* argv[]) {
     ChSystemSMC sysMBS;
     ChSystemFsi sysFSI(sysMBS);
 
-    sysMBS.Set_G_acc(gravity_mbs);
-    sysFSI.Set_G_acc(gravity_fsi);
-
     sysFSI.SetVerbose(verbose_fsi);
 
     // Use the default input file or you may enter your input parameters as a command line argument
@@ -257,8 +254,10 @@ int main(int argc, char* argv[]) {
         std::cout << "or to use default input parameters ./demo_FSI_SingleWheelTest " << std::endl;
         return 1;
     }
-
     sysFSI.ReadParametersFromFile(inputJson);
+
+    sysMBS.Set_G_acc(gravity_mbs);
+    sysFSI.Set_G_acc(gravity_fsi);
 
     sysFSI.SetInitialSpacing(iniSpacing);
     sysFSI.SetKernelLength(kernelLength);

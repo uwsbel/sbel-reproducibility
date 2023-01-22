@@ -139,11 +139,6 @@ int main(int argc, char* argv[]) {
     ChSystemNSC sysMBS;
     ChSystemFsi sysFSI(sysMBS);
 
-    ChVector<> gravity = ChVector<>(gravity_G * sin(slope_angle), 0, gravity_G * cos(slope_angle));
-    ChVector<> gravity_T = ChVector<>(gravity_G * sin(slope_angle), 0, gravity_G * cos(slope_angle));
-    sysMBS.Set_G_acc(gravity);
-    sysFSI.Set_G_acc(gravity_T);
-
     // Create oputput directories
     if (!filesystem::create_directory(filesystem::path(out_dir))) {
         std::cerr << "Error creating directory " << out_dir << std::endl;
@@ -161,8 +156,12 @@ int main(int argc, char* argv[]) {
         std::cerr << "Error creating directory " << out_dir + "/rover" << std::endl;
         return 1;
     }
-
     sysFSI.ReadParametersFromFile(inputJson);
+
+    ChVector<> gravity = ChVector<>(gravity_G * sin(slope_angle), 0, gravity_G * cos(slope_angle));
+    ChVector<> gravity_T = ChVector<>(gravity_G * sin(slope_angle), 0, gravity_G * cos(slope_angle));
+    sysMBS.Set_G_acc(gravity);
+    sysFSI.Set_G_acc(gravity_T);
 
     sysFSI.SetInitialSpacing(iniSpacing);
     sysFSI.SetKernelLength(kernelLength);

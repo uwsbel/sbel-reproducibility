@@ -298,10 +298,6 @@ int main(int argc, char* argv[]) {
     ChSystemSMC sysMBS;
     ChSystemFsi sysFSI(sysMBS);
 
-    ChVector<> gravity = ChVector<>(gravity_G * sin(slope_angle), 0, gravity_G * cos(slope_angle));
-    sysMBS.Set_G_acc(gravity);
-    sysFSI.Set_G_acc(gravity);
-
     sysFSI.SetVerbose(verbose_fsi);
     
     // Create oputput directories
@@ -321,8 +317,11 @@ int main(int argc, char* argv[]) {
         std::cerr << "Error creating directory " << out_dir + "/vtk" << std::endl;
         return 1;
     }
-
     sysFSI.ReadParametersFromFile(inputJson);
+
+    ChVector<> gravity = ChVector<>(gravity_G * sin(slope_angle), 0, gravity_G * cos(slope_angle));
+    sysMBS.Set_G_acc(gravity);
+    sysFSI.Set_G_acc(gravity);
 
     sysFSI.SetInitialSpacing(iniSpacing);
     sysFSI.SetKernelLength(kernelLength);

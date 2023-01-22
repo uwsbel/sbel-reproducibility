@@ -290,10 +290,6 @@ int main(int argc, char* argv[]) {
     ChSystemSMC sysMBS;
     ChSystemFsi sysFSI(sysMBS);
 
-    ChVector<> gravity = ChVector<>(0, 0, gravity_G);
-    sysMBS.Set_G_acc(gravity);
-    sysFSI.Set_G_acc(gravity);
-
     sysFSI.SetVerbose(verbose_fsi);
 
     // Use the default input file or you may enter your input parameters as a command line argument
@@ -326,8 +322,11 @@ int main(int argc, char* argv[]) {
         std::cerr << "Error creating directory " << out_dir + "/vtk" << std::endl;
         return 1;
     }
-
     sysFSI.ReadParametersFromFile(inputJson);
+
+    ChVector<> gravity = ChVector<>(0, 0, gravity_G);
+    sysMBS.Set_G_acc(gravity);
+    sysFSI.Set_G_acc(gravity);
 
     sysFSI.SetInitialSpacing(iniSpacing);
     sysFSI.SetKernelLength(kernelLength);
