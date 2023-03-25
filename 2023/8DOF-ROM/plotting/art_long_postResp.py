@@ -430,6 +430,11 @@ for i in range(5):
     data_st = data_st[:951]
     data = data[:1101]
 
+    print(f"Ramp Test{test_nums_ramp[i]}")
+    print(f"Longitudinal Velocity Error = {np.sqrt(np.sum((model_post_mean[:,3] - data['velo'])**2)/model_post_mean.shape[0])}")
+
+    print(f"Step Test{test_nums_step[i]}")
+    print(f"Longitudinal Velocity Error = {np.sqrt(np.sum((model_post_mean_st[:,3] - data_st['velo'])**2)/model_post_mean_st.shape[0])}")
 
     # plot the data
     axes[0].plot(data['time'],data['velo'],cols[i],label =f'Test {i + 1}',alpha = 0.5)

@@ -81,8 +81,8 @@ for exp_num,test_num in exp_test_map.items():
 
     
 
-    axes[0].plot(time,acc_controls, cols[i], label = f'Lateral test {i+1}')
-    axes[1].plot(time, steering_controls, cols[i], label =f'Lateral test {i+1}')
+    axes[0].plot(time,acc_controls, cols[i], label = f'Experiment {i+1}')
+    axes[1].plot(time, steering_controls, cols[i], label =f'Experiment {i+1}')
 
 
 
