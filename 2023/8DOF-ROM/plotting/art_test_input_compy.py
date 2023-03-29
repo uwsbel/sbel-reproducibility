@@ -31,7 +31,7 @@ mpl.rcParams.update({
 vehicle = "ART"
 test_nums = [sys.argv[1]]
 
-fig, axes = mpl.subplots(nrows = 1, ncols = 2, figsize = (8,4), sharey = True)
+fig, axes = mpl.subplots(nrows = 1, ncols = 1, figsize = (8,4), sharey = True)
 
 i = 0
 for test_num in test_nums:
@@ -64,8 +64,8 @@ for test_num in test_nums:
     step = 0.001
 
     # simulation end time 
-    endTime = 10.
-    t = 0
+    endTime = 6.
+    t = 3.5
     timeStepNo = 0
     while(t<endTime):
         rom.getControls(controls, driverData, t)
@@ -80,8 +80,7 @@ for test_num in test_nums:
     
 
 
-    axes[0].plot(time,acc_controls, 'k')
-    axes[1].plot(time, steering_controls, 'k')
+    axes.plot(time, steering_controls, 'k')
 
 
 
@@ -90,16 +89,14 @@ for test_num in test_nums:
 
 
 mpl.xlabel("Time (s)")
-axes[0].set_ylabel("Normalized Throttle")
-axes[1].set_ylabel("Normalized Steering")
-# axes[1].legend(fontsize = 12)
-for i, ax in enumerate(axes):
-    ax.set_xlabel("Time (s)")
-    ax.set_ylim([-1.01,1.01])
-    ax.set_xlim([0,max(time)+0.5])
+axes.set_ylabel("Normalized Steering")
+axes.set_xlabel("Time (s)")
+axes.set_ylim([-1.01,1.01])
+axes.set_xticks(np.arange(3.5,endTime,0.2))
+axes.set_xlim([3.5,max(time)])
 fig.tight_layout()
 save = int(sys.argv[3])
 if(save):
-    mpl.savefig(f"./images/art_test_input_Sin" + exp_num + "_" + "r" + test_nums[0] + ".eps", format='eps', dpi=3000) 
-    mpl.savefig(f"./images/art_test_input_Sin" + exp_num + "_" + "r" + test_nums[0], facecolor = 'w', dpi = 600) 
+    mpl.savefig(f"./images/art_test_input_comp2.eps", format='eps', dpi=3000) 
+    mpl.savefig(f"./images/art_test_input_comp2", facecolor = 'w', dpi = 600) 
 mpl.show()
