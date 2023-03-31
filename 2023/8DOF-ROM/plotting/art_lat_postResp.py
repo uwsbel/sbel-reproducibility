@@ -1,5 +1,4 @@
 import sys
-sys.path.append('/home/unjhawala/projectlets/model-repo/simple-vehicles/lang-c/interfaces') #change this before final submission
 import matplotlib.pyplot as mpl
 import arviz as az
 import rom
