@@ -1,5 +1,5 @@
-# The "public-metadata" repo
-The repo contains assets, obj files, json files, scripts, Chrono models, etc., needed to generate results reported in papers, tech reports, presentations, etc.
+# The "sbel-reproducibility" repo
+The repo contains assets, obj files, json files, scripts, Chrono models, etc., needed to reproduce results reported in papers, tech reports, presentations, etc.
 This repo is organized by year of when the metadata was first added to the repo.
 
 ## Info for SBEL members
