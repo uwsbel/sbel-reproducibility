@@ -72,12 +72,12 @@ for i,name in enumerate(names_nc):
         axes[0,i].clear()
         axes[0,i].plot(xd,norm_y,alpha=0.6, ls='-', linewidth=2.0)
         axes[0,i].set_title(names[i])
-        axes[0,i].text(0.5, 0.5, f'Mean = {para_mean:.3}', horizontalalignment='center', verticalalignment='center',transform=axes[0,i].transAxes, fontsize = 13)
+        # axes[0,i].text(0.5, 0.5, f'Mean = {para_mean:.3}', horizontalalignment='center', verticalalignment='center',transform=axes[0,i].transAxes, fontsize = 13)
     else:
         axes[1,i-4].clear()
         axes[1,i-4].plot(xd,norm_y,alpha=0.6, ls='-', linewidth=2.0)
         axes[1,i-4].set_title(names[i])
-        axes[1,i-4].text(0.5, 0.5, f'Mean = {para_mean:.3}', horizontalalignment='center', verticalalignment='center',transform=axes[1,i-4].transAxes, fontsize = 13)
+        # axes[1,i-4].text(0.5, 0.5, f'Mean = {para_mean:.3}', horizontalalignment='center', verticalalignment='center',transform=axes[1,i-4].transAxes, fontsize = 13)
 
 
 

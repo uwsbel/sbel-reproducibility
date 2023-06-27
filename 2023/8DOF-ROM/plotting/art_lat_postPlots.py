@@ -68,7 +68,7 @@ for i,filename in enumerate(files):
     axes.clear()
     axes.plot(xd,norm_y,alpha=0.6, ls='-', linewidth=2.0)
     axes.set_title(names[i])
-    axes.text(0.5, 0.5, f'Mean = {para_mean:.3}', horizontalalignment='center', verticalalignment='center',transform=axes.transAxes, fontsize = 13)
+    # axes.text(0.5, 0.5, f'Mean = {para_mean:.3}', horizontalalignment='center', verticalalignment='center',transform=axes.transAxes, fontsize = 13)
 
     fig.tight_layout()
     save = int(sys.argv[1])

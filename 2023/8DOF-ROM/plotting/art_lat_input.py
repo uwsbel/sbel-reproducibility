@@ -92,7 +92,7 @@ for exp_num,test_num in exp_test_map.items():
 mpl.xlabel("Time (s)")
 axes[0].set_ylabel("Normalized Throttle")
 axes[1].set_ylabel("Normalized Steering")
-axes[1].legend(fontsize = 12)
+axes[1].legend(fontsize = 12, ncol = 2)
 for i, ax in enumerate(axes):
     ax.set_xlabel("Time (s)")
     ax.set_ylim([0,1.01])
