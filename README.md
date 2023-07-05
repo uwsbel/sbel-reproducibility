@@ -1,10 +1,14 @@
 # The "sbel-reproducibility" repo
 The repo contains assets, obj files, json files, scripts, Chrono models, etc., needed to reproduce results reported in papers, tech reports, presentations, etc.
 
-**This repo is organized by year of when the metadata was first added to the repo.**
+**This repo is organized by year of when the metadata was first added to the repo. Each year shows as a folder in this repo.**
 
 ## Info for SBEL members
-- Subfolders are meant to contain information associated with a certain paper, tech report, presentation, etc. Feel free to use subfolders in subfolders.
+- Subfolders are meant to contain information associated with a certain paper, tech report, thesis, etc. Feel free to use subfolders in subfolders.
+- The naming convention is as follows:
+  - If it's a technical report you are dealing with, then call the sub-folder TR-2023-04
+  - If it's a paper, then call the subfolder, for instance, Unjhawala-IEEE-LibraryOfROM-vehicles. In other words, last name of first author, the journal (or conference where published), and a couple of words tied to the title or topic of the paper
+  - If it's a thesis, then call the subfolder, for instance, Elmquist-PhD. In other words, last name of the person who defended the thesis, and the type of thesis. It can be PhD, MS, or IndepThesis
 - Please include a readme.md file in the high level subfolder to describe the content of the directroy along with where the material was used (which paper/tech report/etc.).
 - **Important:** If the metadata is meant to be used in conjunction with Chrono, please provide a commit ID/SHA1 - hash value that the results reported in your paper/tech report/etc. were generated with
 - Please avoid dropping large files here, particularly so if they're non-ascii. For large files that are available elsewhere, provide a link (in your readme.md) that can be used to download the file. This applies, for instance, to large pics, movies, etc.
