@@ -1,6 +1,7 @@
 # The "sbel-reproducibility" repo
 The repo contains assets, obj files, json files, scripts, Chrono models, etc., needed to reproduce results reported in papers, tech reports, presentations, etc.
-This repo is organized by year of when the metadata was first added to the repo.
+
+**This repo is organized by year of when the metadata was first added to the repo.**
 
 ## Info for SBEL members
 - Subfolders are meant to contain information associated with a certain paper, tech report, presentation, etc. Feel free to use subfolders in subfolders.
