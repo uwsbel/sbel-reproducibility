@@ -24,7 +24,7 @@
 
     - To check if docker container is working fine, run ```docker ps```, there should be a container entry based on the previous image you pulled
 
-    - If you did previous step, open your browser and go to the link: http://localhost:6901/. We added VNC support for better running and visualizing the simulation.
+    - If you did previous step, open your browser and go to the link: http://localhost:6901/. **Password is: "sbel"** We added VNC support for better running and visualizing the simulation.
 
 ## Running Simulation Experiments
 In your website browser (http://localhost:6901/), you should be able to access a GUI-like desktop, which is the container we prepare for you to run simulation (**Note, the following command should be running inside this desktop in the above website**). Simulation demos needs two parts in our design: (1) the CHRONO simulation with ROS2 communication support; (2) a ROS2 node that subscribing information from CHRONO simulation, running different control policies, and then publishing control command back to CHRONO simulation to form feedback loop.
