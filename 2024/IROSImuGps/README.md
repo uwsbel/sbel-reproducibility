@@ -42,7 +42,7 @@ In your website browser (http://localhost:6901/), you should be able to access a
 
         ```./demo_ROS_dART <trajectory>```
         
-        Here, ```<trajectory> ```could be ```straight``` or ```half_sine``` or ```circle```, which the csv files storing information of different reference trajectory. 
+        Here, ```<trajectory> ```could be ```straight``` or ```half_sine``` or ```circle```.  
 
    The 3 trajectories used to generate the results for this paper are stored in ```/sbel/Desktop/chrono/build/data/trajectories```. 
 
