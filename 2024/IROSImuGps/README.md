@@ -3,7 +3,7 @@ This repository holds the source code to reproduce results obtained in the IROS 
 
 ### Using the Chrono Demo 
 
-We set up a Chrono demo based on the three trajectories we describe in the paper. The demo sets up the dART vehicle equipped with 3 GPS sensors with zero noise, normal noise, and random walk based noise. EachGPS published to 3 different ROS2 topics - zero dynamics, default AirSim parameters, and calibrated AirSim parameters. 
+We set up a Chrono demo based on the three trajectories we describe in the paper. The demo sets up the dART vehicle equipped with 3 GPS sensors with zero noise, normal noise, and random walk based noise. Each GPS publishes to 3 different ROS2 topics to account for covariance - zero dynamics, default AirSim parameters, and calibrated AirSim parameters. 
 
 To use the demo, follow the instructions below - 
 
