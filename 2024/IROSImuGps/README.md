@@ -1,4 +1,4 @@
-### Quantifying the Sim2real Gap for GPS and IMU Sensors
+# Quantifying the Sim2real Gap for GPS and IMU Sensors
 This repository holds the source code to reproduce results obtained in the IROS submission "Quantifying the Sim2real Gap for GPS and IMU Sensors".
 
 ### Using the Chrono Demo 
@@ -7,13 +7,13 @@ We set up a Chrono demo based on the three trajectories we describe in the paper
 
 To use the demo, follow the instructions below - 
 
-## Requirement
+### Requirement
 
 - NVIDIA GPU
 - Docker (24.0.6 or above)
     - for Linux user, you will need to download [NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html)
 
-## Docker Container Setup Instruction
+### Docker Container Setup Instruction
 
 1. Pull our docker image
 
@@ -33,7 +33,7 @@ To use the demo, follow the instructions below -
 
     - If you did previous step, open your browser and go to the link: http://localhost:6901/. **Password is: "sbel"** We added VNC support for better running and visualizing the simulation.
   
-## Running the demo
+### Running the demo
 In your website browser (http://localhost:6901/), you should be able to access a GUI-like desktop, which is the container we prepare for you to run simulation (**Note, the following command should be running inside this desktop in the above website**). Simulation demos needs two parts in our design: (1) the CHRONO simulation with ROS2 communication support; (2) a ROS2 node that subscribing information from CHRONO simulation, running different control policies, and then publishing control command back to CHRONO simulation to form feedback loop.
 
 1. Run CHRONO Simulation Demo
