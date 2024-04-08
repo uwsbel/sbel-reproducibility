@@ -19,15 +19,15 @@ To use the demo, follow the instructions below -
 
     - In terminal run: 
     
-        ```docker pull iros2024:latest```
+        ```docker pull uwsbel/ros:iros2024_imu_gps```
     
-    - To check if docker image got pulled correctly, run ```docker images```, there should be an entry named and labeled ```iros2024:latest```
+    - To check if docker image got pulled correctly, run ```docker images```, there should be an entry named and labeled ```uwsbel/ros:iros2024_imu_gps```
 
 2. Spin a docker container using pulled image
 
     - In terminal run:
 
-        ```docker run -d --gpus=all -p 5901:5901 -p 6901:6901 iros2024:latest```
+        ```docker run -d --gpus=all -p 5901:5901 -p 6901:6901 uwsbel/ros:iros2024_imu_gps```
 
     - To check if docker container is working fine, run ```docker ps```, there should be a container entry based on the previous image you pulled
 
