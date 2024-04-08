@@ -46,8 +46,8 @@ In your website browser (http://localhost:6901/), you should be able to access a
 
    The 3 trajectories used to generate the results for this paper are stored in ```/sbel/Desktop/chrono/build/data/trajectories```. 
 
-   The demonstration is configured to receive control inputs (steering and throttle), and is designed to accommodate any controller. 
-
+   The demonstration is configured to receive control inputs (steering and throttle), and is designed to accommodate any controller. To learn more about the autonomy stack used, 
+   look [here](https://github.com/uwsbel/autonomy-research-testbed). 
 ### Reproducing Plots and Data Analysis
 All the scripts used to generate the plots and tables from the paper are present in the `scripts` directory. To run the scripts, first download the `data2` folder from the following link: [Data](https://drive.google.com/drive/folders/1t3GVovJ4nNwaoIZhAmNQ-YUVguKNMHZP?usp=sharing) and place it in the root directory of the repository.  
 The `data2` folder consists of the processed data from the experiments conducted in the paper. The data is stored in the form of `.txt` files.   
