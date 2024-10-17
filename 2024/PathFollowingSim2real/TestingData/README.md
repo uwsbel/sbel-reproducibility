@@ -1,0 +1,3 @@
+# Testing Data for Validity Check
+
+As mentioned in the paper, we conducted 60 reality testings over 4 different control policies and 3 different reference trajectories. In the above three folders, they correspond with three reference trajectories mentioned in the paper. In each folder, data files are organized in the structure: $<algorithm \ name> +<testing \ number>.csv$ If there are name "sim" in the file name, it means that this is the simulation testing data.  
