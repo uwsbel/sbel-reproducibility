@@ -1,0 +1,112 @@
+# Blender 4.3.2 MTL File: 'audi.blend'
+# www.blender.org
+
+newmtl Tire_PhongSG.002
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 1
+map_Kd textures/Audi_Whole_Texturing_031021_Wheels_BaseColor.jpg
+map_Ns textures/Audi_Whole_Texturing_031021_Wheels_Roughness.jpg
+map_refl textures/Audi_Whole_Texturing_031021_Wheels_Metallic.jpg
+
+newmtl Tire_PhongSG.003
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 1
+map_Kd textures/Audi_Whole_Texturing_031021_Wheels_BaseColor.jpg
+map_Ns textures/Audi_Whole_Texturing_031021_Wheels_Roughness.jpg
+map_refl textures/Audi_Whole_Texturing_031021_Wheels_Metallic.jpg
+
+newmtl Tire_PhongSG.004
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 1
+map_Kd textures/Audi_Whole_Texturing_031021_Wheels_BaseColor.jpg
+map_Ns textures/Audi_Whole_Texturing_031021_Wheels_Roughness.jpg
+map_refl textures/Audi_Whole_Texturing_031021_Wheels_Metallic.jpg
+
+newmtl Tire_PhongSG.005
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 1
+map_Kd textures/Audi_Whole_Texturing_031021_Wheels_BaseColor.jpg
+map_Ns textures/Audi_Whole_Texturing_031021_Wheels_Roughness.jpg
+map_refl textures/Audi_Whole_Texturing_031021_Wheels_Metallic.jpg
+
+newmtl phong1SG
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+illum 1
+map_Kd textures/Audi_Whole_Texturing_031021_Chassis1_BaseColor_Red.jpg
+map_Ns textures/Audi_Whole_Texturing_031021_Chassis1_Roughness.jpg
+map_refl textures/Audi_Whole_Texturing_031021_Chassis1_Metallic.jpg
+map_d textures/Chassis1_Opacity.jpg
+
+newmtl phong2SG
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 1
+map_Kd textures/Audi_Whole_Texturing_031021_Interior_Aux_BaseColor.jpg
+map_Ns textures/Audi_Whole_Texturing_031021_Interior_Aux_Roughness.jpg
+map_refl textures/Audi_Whole_Texturing_031021_Interior_Aux_Metallic.jpg
+
+newmtl phong3SG.002
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 1
+map_Kd textures/Audi_Whole_Texturing_031021_Wheels_BaseColor.jpg
+map_Ns textures/Audi_Whole_Texturing_031021_Wheels_Roughness.jpg
+map_refl textures/Audi_Whole_Texturing_031021_Wheels_Metallic.jpg
+
+newmtl phong3SG.003
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 1
+map_Kd textures/Audi_Whole_Texturing_031021_Wheels_BaseColor.jpg
+map_Ns textures/Audi_Whole_Texturing_031021_Wheels_Roughness.jpg
+map_refl textures/Audi_Whole_Texturing_031021_Wheels_Metallic.jpg
+
+newmtl phong3SG.004
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 1
+map_Kd textures/Audi_Whole_Texturing_031021_Wheels_BaseColor.jpg
+map_Ns textures/Audi_Whole_Texturing_031021_Wheels_Roughness.jpg
+map_refl textures/Audi_Whole_Texturing_031021_Wheels_Metallic.jpg
+
+newmtl phong3SG.005
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 1
+map_Kd textures/Audi_Whole_Texturing_031021_Wheels_BaseColor.jpg
+map_Ns textures/Audi_Whole_Texturing_031021_Wheels_Roughness.jpg
+map_refl textures/Audi_Whole_Texturing_031021_Wheels_Metallic.jpg
