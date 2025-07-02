@@ -33,3 +33,6 @@ The run time visualization aimed to achieve real-time and fast rendering for sim
   <img src="data/render/3rd.png" alt="Straight-driving sample" width="66%"/>
   <img src="data/render/top_view.png" alt="Complex-driving sample" width="29%"/>
 </p>
+
+## Recorded Data for Experiment
+For the experiment result presented in the paper, we stored and publish in the folder `expData_CCTA25`. There is also data plotting and anayzing code in the folder.
