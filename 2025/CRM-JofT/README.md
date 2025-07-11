@@ -9,7 +9,7 @@ To run and reproduce all the data in this paper, you will need to build Project 
 
 1) [testing/baseline](https://github.com/uwsbel/chrono-wisc/tree/testing/baseline) - To run speed analysis tests of Chrono's baseline SPH solver (Chrono version 9.0.1).
 2) [testing/benchmark3](https://github.com/uwsbel/chrono-wisc/tree/testing/benchmark3) - To run speed analysis tests of Chrono::CRM.
-3) [testing/fsi-CRMAcc](https://github.com/uwsbel/chrono-wisc/tree/testing/fsi-CRMAcc) - To run the validation tests discussed in the paper.
+3) [testing/fsi-CRMAcc](https://github.com/uwsbel/chrono-wisc/tree/feature/fsi-CRMAcc) - To run the validation tests discussed in the paper.
 
 The build instructions are the same as those for [Project Chrono](https://api.projectchrono.org/tutorial_install_chrono.html). Make sure you build each of these in a separate directory for ease.  
 
