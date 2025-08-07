@@ -52,3 +52,7 @@ __pycache__/
 
 # Build files
 build/
+
+# Exception: Don't ignore robot data folder even if it contains .obj files
+!2025/multi-terrain-RL/data/robot/
+!2025/multi-terrain-RL/data/robot/**

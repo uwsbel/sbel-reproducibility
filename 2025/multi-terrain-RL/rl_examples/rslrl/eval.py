@@ -28,9 +28,9 @@ def main():
         env_cfg["reward_scales"] = {}
 
     # Create environment
-    # device = 'cuda:0' if torch.cuda.is_available() else 'cpu'
-    # print(f"Using device: {device}")
-    device = 'cpu'
+    device = 'cuda:0' if torch.cuda.is_available() else 'cpu'
+    print(f"Using device: {device}")
+    #device = 'cpu'
 
     env_type = "rigid"
 
