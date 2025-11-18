@@ -7,8 +7,6 @@ This repository provides the implementation of the **FNODE** framework for data-
 ## Environment Setup
 
 ```bash
-git clone https://github.com/Hongyu0329/FNODE.git  
-cd FNODE 
 conda create -n fnode python=3.11 && conda activate fnode
 pip install -r requirements.txt  
 ```
