@@ -1,0 +1,23 @@
+# FNODE Project Dependencies
+# Core dependencies for Flow Matching Neural Ordinary Differential Equations
+
+# Deep Learning Framework
+torch>=2.0.0
+scikit-learn==1.2.2
+
+# Numerical and Scientific Computing
+numpy>=1.21.0,<2.0
+scipy>=1.7.0
+pandas>=1.3.0
+
+# Visualization
+matplotlib>=3.4.0
+
+# Optional Dependencies
+# Advanced ODE solving for PNODE models
+torchdiffeq>=0.2.3
+
+# Convex optimization for MPC control
+cvxpy>=1.3.0
+
+tqdm>=4.62.0

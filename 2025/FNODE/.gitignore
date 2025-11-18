@@ -1,0 +1,50 @@
+# Python cache files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# IDE and editor files
+.idea/
+.claude/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Project-specific directories
+accel_analysis/
+dataset/
+log/
+mpc_cartdp/
+saved_model/
+results/
+
+# Project-specific figures
+figures/Cart_Pole/
+figures/Cart_Pole_Controlled/
+figures/Double_Pendulum/
+figures/Slider_Crank/
+figures/Single_Mass_Spring_Damper/
+figures/Triple_Mass_Spring_Damper/
+
+# Project-specific files
+main_accel.py
+
+# JetBrains IDE specific (legacy, covered by .idea/ above)
+shelf/
+workspace.xml
+httpRequests/
+dataSources/
+dataSources.local.xml
+
+mpc_cartpole/results_baseline/
+mpc_cartpole/results_fnode/
+mpc_cartpole/*.png
+
+accel_comparison/
+
+plot.sh
+sc.sh
