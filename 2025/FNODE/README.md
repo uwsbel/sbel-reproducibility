@@ -1,4 +1,4 @@
-# FNODE: Functional Neural ODE Framework for Multibody Dynamics
+# FNODE: Flow-Matching for data-driven simulation of constrained multibody systems
 
 ## Overview
 
