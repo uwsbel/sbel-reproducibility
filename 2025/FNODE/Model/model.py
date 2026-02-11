@@ -509,13 +509,7 @@ def train_fnode_with_csv_targets(model, s_train, t_train, train_params, optimize
 
     # Prepare training data
     # FNODE expects full state as input (positions and velocities)
-    if model.d_interest == 0:
-        # Pure state input
-        model_input = s_train_effective
-    else:
-        # State + additional features (e.g., time)
-        time_feature = t_train_effective.unsqueeze(-1)
-        model_input = torch.cat([s_train_effective, time_feature], dim=-1)
+    model_input = s_train_effective
 
     logger.info(f"Model input shape: {model_input.shape}, Expected input dim: {model.dim_input}")
 
@@ -1150,6 +1144,46 @@ def neural_network_force_function_MBDNODE(body_tensor, model):
 
     return accelerations
 
+
+def neural_network_force_function_FNODE(body_tensor, model):
+    """
+    Calculate accelerations for the bodies using the FNODE model.
+
+    Args:
+        body_tensor: Tensor with shape [num_bodys, 2] (position, velocity)
+        model: FNODE model instance
+
+    Returns:
+        Acceleration tensor with shape [num_bodys]
+    """
+    device = body_tensor.device
+    num_bodies = body_tensor.shape[0]
+
+    # Convert body tensor to flat state format expected by FNODE
+    # body_tensor is [num_bodies, 2] -> flat_state is [2*num_bodies]
+    flat_state = torch.zeros(2 * num_bodies, device=device)
+    for i in range(num_bodies):
+        flat_state[2*i] = body_tensor[i, 0]      # position
+        flat_state[2*i + 1] = body_tensor[i, 1]  # velocity
+
+    # Add time feature if model requires it (d_interest > 0)
+    if model.d_interest == 1:
+        # For simplicity, use zero time feature (could be enhanced to track actual time)
+        time_feature = torch.zeros(1, device=device)
+        model_input = torch.cat([flat_state, time_feature], dim=-1)
+    elif model.d_interest > 1:
+        # For d_interest > 1, additional feature handling would be needed
+        raise NotImplementedError(f"d_interest={model.d_interest} > 1 not implemented for RK4 integration")
+    else:
+        model_input = flat_state
+
+    # Get accelerations from FNODE model
+    # Add batch dimension for model forward pass
+    model_input = model_input.unsqueeze(0)
+    accelerations = model(model_input).squeeze(0)
+
+    return accelerations
+
 # Assume necessary imports (torch, integrators) and definition of neural_network_force_function_MBDNODE
 
 def test_fnode(model, s0_test_core_state, t_test_eval_times, test_params, output_paths):
@@ -1229,31 +1263,93 @@ def test_fnode(model, s0_test_core_state, t_test_eval_times, test_params, output
 
             return dy_dt_batch
 
-    ode_func_for_solver = AccelerationBasedODEFunc(model).to(current_device)
     ode_solver_params = test_params.get('ode_solver_params',
                                         {'method': 'dopri5', 'rtol': 1e-7, 'atol': 1e-9})  # Adjusted defaults
 
-    logger.info(
-        f"Running ODE solver ({ode_solver_params.get('method', 'dopri5')}) with rtol={ode_solver_params.get('rtol')} atol={ode_solver_params.get('atol')}")
-    try:
-        with torch.no_grad():
-            pred_test_traj = ODEINT_FN(
-                ode_func_for_solver,
-                s0_test_core_state.to(current_device),
-                t_test_eval_times.to(current_device),
-                rtol=ode_solver_params.get('rtol'),
-                atol=ode_solver_params.get('atol'),
-                method=ode_solver_params.get('method')
-            )
-        if pred_test_traj.shape[1] == 1: pred_test_traj = pred_test_traj.squeeze(1)
-        logger.info(f"ODE solver finished. Predicted trajectory shape: {pred_test_traj.shape}")
-        if torch.isnan(pred_test_traj).any() or torch.isinf(pred_test_traj).any():
-            logger.warning("Prediction contains NaN or inf values. Clamping them to zero.")
-            pred_test_traj = torch.nan_to_num(pred_test_traj, nan=0.0, posinf=0.0, neginf=0.0)
-        return pred_test_traj
-    except Exception as ode_err:
-        logger.error(f"ODE integration failed during testing: {ode_err}", exc_info=True)
-        return None
+    # Check if we should use runge_kutta_four_multiple_body for 'rk4' method
+    if ode_solver_params.get('method') == 'rk4':
+        logger.info("Using runge_kutta_four_multiple_body for RK4 integration")
+
+        # Prepare initial body tensor from s0_test_core_state
+        # s0_test_core_state is [1, core_state_dim] where core_state_dim = 2 * num_bodies
+        s0_flat = s0_test_core_state.squeeze(0)  # Remove batch dimension
+        num_bodies = model.num_bodys
+
+        # Convert flat state to body tensor format [num_bodies, 2]
+        body_tensor = torch.zeros(num_bodies, 2, device=current_device)
+        for i in range(num_bodies):
+            body_tensor[i, 0] = s0_flat[2*i]      # position
+            body_tensor[i, 1] = s0_flat[2*i + 1]  # velocity
+
+        # Calculate number of steps and dt from time vector
+        num_steps = len(t_test_eval_times) - 1
+        if num_steps <= 0:
+            logger.error("Need at least 2 time points for RK4 integration")
+            return None
+        dt = (t_test_eval_times[-1] - t_test_eval_times[0]).item() / num_steps
+
+        # Run RK4 integration using the same pattern as test_MBDNODE
+        try:
+            with torch.no_grad():
+                testing_result = runge_kutta_four_multiple_body(
+                    body_tensor,
+                    neural_network_force_function_FNODE,
+                    num_steps,
+                    dt,
+                    if_final_state=False,
+                    model=model
+                )
+
+            if testing_result is None:
+                logger.error("runge_kutta_four_multiple_body returned None")
+                return None
+
+            # Convert result from [num_steps+1, num_bodies, 2] to [num_steps+1, core_state_dim]
+            num_time_points = testing_result.shape[0]
+            pred_test_traj = torch.zeros(num_time_points, 2 * num_bodies, device=current_device)
+
+            for t in range(num_time_points):
+                for i in range(num_bodies):
+                    pred_test_traj[t, 2*i] = testing_result[t, i, 0]      # position
+                    pred_test_traj[t, 2*i + 1] = testing_result[t, i, 1]  # velocity
+
+            logger.info(f"RK4 solver finished. Predicted trajectory shape: {pred_test_traj.shape}")
+
+            if torch.isnan(pred_test_traj).any() or torch.isinf(pred_test_traj).any():
+                logger.warning("Prediction contains NaN or inf values. Clamping them to zero.")
+                pred_test_traj = torch.nan_to_num(pred_test_traj, nan=0.0, posinf=0.0, neginf=0.0)
+
+            return pred_test_traj
+
+        except Exception as rk4_err:
+            logger.error(f"RK4 integration failed during testing: {rk4_err}", exc_info=True)
+            return None
+
+    else:
+        # Use existing torchdiffeq implementation for other methods
+        ode_func_for_solver = AccelerationBasedODEFunc(model).to(current_device)
+
+        logger.info(
+            f"Running ODE solver ({ode_solver_params.get('method', 'dopri5')}) with rtol={ode_solver_params.get('rtol')} atol={ode_solver_params.get('atol')}")
+        try:
+            with torch.no_grad():
+                pred_test_traj = ODEINT_FN(
+                    ode_func_for_solver,
+                    s0_test_core_state.to(current_device),
+                    t_test_eval_times.to(current_device),
+                    rtol=ode_solver_params.get('rtol'),
+                    atol=ode_solver_params.get('atol'),
+                    method=ode_solver_params.get('method')
+                )
+            if pred_test_traj.shape[1] == 1: pred_test_traj = pred_test_traj.squeeze(1)
+            logger.info(f"ODE solver finished. Predicted trajectory shape: {pred_test_traj.shape}")
+            if torch.isnan(pred_test_traj).any() or torch.isinf(pred_test_traj).any():
+                logger.warning("Prediction contains NaN or inf values. Clamping them to zero.")
+                pred_test_traj = torch.nan_to_num(pred_test_traj, nan=0.0, posinf=0.0, neginf=0.0)
+            return pred_test_traj
+        except Exception as ode_err:
+            logger.error(f"ODE integration failed during testing: {ode_err}", exc_info=True)
+            return None
 
 
 

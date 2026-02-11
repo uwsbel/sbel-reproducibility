@@ -1497,7 +1497,8 @@ def plot_acceleration_comparison(
                     else:
                         analytical_accels = analytical_accels[:full_length]
 
-                acceleration_data['Analytical (GT)'] = analytical_accels
+                # Skip plotting analytical accelerations as requested
+                # acceleration_data['Analytical (GT)'] = analytical_accels
             else:
                 logger.warning("Analytical accelerations returned non-array type")
         else:
@@ -1547,7 +1548,7 @@ def plot_acceleration_comparison(
     # Color mapping
     color_map = {
         'FNODE': 'red',
-        'Analytical (GT)': 'blue',
+        # 'Analytical (GT)': 'blue',  # Removed as requested
         'Target (FFT)': 'green',
         'Target (FD)': 'orange',
         'Target': 'purple'
@@ -1566,14 +1567,9 @@ def plot_acceleration_comparison(
             accel_body_data = accel_data[:, body_idx]
             data_color = color_map.get(data_name, 'gray')
 
-            if 'analytical' in data_name.lower() or 'gt' in data_name.lower():
-                # Plot analytical as continuous line
-                mask = ~np.isnan(accel_body_data)
-                if np.any(mask):
-                    ax.plot(time_np[mask], accel_body_data[mask], color=data_color, linestyle='-',
-                            label=data_name, lw=2.0, alpha=0.9)
+    
 
-            elif 'target' in data_name.lower():
+            if 'target' in data_name.lower():
                 # Target only exists for training
                 mask = ~np.isnan(accel_body_data)
                 if np.any(mask):
@@ -1634,16 +1630,17 @@ def plot_acceleration_comparison(
     train_analytical_path = os.path.join(results_dir, "train_analytical_accelerations.csv")
     train_target_path = os.path.join(results_dir, "train_target_accelerations.csv")
 
-    if os.path.exists(train_analytical_path):
-        try:
-            train_analytical_df = pd.read_csv(train_analytical_path)
-            analytical_cols = [col for col in train_analytical_df.columns if 'analytical_accel_body_' in col]
-            if analytical_cols:
-                train_analytical_np = train_analytical_df[analytical_cols].values
-                if len(train_analytical_np) >= num_steps_train:
-                    train_comparison_data['Analytical (Train File)'] = train_analytical_np[:num_steps_train]
-        except Exception as e:
-            logger.warning(f"Could not load train analytical file: {e}")
+    # Skip loading analytical accelerations as requested
+    # if os.path.exists(train_analytical_path):
+    #     try:
+    #         train_analytical_df = pd.read_csv(train_analytical_path)
+    #         analytical_cols = [col for col in train_analytical_df.columns if 'analytical_accel_body_' in col]
+    #         if analytical_cols:
+    #             train_analytical_np = train_analytical_df[analytical_cols].values
+    #             if len(train_analytical_np) >= num_steps_train:
+    #                 train_comparison_data['Analytical (Train File)'] = train_analytical_np[:num_steps_train]
+    #     except Exception as e:
+    #         logger.warning(f"Could not load train analytical file: {e}")
 
     if os.path.exists(train_target_path):
         try:
@@ -1670,11 +1667,12 @@ def plot_acceleration_comparison(
                 train_body_data = train_data[:, body_idx]
 
                 # Choose color and style
-                if 'analytical' in data_name.lower():
-                    color = 'blue'
-                    style = '-'
-                    lw = 2.0
-                elif 'target' in data_name.lower():
+                # Skip analytical as it's not plotted anymore
+                # if 'analytical' in data_name.lower():
+                #     color = 'blue'
+                #     style = '-'
+                #     lw = 2.0
+                if 'target' in data_name.lower():
                     color = 'green'
                     style = '--'
                     lw = 1.5
@@ -1797,7 +1795,8 @@ def generate_target_accelerations(full_trajectory, time_vector, test_case, num_b
                 else:
                     # Fallback to FD for this body
                     logger.info(f"FFT failed for body {body_idx}, using FD")
-                    fd_deriv = estimate_temporal_gradient_finite_diff(velocity, time_vector, order=4)
+                    fd_order = getattr(args, 'fd_order', 4)  # Use fd_order from args if available, else default to 4
+                    fd_deriv = estimate_temporal_gradient_finite_diff(velocity, time_vector, order=fd_order)
                     if fd_deriv is not None:
                         fft_targets[:, body_idx] = fd_deriv
 
@@ -1818,11 +1817,15 @@ def generate_target_accelerations(full_trajectory, time_vector, test_case, num_b
     fd_csv_path = os.path.join(results_dir, "fd_target.csv")
     fd_targets = torch.zeros((len(full_trajectory), num_bodies), device=full_trajectory.device)
 
+    # Get fd_order from args if available, else default to 4
+    fd_order = getattr(args, 'fd_order', 4)
+    logger.info(f"Using finite difference order: {fd_order}")
+
     for body_idx in range(num_bodies):
         velocity_idx = body_idx * 2 + 1
         if velocity_idx < full_trajectory.shape[1]:
             velocity = full_trajectory[:, velocity_idx]
-            fd_deriv = estimate_temporal_gradient_finite_diff(velocity, time_vector, order=4)
+            fd_deriv = estimate_temporal_gradient_finite_diff(velocity, time_vector, order=fd_order)
             if fd_deriv is not None:
                 fd_targets[:, body_idx] = fd_deriv
 

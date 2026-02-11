@@ -74,7 +74,7 @@ def parse_arguments():
     parser.add_argument('--seed', type=int, default=42, help='Global random seed.')
     parser.add_argument('--device', type=str, default='cuda' if torch.cuda.is_available() else 'cpu',
                         help="Computation device.")
-    parser.add_argument('--generate_new_data', action='store_true', default=True, help="Flag to generate new dataset.")
+    parser.add_argument('--generate_new_data', action='store_true', default=False, help="Flag to generate new dataset.")
     parser.add_argument('--data_dt', type=float, default=0.01, help="Time step for data generation.")
     parser.add_argument('--data_total_steps', type=int, default=400,
                         help="Total steps for the FIRST generated trajectory (train+test). Additional trajectories use train portion length.")
@@ -85,7 +85,7 @@ def parse_arguments():
     parser.add_argument('--prob', type=int, default=100,
                         help="Probability factor for FFT truncation. Used to calculate trunc = train_time_step//prob")
 
-    parser.add_argument('--layers', type=int, default=2, help="Number of layers for FNODE (input + hidden + output).")
+    parser.add_argument('--layers', type=int, default=3, help="Number of layers for FNODE (input + hidden + output).")
     parser.add_argument('--hidden_size', type=int, default=256, help="Hidden layer width for FNODE.")
     parser.add_argument('--activation', type=str, default='tanh', choices=['relu', 'tanh'], help="Activation function.")
     parser.add_argument('--initializer', type=str, default='xavier', choices=['xavier', 'kaiming'],
@@ -99,22 +99,18 @@ def parse_arguments():
     parser.add_argument('--patience', type=int, default=50,
                         help="Patience for early stopping (number of epochs without improvement).")
     parser.add_argument('--lr', type=float, default=1e-3, help="Learning rate.")
-    parser.add_argument('--optimizer', type=str, default='adam', choices=['adam', 'adamw'], help="Optimizer.")
+    parser.add_argument('--optimizer', type=str, default='adamw', choices=['adam', 'adamw'], help="Optimizer.")
     parser.add_argument('--lr_scheduler', type=str, default='exponential', choices=['none', 'exponential', 'step', 'cosine'],
                         help="LR scheduler.")
     parser.add_argument('--lr_decay_rate', type=float, default=0.98, help="Decay rate for schedulers.")
     parser.add_argument('--lr_decay_steps', type=int, default=1, help="Step size or T_max for schedulers.")
-    parser.add_argument('--out_time_log', type=int, default=1, help="Log training progress every N epochs.")
+    parser.add_argument('--out_time_log', type=int, default=10, help="Log training progress every N epochs.")
     parser.add_argument('--save_ckpt_freq', type=int, default=0, help="Save checkpoint every N epochs (0 to disable).")
 
     parser.add_argument('--fnode_loss_type', type=str, default='derivative', choices=['derivative'],
                         help="Loss type for FNODE. MUST be 'derivative' for state->acceleration mapping.")
-    parser.add_argument('--fnode_target_fd_order', type=int, default=4,
-                        help="Order for Finite Difference target derivative.")
     parser.add_argument('--fnode_use_hybrid_target', action='store_true', default=False,
                         help="Use hybrid FFT-FD target.")
-    parser.add_argument('--min_fft_segment_length', type=int, default=30,
-                        help="Minimum length for FFT segments. Automatically set if 0.")
 
     parser.add_argument('--ode_method', type=str, default="rk4", help="ODE solver for testing.")
     parser.add_argument('--ode_rtol', type=float, default=1e-7, help="Relative tolerance for ODE solver (testing).")
@@ -129,9 +125,6 @@ def parse_arguments():
     parser.add_argument('--train_ratio', type=float, default=0.75, help="Training set ratio.")
     parser.add_argument('--val_ratio', type=float, default=0, help="Validation set ratio (0 = no validation).")
 
-    # Slider Crank specific parameters
-    parser.add_argument('--slider_crank_r', type=float, default=1.0, help="Crank length (radius) for Slider Crank.")
-    parser.add_argument('--slider_crank_l', type=float, default=4.0, help="Rod length for Slider Crank.")
 
     args = parser.parse_args()
     args.model_type = 'FNODE'
@@ -154,7 +147,6 @@ def main():
     log_directory = os.path.join(base_log_dir, args.test_case)
     os.makedirs(log_directory, exist_ok=True)
     log_file_path = os.path.join(log_directory, 'fnode.log')
-
     # Reconfigure logging with file output
     setup_logging(log_file_path)
     logger = logging.getLogger("FNODE_Main")
@@ -164,7 +156,7 @@ def main():
         'Single_Mass_Spring_Damper': (9e-5, 0.3),
         'Double_Pendulum': (5e-4, 1.0),
         'Triple_Mass_Spring_Damper': (5e-5, 1.0),
-        'Slider_Crank': (1e-4, 1.0),
+        'Slider_Crank': (1e-5, 1.0),
         'Cart_Pole': (1e-3, 1.0)
     }
  
@@ -446,6 +438,11 @@ def main():
     # --- Testing ---
     logger.info("=== FNODE Testing ===")
     fnode_model.eval()
+
+    # Define data sizes for metrics (needed regardless of training or loading)
+    train_data_size = s_train_tensor.shape[0]
+    test_data_size = s_test_tensor.shape[0] if s_test_tensor is not None else 0
+    full_data_size = s_full_tensor.shape[0]
 
     # Get initial state for testing
     s0_for_test = s_train_tensor[0:1]

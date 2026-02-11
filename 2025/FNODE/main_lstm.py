@@ -40,14 +40,14 @@ def parse_arguments():
                         help="Computation device.")
 
     # Data Generation
-    parser.add_argument('--generate_new_data', action='store_true', default=True,
+    parser.add_argument('--generate_new_data', action='store_true', default=False,
                         help="Flag to generate new dataset.")
     parser.add_argument('--data_dt', type=float, default=0.01, help="Time step for data generation.")
     parser.add_argument('--data_total_steps', type=int, default=400, help="Total steps for generated data.")
     parser.add_argument('--train_ratio', type=float, default=0.75, help="Training data ratio.")
 
     # Model Hyperparameters
-    parser.add_argument('--layers', type=int, default=2, help="Number of LSTM layers.")
+    parser.add_argument('--layers', type=int, default=3, help="Number of LSTM layers.")
     parser.add_argument('--hidden_size', type=int, default=256, help="LSTM hidden size.")
     parser.add_argument('--lstm_dropout', type=float, default=0.0, help="Dropout rate for LSTM.")
     parser.add_argument('--lstm_seq_len', type=int, default=16, help="Input sequence length for LSTM.")

@@ -134,6 +134,11 @@ def plot_all_models_comparison(time_array: np.ndarray,
 
         print(f"Creating plot for {model_name}...")
 
+        # Check data consistency
+        if len(q_pred) < min_len or len(v_pred) < min_len:
+            print(f"  Warning: {model_name} predictions have fewer points than expected.")
+            print(f"    Expected: {min_len}, Got q_pred: {len(q_pred)}, v_pred: {len(v_pred)}")
+
         # Create figure with 6x2 subplots for this model
         fig, axs = plt.subplots(6, 2, figsize=(14, 18), sharex=False)
 
@@ -160,26 +165,32 @@ def plot_all_models_comparison(time_array: np.ndarray,
         for idx, config in enumerate(plot_config):
             ax = config['ax']
             gt_data = config['gt'][:min_len]
-            pred_data = config['pred'][:min_len]
+            pred_data = config['pred']
+
+            # Ensure pred_data and time_plot have same length
+            actual_pred_len = min(len(pred_data), min_len)
+            pred_data = pred_data[:actual_pred_len]
+            time_plot_adjusted = time_plot[:actual_pred_len]
+            gt_data_adjusted = gt_data[:actual_pred_len]
 
             # Plot ground truth
-            ax.plot(time_plot, gt_data, 'b-', linewidth=2, label='Ground truth')
+            ax.plot(time_plot_adjusted, gt_data_adjusted, 'b-', linewidth=2, label='Ground truth')
 
             # Plot ID generalization (training region)
-            if split_idx > 0:
-                ax.plot(time_plot[:split_idx], pred_data[:split_idx], 'r--',
+            if split_idx > 0 and split_idx <= actual_pred_len:
+                ax.plot(time_plot_adjusted[:split_idx], pred_data[:split_idx], 'r--',
                        linewidth=2.5, label='ID generalization')
 
             # Plot OOD generalization (test region)
-            if split_idx < min_len:
-                ax.plot(time_plot[split_idx:], pred_data[split_idx:], 'r:',
+            if split_idx < actual_pred_len:
+                ax.plot(time_plot_adjusted[split_idx:], pred_data[split_idx:], 'r:',
                        linewidth=2.5, label='OOD generalization')
 
             # Set ylabel
             ax.set_ylabel(config['ylabel'], fontsize=label_fontsize)
 
             # Set x-axis limits and ticks for all subplots
-            ax.set_xlim(time_plot[0], time_plot[-1])
+            ax.set_xlim(time_plot_adjusted[0], time_plot_adjusted[-1])
             ax.xaxis.set_major_locator(ticker.MaxNLocator(integer=True, nbins=12))
 
             # Add grid

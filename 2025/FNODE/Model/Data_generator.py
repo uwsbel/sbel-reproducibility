@@ -16,6 +16,207 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 # Update the existing generate_slider_crank_dataset function in Data_generator.py
 # to avoid numerical instability problems
 
+def generate_slider_crank_dataset_with_friction(
+        c_slide, time_span=20.0, dt=1e-3,
+        root_dir='.', seed=42
+):
+    """
+    Generate slider-crank dataset with variable friction parameter.
+
+    Args:
+        c_slide: Friction coefficient parameter [N·(m/s)^-ψ]
+        time_span: Simulation time length in seconds (default 20.0s)
+        dt: Internal timestep (1e-3), returns data sampled at 1e-2
+        root_dir: Root directory for saving data
+        seed: Random seed
+
+    Returns:
+        s_data: State data [theta, omega] sampled at dt=0.01
+        t_data: Time vector sampled at dt=0.01
+    """
+    # Calculate total steps for internal dt=0.001
+    total_num_steps = int(time_span / dt)
+
+    # Same physics parameters as original
+    m1, m2, m3 = 1.0, 1.0, 1.0
+    J1, J2, J3 = 0.10, 0.10, 0.10
+    L1, L2 = 1.0, 2.0
+    g = 9.81
+    tau1 = lambda t: -0.002 * np.sin(2 * np.pi * t)
+    c12 = 0.05
+    gamma = 1.0
+    # Use the passed friction parameter
+    psi = 1.0
+    K_spring = 1.0
+    delta = 1.0
+    x3_max = 2.5 * L1 + 2.0 * L2
+
+    # Rest of the implementation remains the same
+    h = dt
+    N_steps = total_num_steps
+    n_gen = 9
+    n_constr = 8
+    M = np.diag([m1, m1, J1, m2, m2, J2, m3, m3, J3])
+
+    def constraint(q: np.ndarray) -> np.ndarray:
+        x1, y1, th1, x2, y2, th2, x3, y3, th3 = q
+        return np.array([
+            x1 - L1 * np.cos(th1),
+            y1 - L1 * np.sin(th1),
+            x1 + L1 * np.cos(th1) - x2 + L2 * np.cos(th2),
+            y1 + L1 * np.sin(th1) - y2 + L2 * np.sin(th2),
+            x2 + L2 * np.cos(th2) - x3,
+            y2 + L2 * np.sin(th2) - y3,
+            y3,
+            th3
+        ])
+
+    def constraint_jacobian(q: np.ndarray) -> np.ndarray:
+        x1, y1, th1, x2, y2, th2, x3, y3, th3 = q
+        J = np.zeros((8, 9))
+        J[0, 0] = 1.0
+        J[0, 2] = L1 * np.sin(th1)
+        J[1, 1] = 1.0
+        J[1, 2] = -L1 * np.cos(th1)
+        J[2, 0] = 1.0
+        J[2, 3] = -1.0
+        J[2, 2] = -L1 * np.sin(th1)
+        J[2, 5] = -L2 * np.sin(th2)
+        J[3, 1] = 1.0
+        J[3, 4] = -1.0
+        J[3, 2] = L1 * np.cos(th1)
+        J[3, 5] = L2 * np.cos(th2)
+        J[4, 3] = 1.0
+        J[4, 6] = -1.0
+        J[4, 5] = -L2 * np.sin(th2)
+        J[5, 4] = 1.0
+        J[5, 7] = -1.0
+        J[5, 5] = L2 * np.cos(th2)
+        J[6, 7] = 1.0
+        J[7, 8] = 1.0
+        return J
+
+    def external_forces(q: np.ndarray, v: np.ndarray, lambda_val: float, t: float) -> np.ndarray:
+        x1, y1, th1, x2, y2, th2, x3, y3, th3 = q
+        vx1, vy1, w1, vx2, vy2, w2, vx3, vy3, w3 = v
+        f = np.zeros(n_gen)
+        f[1] = -m1 * g
+        f[4] = -m2 * g
+        f[7] = -m3 * g
+        rel_w = w1 - w2
+        damper = c12 * np.abs(rel_w) ** gamma * np.sign(rel_w)
+        f[2] = tau1(t) - damper
+        f[5] = -damper
+        # Using passed friction parameter
+        friction = c_slide * abs(lambda_val) * np.sign(vx3)
+        spring = 0.0
+        comp = x3_max - x3
+        if comp > 0.0:
+            spring = K_spring * comp ** delta
+        f[6] = -(friction + spring)
+        return f
+
+    def bb_alm_step(v_guess: np.ndarray, lam_guess: np.ndarray,
+                    v_prev: np.ndarray, q_prev: np.ndarray, t_next: float):
+        v = v_guess.copy()
+        lam = lam_guess.copy()
+        rho = 1.0e10
+        max_inner = 12
+        max_outer = 25
+        tol = 1.0e-6
+        local_tol = 1.0e-1
+        alpha = 1.0e-3
+        use_bb1 = True
+        normal_force = lam[6]
+
+        def grad_L(v_loc: np.ndarray, lambda_val: float) -> np.ndarray:
+            g_term = (M @ (v_loc - v_prev)) / h
+            qA = q_prev + h * v_loc
+            ext = external_forces(qA, v_loc, lambda_val, t_next)
+            c_val = constraint(qA)
+            J_val = constraint_jacobian(qA)
+            return g_term - ext + J_val.T @ (lam + rho * h * c_val)
+
+        for outer_iter in range(max_outer):
+            local_tol = max(local_tol * 0.5, tol)
+            vk, gk = v.copy(), grad_L(v, normal_force)
+            for inner_iter in range(max_inner):
+                vk1 = vk - alpha * gk
+                gk1 = grad_L(vk1, lam[7])
+                norm_gk1 = np.linalg.norm(gk1)
+                if norm_gk1 < local_tol:
+                    vk, gk = vk1, gk1
+                    break
+                s, y = vk1 - vk, gk1 - gk
+                if use_bb1:
+                    alpha = np.dot(s, s) / (np.dot(s, y) + 1e-12)
+                else:
+                    alpha = np.dot(s, y) / (np.dot(y, y) + 1e-12)
+                use_bb1 = not use_bb1
+                vk, gk = vk1, gk1
+            v = vk
+            qA = q_prev + h * v
+            c_val = constraint(qA)
+            lam += rho * h * c_val
+            normal_force = lam[6]
+            if np.linalg.norm(c_val) < tol:
+                break
+        return v, lam
+
+    # Initial configuration
+    theta1_0 = theta2_0 = theta3_0 = 0.0
+    x1_0, y1_0 = L1, 0.0
+    x2_0, y2_0 = 2 * L1 + L2, 0.0
+    x3_0, y3_0 = 2 * L1 + 2 * L2, 0.0
+    q = np.array([x1_0, y1_0, theta1_0, x2_0, y2_0, theta2_0, x3_0, y3_0, theta3_0])
+    v = np.zeros(n_gen)
+    lam = np.zeros(n_constr)
+    v_guess = v.copy()
+
+    # History arrays
+    q_hist = np.zeros((N_steps + 1, n_gen))
+    v_hist = np.zeros_like(q_hist)
+    a_hist = np.zeros_like(q_hist)  # Add acceleration history
+    q_hist[0] = q
+    v_hist[0] = v
+    a_hist[0] = np.zeros(n_gen)  # Initial acceleration
+
+    # Time integration loop (silent)
+    logger.info(f"Generating slider-crank data with c_slide={c_slide:.2f}, time_span={time_span}s")
+    for k in range(N_steps):
+        t_next = (k + 1) * h
+        v, lam = bb_alm_step(v_guess, lam, v_prev=v, q_prev=q, t_next=t_next)
+        q += h * v
+        a = (v - v_hist[k]) / h
+        q_hist[k + 1] = q
+        v_hist[k + 1] = v
+        a_hist[k + 1] = a  # Store acceleration
+        v_guess = v + h * a
+
+    # Extract theta1, omega1, and alpha1 (angular acceleration)
+    theta1_data = q_hist[:-1, 2]
+    omega1_data = v_hist[:-1, 2]
+    alpha1_data = a_hist[:-1, 2]  # Extract theta1 acceleration
+
+    # Sample every 10 points to get dt=0.01 from dt=0.001
+    sampling_interval = 10
+    s_data_np = np.column_stack((theta1_data, omega1_data))
+    t_data_np = np.arange(len(theta1_data)) * dt
+    a_data_np = alpha1_data  # Keep acceleration data
+
+    # Sample data
+    s_data_sampled = s_data_np[::sampling_interval]
+    t_data_sampled = t_data_np[::sampling_interval]
+    a_data_sampled = a_data_np[::sampling_interval]
+
+    # Convert to torch tensors
+    s_tensor = torch.tensor(s_data_sampled, dtype=torch.float32)
+    t_tensor = torch.tensor(t_data_sampled, dtype=torch.float32)
+    a_tensor = torch.tensor(a_data_sampled, dtype=torch.float32)
+
+    return s_tensor, t_tensor, a_tensor
+
+
 def generate_slider_crank_dataset(
         total_num_steps, train_num_steps, dt=1e-3,
         root_dir='.', seed=42
@@ -61,9 +262,9 @@ def generate_slider_crank_dataset(
     gamma = 1.0
 
     # Slider friction + nonlinear spring
-    c_slide = 0.20  # [N·(m/s)^‑ψ]
+    c_slide = 0.00  # [N·(m/s)^‑ψ]
     psi = 1.0
-    K_spring = 0.20  # [N/m^δ]
+    K_spring = 1.0  # [N/m^δ]
     delta = 1.0
     x3_max = 2.5 * L1 + 2.0 * L2  # reference slider travel limit
 
@@ -135,10 +336,10 @@ def generate_slider_crank_dataset(
         return J
 
     # -------------------------------------------------------------------
-    #  Non‑inertial loads  f_ext(q, v, t)
+    #  Non‑inertial loads  f_ext(q, v, t) - MODIFIED FOR COULOMB FRICTION
     # -------------------------------------------------------------------
 
-    def external_forces(q: np.ndarray, v: np.ndarray, t: float) -> np.ndarray:
+    def external_forces(q: np.ndarray, v: np.ndarray, lambda_val: float, t: float) -> np.ndarray:
         """Generalised loads (size 9) including gravity, drive, damper, spring."""
         x1, y1, th1, x2, y2, th2, x3, y3, th3 = q
         vx1, vy1, w1, vx2, vy2, w2, vx3, vy3, w3 = v
@@ -157,7 +358,8 @@ def generate_slider_crank_dataset(
         f[5] = -damper  # ‑c₁₂ϕ̇  (opposite sign)
 
         # slider friction + spring (x‑direction of body‑3)
-        friction = c_slide * np.abs(vx3) ** psi * np.sign(vx3)
+        # NOW USING COULOMB FRICTION MODEL
+        friction = c_slide * abs(lambda_val) * np.sign(vx3)
         spring = 0.0
         comp = x3_max - x3  # only active when positive (compression)
         if comp > 0.0:
@@ -168,7 +370,7 @@ def generate_slider_crank_dataset(
         return f
 
     # -------------------------------------------------------------------
-    #  ALM + BB velocity solve
+    #  ALM + BB velocity solve - MODIFIED FOR COULOMB FRICTION
     # -------------------------------------------------------------------
 
     def bb_alm_step(v_guess: np.ndarray, lam_guess: np.ndarray,
@@ -183,22 +385,23 @@ def generate_slider_crank_dataset(
         local_tol = 1.0e-1
         alpha = 1.0e-3
         use_bb1 = True
+        normal_force = lam[6]  # Get normal force from constraint
 
-        def grad_L(v_loc: np.ndarray) -> np.ndarray:
+        def grad_L(v_loc: np.ndarray, lambda_val: float) -> np.ndarray:
             g_term = (M @ (v_loc - v_prev)) / h
             qA = q_prev + h * v_loc
-            ext = external_forces(qA, v_loc, t_next)
+            ext = external_forces(qA, v_loc, lambda_val, t_next)  # Pass lambda_val
             c_val = constraint(qA)
             J_val = constraint_jacobian(qA)
             return g_term - ext + J_val.T @ (lam + rho * h * c_val)
 
         for outer_iter in range(max_outer):
             local_tol = max(local_tol * 0.5, tol)
-            vk, gk = v.copy(), grad_L(v)
+            vk, gk = v.copy(), grad_L(v, normal_force)  # Pass normal_force
 
             for inner_iter in range(max_inner):
                 vk1 = vk - alpha * gk
-                gk1 = grad_L(vk1)
+                gk1 = grad_L(vk1, lam[7])  # Use lam[7] as in original code
                 norm_gk1 = np.linalg.norm(gk1)
                 # print inner loop statistics
                 # print(f"inner {inner_iter}, norm(gk1)={norm_gk1:.2e}")
@@ -217,6 +420,7 @@ def generate_slider_crank_dataset(
             qA = q_prev + h * v
             c_val = constraint(qA)
             lam += rho * h * c_val
+            normal_force = lam[6]  # Update normal force
             # print outer loop statistics
             # print(f">>>>> End of  OUTER STEP #{outer_iter}; norm(constr_violation)={np.linalg.norm(c_val):.2e}")
 

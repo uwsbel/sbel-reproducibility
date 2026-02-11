@@ -40,14 +40,14 @@ def parse_arguments():
                         help="Computation device.")
 
     # Data Generation
-    parser.add_argument('--generate_new_data', action='store_true', default=True,
+    parser.add_argument('--generate_new_data', action='store_true', default=False,
                         help="Flag to generate new dataset.")
     parser.add_argument('--data_dt', type=float, default=0.01, help="Time step for data generation.")
     parser.add_argument('--data_total_steps', type=int, default=400, help="Total steps for generated data.")
     parser.add_argument('--train_ratio', type=float, default=0.75, help="Training data ratio.")
 
     # Model Hyperparameters
-    parser.add_argument('--layers', type=int, default=2, help="Number of layers for FCNN.")
+    parser.add_argument('--layers', type=int, default=3, help="Number of layers for FCNN.")
     parser.add_argument('--hidden_size', type=int, default=256, help="Hidden layer width.")
     parser.add_argument('--activation', type=str, default='tanh', choices=['relu', 'tanh'],
                         help="Activation function.")

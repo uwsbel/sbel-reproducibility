@@ -49,7 +49,7 @@ def parse_arguments():
     parser.add_argument('--train_ratio', type=float, default=0.75, help="Training data ratio (default 0.7).")
 
     # Model Hyperparameters
-    parser.add_argument('--layers', type=int, default=2, help="Number of layers for NN models.")
+    parser.add_argument('--layers', type=int, default=3, help="Number of layers for NN models.")
     parser.add_argument('--hidden_size', type=int, default=256, help="Hidden layer width.")
     parser.add_argument('--activation', type=str, default='tanh', choices=['relu', 'tanh'],
                         help="Activation function.")

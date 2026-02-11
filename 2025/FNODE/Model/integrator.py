@@ -71,7 +71,7 @@ def runge_kutta_four_multiple_body(bodys, force_function, num_steps, time_step,
 
     if not isinstance(bodys, torch.Tensor): bodys = torch.tensor(bodys, dtype=torch.float32, device=current_device)
 
-    num_bodys = bodys.shape[1]
+    num_bodys = bodys.shape[0]
     # Initialize trajectory list
     body_trajectory_list = [bodys.clone()]
     current_state_i = bodys.clone()
