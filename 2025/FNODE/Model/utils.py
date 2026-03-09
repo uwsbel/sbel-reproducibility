@@ -727,7 +727,14 @@ def trig_angle_loss(pred_angles, true_angles):
 
 # --- Signal Processing Utilities ---
 
-def estimate_temporal_gradient_finite_diff(trajectory_component, time_vector, order=4, smooth_boundaries=False):
+def estimate_temporal_gradient_finite_diff(
+    trajectory_component,
+    time_vector,
+    order=4,
+    smooth_boundaries=False,
+    boundary_order=None,
+    strict_boundary=False,
+):
     """
     Estimates the gradient of a trajectory component using finite differences.
     Enhanced version with better error handling and support for higher-order differences.
@@ -735,8 +742,10 @@ def estimate_temporal_gradient_finite_diff(trajectory_component, time_vector, or
     Args:
         trajectory_component: The trajectory data
         time_vector: Time points
-        order: Order of finite difference (2 or 4)
-        smooth_boundaries: Whether to apply smoothing at boundaries
+        order: Interior finite-difference order (1, 2, or 4)
+        smooth_boundaries: Deprecated and ignored (boundary smoothing removed)
+        boundary_order: Optional endpoint stencil order (1, 2, 4, 6). If None, keep legacy behavior.
+        strict_boundary: If True, return None when selected boundary_order needs more samples than available.
     """
     if trajectory_component is None or time_vector is None or len(trajectory_component) < 2:
         logger.error("Invalid input for finite difference gradient estimation.")
@@ -747,9 +756,9 @@ def estimate_temporal_gradient_finite_diff(trajectory_component, time_vector, or
 
     # Ensure tensors
     if not isinstance(trajectory_component, torch.Tensor):
-        trajectory_component = torch.tensor(trajectory_component, dtype=torch.float32, device=current_device)
+        trajectory_component = torch.tensor(trajectory_component, dtype=torch.float64, device=current_device)
     if not isinstance(time_vector, torch.Tensor):
-        time_vector = torch.tensor(time_vector, dtype=torch.float32, device=current_device)
+        time_vector = torch.tensor(time_vector, dtype=torch.float64, device=current_device)
 
     # Ensure 1D
     if trajectory_component.dim() == 2 and trajectory_component.shape[1] == 1:
@@ -779,6 +788,40 @@ def estimate_temporal_gradient_finite_diff(trajectory_component, time_vector, or
         return None
 
     gradient = torch.zeros_like(trajectory_component)
+
+    # Optional endpoint-only stencil override.
+    boundary_req = {1: 2, 2: 3, 4: 5, 6: 7}
+
+    def _apply_endpoint_stencils(grad_tensor, bo, dt_local):
+        if bo == 1:
+            grad_tensor[0] = (trajectory_component[1] - trajectory_component[0]) / dt_local
+            grad_tensor[-1] = (trajectory_component[-1] - trajectory_component[-2]) / dt_local
+            return
+        if bo == 2:
+            grad_tensor[0] = (-3.0 * trajectory_component[0] + 4.0 * trajectory_component[1] - trajectory_component[2]) / (2.0 * dt_local)
+            grad_tensor[-1] = (3.0 * trajectory_component[-1] - 4.0 * trajectory_component[-2] + trajectory_component[-3]) / (2.0 * dt_local)
+            return
+        if bo == 4:
+            grad_tensor[0] = (
+                -25.0 * trajectory_component[0] + 48.0 * trajectory_component[1] - 36.0 * trajectory_component[2]
+                + 16.0 * trajectory_component[3] - 3.0 * trajectory_component[4]
+            ) / (12.0 * dt_local)
+            grad_tensor[-1] = (
+                25.0 * trajectory_component[-1] - 48.0 * trajectory_component[-2] + 36.0 * trajectory_component[-3]
+                - 16.0 * trajectory_component[-4] + 3.0 * trajectory_component[-5]
+            ) / (12.0 * dt_local)
+            return
+        # bo == 6
+        grad_tensor[0] = (
+            -147.0 * trajectory_component[0] + 360.0 * trajectory_component[1] - 450.0 * trajectory_component[2]
+            + 400.0 * trajectory_component[3] - 225.0 * trajectory_component[4] + 72.0 * trajectory_component[5]
+            - 10.0 * trajectory_component[6]
+        ) / (60.0 * dt_local)
+        grad_tensor[-1] = (
+            147.0 * trajectory_component[-1] - 360.0 * trajectory_component[-2] + 450.0 * trajectory_component[-3]
+            - 400.0 * trajectory_component[-4] + 225.0 * trajectory_component[-5] - 72.0 * trajectory_component[-6]
+            + 10.0 * trajectory_component[-7]
+        ) / (60.0 * dt_local)
 
     try:
         if order == 2:
@@ -819,81 +862,236 @@ def estimate_temporal_gradient_finite_diff(trajectory_component, time_vector, or
             gradient[:-1] = (trajectory_component[1:] - trajectory_component[:-1]) / dt_val
             gradient[-1] = gradient[-2]
 
+        # Override only endpoint formulas if boundary_order is explicitly requested.
+        if boundary_order is not None:
+            if boundary_order not in boundary_req:
+                logger.error(f"Unsupported boundary_order={boundary_order}. Choose from 1, 2, 4, 6.")
+                return None
+            req_n = boundary_req[boundary_order]
+            if time_steps < req_n:
+                msg = (f"Boundary order {boundary_order} requires N>={req_n}, got N={time_steps}.")
+                if strict_boundary:
+                    logger.error(msg)
+                    return None
+                logger.warning(msg + " Falling back to boundary order 1.")
+                _apply_endpoint_stencils(gradient, 1, dt_val)
+            else:
+                _apply_endpoint_stencils(gradient, boundary_order, dt_val)
+
     except Exception as e:
         logger.error(f"Finite difference calculation error (Order {order}): {e}")
         return None
 
-    # Apply boundary smoothing if requested
-    if smooth_boundaries and time_steps >= 20:
-        gradient = apply_boundary_smoothing(gradient, trajectory_component, dt_val)
+    if smooth_boundaries:
+        logger.warning("smooth_boundaries is deprecated and ignored.")
 
     return torch.nan_to_num(gradient, nan=0.0, posinf=0.0, neginf=0.0)
 
 
-def apply_boundary_smoothing(gradient, trajectory, dt, boundary_points=10):
+def add_high_frequency_noise(signal, dt, noise_level=0.01, freq_band=(0.3, 0.8), seed=None):
     """
-    Apply Savitzky-Golay smoothing at boundaries to remove artifacts.
+    Add band-limited high-frequency noise to a signal.
 
     Args:
-        gradient: Computed gradient
-        trajectory: Original trajectory data
+        signal: Input signal (velocity data), shape [num_steps] or [num_steps, num_bodies]
         dt: Time step
-        boundary_points: Number of points at each boundary to smooth
+        noise_level: Amplitude of noise (relative to signal std)
+        freq_band: Frequency band as fraction of Nyquist frequency, e.g. (0.3, 0.8)
+        seed: Random seed for reproducibility
+
+    Returns:
+        Noisy signal with same shape as input
     """
-    try:
-        from scipy.signal import savgol_filter
-    except ImportError:
-        logger.warning("scipy not available for boundary smoothing")
-        return gradient
+    if seed is not None:
+        torch.manual_seed(seed)
+        np.random.seed(seed)
 
-    n_points = len(gradient)
-    if n_points < 20:
-        return gradient  # Too few points for smoothing
+    # Ensure tensor
+    if not isinstance(signal, torch.Tensor):
+        signal = torch.tensor(signal, dtype=torch.float32)
 
-    # Ensure gradient is on CPU for scipy
-    device = gradient.device if isinstance(gradient, torch.Tensor) else None
-    if isinstance(gradient, torch.Tensor):
-        gradient_np = gradient.cpu().numpy()
-        trajectory_np = trajectory.cpu().numpy() if isinstance(trajectory, torch.Tensor) else trajectory
+    original_shape = signal.shape
+    device = signal.device
+
+    # Work with 1D signal, reshape if needed
+    if signal.dim() > 1:
+        signal_flat = signal.reshape(-1)
     else:
-        gradient_np = gradient
-        trajectory_np = trajectory
+        signal_flat = signal
 
-    smoothed_gradient = gradient_np.copy()
+    N = len(signal_flat)
+    fs = 1.0 / dt  # Sampling frequency
+    fN = fs / 2.0  # Nyquist frequency
 
-    # Smooth at the beginning
-    window_start = min(11, n_points // 4)  # Adaptive window size
-    if window_start % 2 == 0:
-        window_start += 1  # Ensure odd window
+    # Generate white noise in time domain
+    white_noise = torch.randn_like(signal_flat)
 
-    if window_start >= 5:
-        # Apply Savitzky-Golay to compute smooth derivatives
-        smooth_region = min(boundary_points, n_points // 5)
-        extended_region = min(smooth_region * 2, n_points // 3)
+    # FFT to frequency domain
+    noise_fft = torch.fft.fft(white_noise)
 
-        # Compute smooth derivative for beginning
-        smooth_start = savgol_filter(trajectory_np[:extended_region],
-                                    window_start, polyorder=3, deriv=1, delta=dt)
+    # Create frequency array
+    freqs = torch.fft.fftfreq(N, dt).to(device)
 
-        # Blend with original using cosine interpolation
-        for i in range(smooth_region):
-            alpha = 0.5 * (1 - np.cos(np.pi * i / smooth_region))  # 0 to 1
-            smoothed_gradient[i] = (1 - alpha) * smooth_start[i] + alpha * gradient_np[i]
+    # Create band-pass filter for high frequencies
+    freq_min = freq_band[0] * fN
+    freq_max = freq_band[1] * fN
 
-        # Smooth at the end
-        smooth_end = savgol_filter(trajectory_np[-extended_region:],
-                                  window_start, polyorder=3, deriv=1, delta=dt)
+    # Create smooth band-pass filter using Gaussian transitions
+    filter_mask = torch.zeros_like(freqs)
+    transition_width = 0.05 * fN  # 5% of Nyquist for smooth transition
 
-        for i in range(smooth_region):
-            idx = -(smooth_region - i)
-            alpha = 0.5 * (1 - np.cos(np.pi * i / smooth_region))  # 0 to 1
-            smoothed_gradient[idx] = (1 - alpha) * smooth_end[idx] + alpha * gradient_np[idx]
+    for i, f in enumerate(torch.abs(freqs)):
+        if freq_min <= f <= freq_max:
+            filter_mask[i] = 1.0
+        elif freq_min - transition_width <= f < freq_min:
+            # Smooth rise
+            filter_mask[i] = 0.5 * (1 + torch.cos(torch.pi * (freq_min - f) / transition_width))
+        elif freq_max < f <= freq_max + transition_width:
+            # Smooth fall
+            filter_mask[i] = 0.5 * (1 + torch.cos(torch.pi * (f - freq_max) / transition_width))
 
-    # Convert back to tensor if needed
-    if device is not None:
-        smoothed_gradient = torch.tensor(smoothed_gradient, dtype=gradient.dtype, device=device)
+    # Apply band-pass filter in frequency domain
+    noise_fft_filtered = noise_fft * filter_mask
 
-    return smoothed_gradient
+    # Back to time domain
+    band_limited_noise = torch.fft.ifft(noise_fft_filtered).real
+
+    # Scale noise relative to signal standard deviation
+    signal_std = signal_flat.std()
+    noise_std = band_limited_noise.std()
+    if noise_std > 0:
+        band_limited_noise = band_limited_noise * (noise_level * signal_std / noise_std)
+
+    # Add noise to signal
+    noisy_signal = signal_flat + band_limited_noise
+
+    # Reshape back to original shape
+    noisy_signal = noisy_signal.reshape(original_shape)
+
+    return noisy_signal
+
+
+def add_awgn(signal, noise_level=0.05, seed=None):
+    """
+    Add Additive White Gaussian Noise (AWGN) to a signal.
+
+    Args:
+        signal: Input signal (numpy array or torch tensor)
+        noise_level: Standard deviation of the noise relative to signal std
+        seed: Random seed for reproducibility
+
+    Returns:
+        noisy_signal: Signal with AWGN added
+    """
+    if seed is not None:
+        np.random.seed(seed)
+        torch.manual_seed(seed)
+
+    # Convert to tensor if needed
+    if isinstance(signal, np.ndarray):
+        signal = torch.tensor(signal, dtype=torch.float32)
+        return_numpy = True
+    else:
+        return_numpy = False
+
+    # Calculate noise standard deviation
+    signal_std = torch.std(signal)
+    noise_std = noise_level * signal_std
+
+    # Generate AWGN
+    awgn = torch.randn_like(signal) * noise_std
+
+    # Add noise to signal
+    noisy_signal = signal + awgn
+
+    # Convert back to numpy if needed
+    if return_numpy:
+        return noisy_signal.numpy()
+    else:
+        return noisy_signal
+
+
+def design_lowpass_filter(N, dt, cutoff_hz, filter_type='gaussian'):
+    """
+    Design a lowpass filter in frequency domain.
+
+    Args:
+        N: Number of frequency points
+        dt: Time step
+        cutoff_hz: Cutoff frequency in Hz
+        filter_type: 'gaussian', 'butterworth', or 'hard'
+
+    Returns:
+        Filter coefficients in frequency domain
+    """
+    fs = 1.0 / dt
+    freqs = torch.fft.fftfreq(N, dt)
+
+    if filter_type == 'gaussian':
+        # Gaussian filter: H(f) = exp(-0.5 * (f/fc)^2)
+        H = torch.exp(-0.5 * (freqs / cutoff_hz) ** 2)
+
+    elif filter_type == 'butterworth':
+        # 2nd order Butterworth approximation
+        order = 2
+        H = 1.0 / (1.0 + (torch.abs(freqs) / cutoff_hz) ** (2 * order))
+
+    elif filter_type == 'hard':
+        # Hard cutoff (not recommended due to Gibbs phenomenon)
+        H = (torch.abs(freqs) <= cutoff_hz).float()
+
+    else:
+        raise ValueError(f"Unknown filter type: {filter_type}")
+
+    return H
+
+
+def fft_derivative_with_lowpass(signal, dt, cutoff_hz=10.0, filter_type='gaussian', derivative_order=1):
+    """
+    Calculate derivative using FFT with simultaneous lowpass filtering.
+    This avoids noise amplification by filtering before/during differentiation.
+
+    Args:
+        signal: Input signal (e.g., velocity), shape [num_steps]
+        dt: Time step
+        cutoff_hz: Lowpass filter cutoff frequency in Hz
+        filter_type: 'gaussian', 'butterworth', or 'hard'
+        derivative_order: 1 for first derivative, 2 for second derivative
+
+    Returns:
+        Filtered derivative (e.g., acceleration)
+    """
+    if not isinstance(signal, torch.Tensor):
+        signal = torch.tensor(signal, dtype=torch.float32)
+
+    device = signal.device
+    N = len(signal)
+
+    # FFT of signal
+    signal_fft = torch.fft.fft(signal)
+
+    # Get frequencies for derivative operator
+    freqs = torch.fft.fftfreq(N, dt).to(device)
+
+    # Derivative operator in frequency domain: (j*2*pi*f)^n
+    if derivative_order == 1:
+        derivative_operator = 2j * np.pi * freqs
+    elif derivative_order == 2:
+        derivative_operator = -(2 * np.pi * freqs) ** 2
+    else:
+        raise ValueError(f"Derivative order {derivative_order} not supported")
+
+    # Design lowpass filter
+    H_lowpass = design_lowpass_filter(N, dt, cutoff_hz, filter_type).to(device)
+
+    # Apply both derivative and lowpass filter in frequency domain
+    # Key: Do both operations together to avoid amplifying noise
+    filtered_derivative_fft = signal_fft * derivative_operator * H_lowpass
+
+    # Back to time domain
+    filtered_derivative = torch.fft.ifft(filtered_derivative_fft).real
+
+    return filtered_derivative
 
 
 def spectral_derivative_1d(y_data, dt, derivative_order=1):
@@ -1007,12 +1205,23 @@ def minimal_oscillation_interpolation(y_samples, t_samples, t_eval):
     return y_interp
 
 
-def calculate_fft_target_derivative(velocity_trajectory, time_vector, output_csv_path=None):
+def calculate_fft_target_derivative(
+                velocity_trajectory,
+                time_vector,
+                output_csv_path=None,
+                *,
+                deriv_smoothing_gaussian_width=None
+
+):
     """
     Calculate derivative using FFT following paper methodology (Equations 16-22).
     Implements: Detrending → Mirror Reflection → Tukey Window → FFT → Gaussian Filter → IFFT
 
     Note: This version strictly follows the paper - NO zero-padding, NO Savitzky-Golay smoothing.
+
+    Noisy-target options:
+    - deriv_smoothing_gaussian_width: Gaussian smoothing bandwidth on derivative spectrum.
+      If not provided, defaults to the paper-recommended sigma ~= N/20 (Eq. 21).
     """
 
     # Ensure tensors
@@ -1021,8 +1230,13 @@ def calculate_fft_target_derivative(velocity_trajectory, time_vector, output_csv
     if not isinstance(time_vector, torch.Tensor):
         time_vector = torch.tensor(time_vector, dtype=torch.float32)
 
+    # Ensure both tensors are on the same device and have the same dtype
     device = velocity_trajectory.device
+    time_vector = time_vector.to(device).to(velocity_trajectory.dtype)
     N = len(velocity_trajectory)
+    if N < 3:
+        logger.warning(f"FFT derivative needs at least 3 samples, got N={N}. Falling back to FD order=2.")
+        return estimate_temporal_gradient_finite_diff(velocity_trajectory, time_vector, order=2)
     dt = (time_vector[1] - time_vector[0]).item()
 
     # Step 1: Remove linear trend to improve periodicity
@@ -1036,49 +1250,33 @@ def calculate_fft_target_derivative(velocity_trajectory, time_vector, output_csv
     # Detrended signal
     detrended_velocity = velocity_trajectory - linear_trend
 
-    # Step 2: Apply smooth periodic extension using reflection and tapering
-    extension_length = N // 4  # Extend by 25% on each side
+    # Step 2: Mirror reflection with cosine weights (Eq. 19)
+    extension_length = max(1, min(N // 4, N - 1))
+    mirror_idx = torch.arange(1, extension_length + 1, device=device, dtype=velocity_trajectory.dtype)
+    tau = 0.5 * (1.0 - torch.cos(torch.pi * mirror_idx / extension_length))
 
-    # Create smooth transition function
-    transition_length = min(N // 20, 50)  # Transition region length
-
-    # Reflect and taper the signal at boundaries
-    # Left extension: mirror the beginning and smoothly transition to zero
-    left_reflect = torch.flip(detrended_velocity[1:extension_length + 1], dims=[0])
-    left_taper = torch.linspace(0, 1, transition_length, device=device)
-    if len(left_reflect) > transition_length:
-        left_reflect[-transition_length:] *= left_taper
-    else:
-        left_reflect *= left_taper[:len(left_reflect)]
-
-    # Right extension: mirror the end and smoothly transition to zero
-    right_reflect = torch.flip(detrended_velocity[-extension_length - 1:-1], dims=[0])
-    right_taper = torch.linspace(1, 0, transition_length, device=device)
-    if len(right_reflect) > transition_length:
-        right_reflect[:transition_length] *= right_taper
-    else:
-        right_reflect *= right_taper[-len(right_reflect):]
+    left_reflect = torch.flip(detrended_velocity[1:extension_length + 1], dims=[0]) * tau
+    right_reflect = torch.flip(detrended_velocity[-extension_length - 1:-1], dims=[0]) * torch.flip(tau, dims=[0])
 
     # Step 3: Make the extended signal periodic using cosine tapering
     # This ensures smooth transition at the boundaries
     extended_signal = torch.cat([left_reflect, detrended_velocity, right_reflect])
     extended_N = len(extended_signal)
 
-    # Apply Tukey (tapered cosine) window to the extended signal
-    alpha = 0.2  # Taper parameter (20% of signal is tapered)
-    tukey_window = torch.ones(extended_N, device=device)
-
-    # Number of points in the taper
-    n_taper = int(alpha * extended_N / 2)
-
-    if n_taper > 0:
-        # Left taper
-        taper_left = 0.5 * (1 + torch.cos(torch.linspace(torch.pi, 0, n_taper, device=device)))
-        tukey_window[:n_taper] = taper_left
-
-        # Right taper
-        taper_right = 0.5 * (1 + torch.cos(torch.linspace(0, torch.pi, n_taper, device=device)))
-        tukey_window[-n_taper:] = taper_right
+    # Apply Tukey (tapered cosine) window with alpha=0.2 (Eq. 20)
+    alpha = 0.2
+    tukey_window = torch.ones(extended_N, device=device, dtype=velocity_trajectory.dtype)
+    if extended_N > 1 and alpha > 0:
+        n = torch.arange(extended_N, device=device, dtype=velocity_trajectory.dtype)
+        x = n / (extended_N - 1)
+        left_mask = x < (alpha / 2.0)
+        right_mask = x > (1.0 - alpha / 2.0)
+        tukey_window[left_mask] = 0.5 * (
+            1.0 + torch.cos(torch.pi * (2.0 * x[left_mask] / alpha - 1.0))
+        )
+        tukey_window[right_mask] = 0.5 * (
+            1.0 + torch.cos(torch.pi * (2.0 * x[right_mask] / alpha - 2.0 / alpha + 1.0))
+        )
 
     windowed_extended = extended_signal * tukey_window
 
@@ -1108,19 +1306,22 @@ def calculate_fft_target_derivative(velocity_trajectory, time_vector, output_csv
     # Apply derivative in frequency domain
     Y_prime_k = Y_k * multiplier
 
-    # Apply spectral smoothing to reduce high-frequency noise
-    # Use Gaussian filter in frequency domain
-    freq_gaussian_width = fft_size // 7  # Adjust for smoothness
-    freq_indices = torch.arange(fft_size, device=device)
+    # Apply spectral smoothing to reduce high-frequency noise (on derivative)
+    # Use Gaussian filter in frequency domain.
+    if deriv_smoothing_gaussian_width is None:
+        freq_gaussian_width = max(1.0, N / 20.0)  # Paper Eq. (21): sigma ~= N/20
+    else:
+        freq_gaussian_width = float(deriv_smoothing_gaussian_width)
 
-    # Create Gaussian filter centered at zero frequency
-    gauss_filter = torch.zeros(fft_size, device=device)
-    gauss_filter[:fft_size // 2] = torch.exp(-0.5 * (freq_indices[:fft_size // 2] / freq_gaussian_width) ** 2)
-    gauss_filter[fft_size // 2:] = torch.exp(
-        -0.5 * ((fft_size - freq_indices[fft_size // 2:]) / freq_gaussian_width) ** 2)
-
-    # Apply filter
-    Y_prime_k_filtered = Y_prime_k * gauss_filter
+    if freq_gaussian_width is not None and freq_gaussian_width > 0:
+        freq_indices = torch.arange(fft_size, device=device)
+        gauss_filter = torch.zeros(fft_size, device=device)
+        gauss_filter[:fft_size // 2] = torch.exp(-0.5 * (freq_indices[:fft_size // 2] / freq_gaussian_width) ** 2)
+        gauss_filter[fft_size // 2:] = torch.exp(
+            -0.5 * ((fft_size - freq_indices[fft_size // 2:]) / freq_gaussian_width) ** 2)
+        Y_prime_k_filtered = Y_prime_k * gauss_filter
+    else:
+        Y_prime_k_filtered = Y_prime_k
 
     # Inverse FFT (Paper Equation 22c)
     derivative_extended = torch.fft.ifft(Y_prime_k_filtered).real
@@ -1342,13 +1543,19 @@ def plot_trajectory_comparison(
         ax_v.grid(True, linestyle=':')
 
         # Legend
-        handles = [
-            plt.Line2D([], [], color='blue', linestyle='-', label='Ground Truth'),
-            plt.Line2D([], [], color='red', linestyle='--', label='Train'),
-            plt.Line2D([], [], color='red', linestyle=':', label='Test')
-        ]
-        ax_x.legend(handles=handles, loc='best', fontsize=legend_fontsize - 2)
-        ax_v.legend(handles=handles, loc='best', fontsize=legend_fontsize - 2)
+        # If multiple models are plotted, keep their names in the legend.
+        # Otherwise fall back to the original compact (GT/Train/Test) legend.
+        if len(pred_np) <= 1:
+            handles = [
+                plt.Line2D([], [], color='blue', linestyle='-', label='Ground Truth'),
+                plt.Line2D([], [], color='red', linestyle='--', label='Train'),
+                plt.Line2D([], [], color='red', linestyle=':', label='Test')
+            ]
+            ax_x.legend(handles=handles, loc='best', fontsize=legend_fontsize - 2)
+            ax_v.legend(handles=handles, loc='best', fontsize=legend_fontsize - 2)
+        else:
+            ax_x.legend(loc='best', fontsize=legend_fontsize - 4)
+            ax_v.legend(loc='best', fontsize=legend_fontsize - 4)
 
         fig_ts.tight_layout()
         if num_epochs:
@@ -1497,8 +1704,7 @@ def plot_acceleration_comparison(
                     else:
                         analytical_accels = analytical_accels[:full_length]
 
-                # Skip plotting analytical accelerations as requested
-                # acceleration_data['Analytical (GT)'] = analytical_accels
+                acceleration_data['Analytical (GT)'] = analytical_accels
             else:
                 logger.warning("Analytical accelerations returned non-array type")
         else:
@@ -1545,14 +1751,29 @@ def plot_acceleration_comparison(
     num_bodies_total = first_accel_data.shape[1] if len(first_accel_data.shape) > 1 else 1
     num_bodies_actual_plot = min(num_bodies_to_plot, num_bodies_total) if num_bodies_to_plot > 0 else num_bodies_total
 
+    # Log dimension information for debugging
+    logger.info(f"Plotting acceleration comparison with {len(acceleration_data)} data sources")
+    logger.info(f"Time vector length: {len(time_np)}")
+    for name, data in acceleration_data.items():
+        logger.info(f"  {name}: shape {data.shape}")
+
     # Color mapping
     color_map = {
         'FNODE': 'red',
-        # 'Analytical (GT)': 'blue',  # Removed as requested
+        'Analytical (GT)': 'blue',
         'Target (FFT)': 'green',
         'Target (FD)': 'orange',
         'Target': 'purple'
     }
+
+    def _plot_priority(data_name):
+        # Draw analytical first, then target, then model on top
+        lower = data_name.lower()
+        if 'analytical' in lower or 'gt' in lower:
+            return 0
+        if 'target' in lower:
+            return 1
+        return 2
 
     # --- PLOT 1: Full trajectory comparison ---
     fig, axs = plt.subplots(1, num_bodies_actual_plot, figsize=(8 * num_bodies_actual_plot, 6), squeeze=False)
@@ -1560,35 +1781,56 @@ def plot_acceleration_comparison(
     for body_idx in range(num_bodies_actual_plot):
         ax = axs[0, body_idx]
 
-        for data_name, accel_data in acceleration_data.items():
+        for data_name, accel_data in sorted(acceleration_data.items(), key=lambda kv: _plot_priority(kv[0])):
             if body_idx >= accel_data.shape[1]:
                 continue
 
             accel_body_data = accel_data[:, body_idx]
             data_color = color_map.get(data_name, 'gray')
 
-    
+            if 'analytical' in data_name.lower() or 'gt' in data_name.lower():
+                # Plot analytical as continuous line
+                mask = ~np.isnan(accel_body_data)
+                if np.any(mask):
+                    # Ensure time and data have compatible lengths
+                    min_length = min(len(time_np), len(accel_body_data))
+                    time_subset = time_np[:min_length]
+                    accel_subset = accel_body_data[:min_length]
+                    mask_subset = mask[:min_length]
+                    ax.plot(time_subset[mask_subset], accel_subset[mask_subset], color=data_color, linestyle='-',
+                            label=data_name, lw=2.0, alpha=0.85, zorder=1)
 
-            if 'target' in data_name.lower():
+            elif 'target' in data_name.lower():
                 # Target only exists for training
                 mask = ~np.isnan(accel_body_data)
                 if np.any(mask):
-                    ax.plot(time_np[mask], accel_body_data[mask], color=data_color, linestyle='--',
-                            label=f'{data_name} (Train)', lw=1.5, alpha=0.8)
+                    # Ensure time and data have compatible lengths
+                    min_length = min(len(time_np), len(accel_body_data))
+                    time_subset = time_np[:min_length]
+                    accel_subset = accel_body_data[:min_length]
+                    mask_subset = mask[:min_length]
+                    ax.plot(time_subset[mask_subset], accel_subset[mask_subset], color=data_color, linestyle='--',
+                            label=f'{data_name} (Train)', lw=1.5, alpha=0.8, zorder=2)
 
             else:
                 # Model predictions - show train/test split
                 mask = ~np.isnan(accel_body_data)
                 if np.any(mask):
-                    train_mask = mask & (np.arange(len(mask)) < num_steps_train)
-                    test_mask = mask & (np.arange(len(mask)) >= num_steps_train)
+                    # Ensure time and data have compatible lengths
+                    min_length = min(len(time_np), len(accel_body_data))
+                    time_subset = time_np[:min_length]
+                    accel_subset = accel_body_data[:min_length]
+                    mask_subset = mask[:min_length]
+
+                    train_mask = mask_subset & (np.arange(len(mask_subset)) < num_steps_train)
+                    test_mask = mask_subset & (np.arange(len(mask_subset)) >= num_steps_train)
 
                     if np.any(train_mask):
-                        ax.plot(time_np[train_mask], accel_body_data[train_mask],
-                                color=data_color, linestyle='--', label=f'{data_name} (Train)', lw=1.5)
+                        ax.plot(time_subset[train_mask], accel_subset[train_mask],
+                                color=data_color, linestyle='--', label=f'{data_name} (Train)', lw=1.5, zorder=3)
                     if np.any(test_mask):
-                        ax.plot(time_np[test_mask], accel_body_data[test_mask],
-                                color=data_color, linestyle=':', label=f'{data_name} (Test)', lw=1.5, alpha=0.7)
+                        ax.plot(time_subset[test_mask], accel_subset[test_mask],
+                                color=data_color, linestyle=':', label=f'{data_name} (Test)', lw=1.5, alpha=0.9, zorder=3)
 
         # Add vertical line for train/test split
         if num_steps_train > 0 and num_steps_train < len(time_np):
@@ -1630,17 +1872,16 @@ def plot_acceleration_comparison(
     train_analytical_path = os.path.join(results_dir, "train_analytical_accelerations.csv")
     train_target_path = os.path.join(results_dir, "train_target_accelerations.csv")
 
-    # Skip loading analytical accelerations as requested
-    # if os.path.exists(train_analytical_path):
-    #     try:
-    #         train_analytical_df = pd.read_csv(train_analytical_path)
-    #         analytical_cols = [col for col in train_analytical_df.columns if 'analytical_accel_body_' in col]
-    #         if analytical_cols:
-    #             train_analytical_np = train_analytical_df[analytical_cols].values
-    #             if len(train_analytical_np) >= num_steps_train:
-    #                 train_comparison_data['Analytical (Train File)'] = train_analytical_np[:num_steps_train]
-    #     except Exception as e:
-    #         logger.warning(f"Could not load train analytical file: {e}")
+    if os.path.exists(train_analytical_path):
+        try:
+            train_analytical_df = pd.read_csv(train_analytical_path)
+            analytical_cols = [col for col in train_analytical_df.columns if 'analytical_accel_body_' in col]
+            if analytical_cols:
+                train_analytical_np = train_analytical_df[analytical_cols].values
+                if len(train_analytical_np) >= num_steps_train:
+                    train_comparison_data['Analytical (Train File)'] = train_analytical_np[:num_steps_train]
+        except Exception as e:
+            logger.warning(f"Could not load train analytical file: {e}")
 
     if os.path.exists(train_target_path):
         try:
@@ -1660,19 +1901,18 @@ def plot_acceleration_comparison(
         for body_idx in range(num_bodies_actual_plot):
             ax = axs_train[0, body_idx]
 
-            for data_name, train_data in train_comparison_data.items():
+            for data_name, train_data in sorted(train_comparison_data.items(), key=lambda kv: _plot_priority(kv[0])):
                 if body_idx >= train_data.shape[1]:
                     continue
 
                 train_body_data = train_data[:, body_idx]
 
                 # Choose color and style
-                # Skip analytical as it's not plotted anymore
-                # if 'analytical' in data_name.lower():
-                #     color = 'blue'
-                #     style = '-'
-                #     lw = 2.0
-                if 'target' in data_name.lower():
+                if 'analytical' in data_name.lower():
+                    color = 'blue'
+                    style = '-'
+                    lw = 2.0
+                elif 'target' in data_name.lower():
                     color = 'green'
                     style = '--'
                     lw = 1.5
@@ -1686,7 +1926,8 @@ def plot_acceleration_comparison(
                 if np.any(mask):
                     plot_time = train_time_np[:len(train_body_data)]
                     ax.plot(plot_time[mask], train_body_data[mask],
-                            color=color, linestyle=style, label=data_name, lw=lw, alpha=0.8)
+                            color=color, linestyle=style, label=data_name, lw=lw, alpha=0.8,
+                            zorder=1 if 'analytical' in data_name.lower() else (2 if 'target' in data_name.lower() else 3))
 
             if num_epochs:
                 ax.set_title(f'Body {body_idx + 1} Training Acceleration Detail ({num_epochs} epochs)', fontsize=title_fontsize)
@@ -1738,7 +1979,7 @@ def load_fnode_target_accelerations(target_csv_path, num_steps_train, current_de
             num_steps_train = len(df)
 
         target_data = df[target_cols].values[:num_steps_train]
-        target_tensor = torch.tensor(target_data, dtype=torch.float32, device=current_device)
+        target_tensor = torch.tensor(target_data, dtype=torch.float64, device=current_device)
 
         logger.info(f"Loaded target accelerations from {target_csv_path}, shape: {target_tensor.shape}")
         return target_tensor
@@ -1748,32 +1989,94 @@ def load_fnode_target_accelerations(target_csv_path, num_steps_train, current_de
         return None
 
 
-def generate_target_accelerations(full_trajectory, time_vector, test_case, num_bodies, args, results_dir):
+def generate_target_accelerations(full_trajectory, time_vector, test_case, num_bodies, args, target_dir):
     """
     Generate target accelerations for FNODE training.
-    Uses FFT method if suitable, otherwise falls back to finite difference.
-    Analytical methods are NOT used for training, only for plotting.
+    Supports three methods via args.fnode_accel_mtd:
+      - 'fft': FFT spectral differentiation on velocity -> acceleration
+      - 'fd': finite difference on velocity -> acceleration
+      - 'analytical': closed-form acceleration from state (when available)
     """
     logger.info("Generating target accelerations for FNODE training...")
+    os.makedirs(target_dir, exist_ok=True)
 
-    # 1. Check if FFT method should be used
-    use_fft = args.fnode_use_hybrid_target  # Renamed parameter but keeping compatibility
+    accel_mtd = getattr(args, "fnode_accel_mtd", "fd")
+    fd_order = int(getattr(args, "fnode_target_fd_order", 2) or 2)
+
+    if accel_mtd not in {"fft", "fd", "analytical"}:
+        logger.error(f"Invalid fnode_accel_mtd: {accel_mtd}. Expected one of: fft, fd, analytical.")
+        return None
 
     # Systems where FFT is not suitable
     fft_unsuitable_systems = {
         'Double_Pendulum': 'Chaotic/quasi-periodic motion not suitable for FFT-based method',
     }
 
-    if test_case in fft_unsuitable_systems and use_fft:
+    if accel_mtd == "fft" and test_case in fft_unsuitable_systems:
         logger.warning(f"FFT method not suitable for {test_case}: {fft_unsuitable_systems[test_case]}")
-        use_fft = False
+        logger.warning("Falling back to finite difference targets.")
+        accel_mtd = "fd"
 
-    # 2. Try FFT method if requested and suitable
-    if use_fft:
-        logger.info("Attempting FFT spectral differentiation method...")
+    # 0. Analytical method (when supported)
+    if accel_mtd == "analytical":
+        logger.info("Using analytical acceleration targets...")
+        analytical_csv_path = os.path.join(target_dir, "analytical_target.csv")
 
-        fft_csv_path = os.path.join(results_dir, "fft_target.csv")
+        try:
+            from Model.force_fun import force_sms, force_smsd, force_tmsd, force_dp, force_cp
+
+            force_func_map = {
+                'Single_Mass_Spring': force_sms,
+                'Single_Mass_Spring_Damper': force_smsd,
+                'Triple_Mass_Spring_Damper': force_tmsd,
+                'Double_Pendulum': force_dp,
+                'Cart_Pole': force_cp,
+            }
+
+            force_func = force_func_map.get(test_case)
+            if force_func is None:
+                logger.error(
+                    f"Analytical acceleration targets are not implemented for test_case='{test_case}'. "
+                    f"Please use --fnode_accel_mtd fd or fft."
+                )
+                return None
+
+            if not torch.is_tensor(full_trajectory):
+                full_trajectory = torch.tensor(full_trajectory, dtype=torch.float64)
+            if not torch.is_tensor(time_vector):
+                time_vector = torch.tensor(time_vector, dtype=torch.float64)
+
+            device = full_trajectory.device
+            N = full_trajectory.shape[0]
+            analytical_targets = torch.zeros((N, num_bodies), device=device, dtype=torch.float64)
+
+            for i in range(N):
+                state_i = full_trajectory[i]
+                bodys = state_i.view(num_bodies, 2)
+                accel_i = force_func(bodys)
+                if accel_i.dim() == 0:
+                    accel_i = accel_i.unsqueeze(0)
+                analytical_targets[i, : accel_i.numel()] = accel_i.to(device=device, dtype=torch.float64).flatten()
+
+            analytical_data = {'time': time_vector.squeeze().cpu().numpy()}
+            for j in range(num_bodies):
+                analytical_data[f'target_accel_body_{j}'] = analytical_targets[:, j].cpu().numpy()
+            pd.DataFrame(analytical_data).to_csv(analytical_csv_path, index=False, float_format='%.8g')
+            logger.info(f"Saved analytical target accelerations to {analytical_csv_path}")
+            return analytical_csv_path
+
+        except Exception as e:
+            logger.error(f"Failed to generate analytical targets: {e}", exc_info=True)
+            return None
+
+    # 2. Try FFT-FD hybrid method if requested and suitable
+    if accel_mtd == "fft":
+        logger.info("Attempting FFT-FD hybrid differentiation method...")
+
+        fft_csv_path = os.path.join(target_dir, "fft_target.csv")
         fft_targets = torch.zeros((len(full_trajectory), num_bodies), device=full_trajectory.device)
+        prob = int(getattr(args, "prob", 50) or 50)
+        prob = max(1, prob)
 
         success_count = 0
         for body_idx in range(num_bodies):
@@ -1781,45 +2084,72 @@ def generate_target_accelerations(full_trajectory, time_vector, test_case, num_b
             if velocity_idx < full_trajectory.shape[1]:
                 velocity = full_trajectory[:, velocity_idx]
 
-                # Apply FFT differentiation
-                body_output_path = os.path.join(results_dir, f"fft_derivative_body_{body_idx}.csv")
+                # FFT for full range
+                body_output_path = os.path.join(target_dir, f"fft_derivative_body_{body_idx}.csv")
                 fft_deriv = calculate_fft_target_derivative(
                     velocity, time_vector,
                     output_csv_path=body_output_path
                 )
+                # FD for full range (used by hybrid boundaries)
+                fd_deriv = estimate_temporal_gradient_finite_diff(velocity, time_vector, order=fd_order)
 
-                if fft_deriv is not None:
+                if fft_deriv is not None and fd_deriv is not None:
+                    n_pts = len(velocity)
+                    trunc = max(1, n_pts // prob)
+                    if trunc >= n_pts // 3:
+                        trunc = max(1, n_pts // 4)
+                    end_start_idx = n_pts - trunc
+
+                    hybrid = fft_deriv.clone()
+                    hybrid[:trunc] = fd_deriv[:trunc]
+                    hybrid[end_start_idx:] = fd_deriv[end_start_idx:]
+
+                    blend_length = min(10, trunc // 4)
+                    if blend_length > 0:
+                        # Smooth FD->FFT transition near left boundary
+                        for i in range(blend_length):
+                            idx = trunc - blend_length // 2 + i
+                            if 0 <= idx < n_pts:
+                                alpha = 0.5 * (1 - np.cos(np.pi * i / blend_length))
+                                hybrid[idx] = (1 - alpha) * fd_deriv[idx] + alpha * fft_deriv[idx]
+                        # Smooth FFT->FD transition near right boundary
+                        for i in range(blend_length):
+                            idx = end_start_idx - blend_length // 2 + i
+                            if 0 <= idx < n_pts:
+                                alpha = 0.5 * (1 - np.cos(np.pi * i / blend_length))
+                                hybrid[idx] = alpha * fd_deriv[idx] + (1 - alpha) * fft_deriv[idx]
+
+                    fft_targets[:, body_idx] = hybrid
+                    success_count += 1
+                    logger.info(
+                        f"FFT-FD hybrid successful for body {body_idx}: "
+                        f"FD boundaries [0:{trunc}] and [{end_start_idx}:{n_pts}], FFT in middle"
+                    )
+                elif fft_deriv is not None:
                     fft_targets[:, body_idx] = fft_deriv
                     success_count += 1
-                    logger.info(f"FFT method successful for body {body_idx}")
-                else:
-                    # Fallback to FD for this body
-                    logger.info(f"FFT failed for body {body_idx}, using FD")
-                    fd_order = getattr(args, 'fd_order', 4)  # Use fd_order from args if available, else default to 4
-                    fd_deriv = estimate_temporal_gradient_finite_diff(velocity, time_vector, order=fd_order)
-                    if fd_deriv is not None:
-                        fft_targets[:, body_idx] = fd_deriv
+                    logger.info(f"FD unavailable for body {body_idx}, using pure FFT")
+                elif fd_deriv is not None:
+                    fft_targets[:, body_idx] = fd_deriv
+                    success_count += 1
+                    logger.info(f"FFT failed for body {body_idx}, using pure FD")
 
-        # Save FFT targets if at least one body succeeded
+        # Save hybrid targets if at least one body succeeded
         if success_count > 0:
             try:
                 fft_data = {'time': time_vector.cpu().numpy()}
                 for j in range(num_bodies):
                     fft_data[f'target_accel_body_{j}'] = fft_targets[:, j].cpu().numpy()
                 pd.DataFrame(fft_data).to_csv(fft_csv_path, index=False, float_format='%.8g')
-                logger.info(f"Saved FFT target accelerations to {fft_csv_path}")
+                logger.info(f"Saved FFT-FD hybrid target accelerations to {fft_csv_path}")
                 return fft_csv_path
             except Exception as e:
                 logger.error(f"Failed to save FFT targets: {e}")
 
     # 3. Fall back to pure finite difference
     logger.info("Using finite difference method for all bodies")
-    fd_csv_path = os.path.join(results_dir, "fd_target.csv")
+    fd_csv_path = os.path.join(target_dir, "fd_target.csv")
     fd_targets = torch.zeros((len(full_trajectory), num_bodies), device=full_trajectory.device)
-
-    # Get fd_order from args if available, else default to 4
-    fd_order = getattr(args, 'fd_order', 4)
-    logger.info(f"Using finite difference order: {fd_order}")
 
     for body_idx in range(num_bodies):
         velocity_idx = body_idx * 2 + 1
@@ -1831,6 +2161,14 @@ def generate_target_accelerations(full_trajectory, time_vector, test_case, num_b
 
     # Save FD targets
     try:
+        # Debug: Log shapes
+        logger.debug(f"time_vector shape: {time_vector.shape}")
+        logger.debug(f"fd_targets shape: {fd_targets.shape}")
+
+        # Ensure time_vector is 1D
+        if time_vector.dim() > 1:
+            time_vector = time_vector.squeeze()
+
         fd_data = {'time': time_vector.cpu().numpy()}
         for j in range(num_bodies):
             fd_data[f'target_accel_body_{j}'] = fd_targets[:, j].cpu().numpy()
@@ -1839,4 +2177,349 @@ def generate_target_accelerations(full_trajectory, time_vector, test_case, num_b
         return fd_csv_path
     except Exception as e:
         logger.error(f"Failed to save FD targets: {e}")
+        logger.error(f"time_vector shape: {time_vector.shape if 'time_vector' in locals() else 'undefined'}")
+        logger.error(f"fd_targets shape: {fd_targets.shape if 'fd_targets' in locals() else 'undefined'}")
         return None
+
+
+def save_data_np(data, test_case, model_string, training_size, num_steps_test, dt):
+    """
+    Save prediction data to numpy file.
+
+    Args:
+        data: Data to save (numpy array or torch tensor)
+        test_case: Name of test case
+        model_string: Model type string
+        training_size: Number of training samples
+        num_steps_test: Number of test steps
+        dt: Time step
+    """
+    if torch.is_tensor(data):
+        data = data.cpu().numpy()
+
+    save_path = os.path.join("results", test_case)
+    os.makedirs(save_path, exist_ok=True)
+
+    filename = f"{model_string}_prediction_train{training_size}_test{num_steps_test}_dt{dt}.npy"
+    full_path = os.path.join(save_path, filename)
+
+    np.save(full_path, data)
+    logger.info(f"Saved prediction data to {full_path}")
+
+
+def plot_sms_results(pred_traj, model_type, training_size, dt, output_dir,
+                     num_steps_test=None, ground_truth_data=None, start_time=None):
+    """
+    Unified plotting function for Single Mass Spring results (LNN and HNN).
+    Generates 2 plots: time series and phase space with energy.
+
+    Args:
+        pred_traj: Predicted trajectory [num_steps, 2] with columns [position, velocity]
+        model_type: 'LNN' or 'HNN'
+        training_size: Number of training steps
+        dt: Time step
+        output_dir: Directory to save figures
+        num_steps_test: Total number of test steps (optional)
+        ground_truth_data: Optional ground truth trajectory for comparison
+        start_time: Start time for timing (optional)
+    """
+    import matplotlib.pyplot as plt
+    import time
+
+    # Ensure output directory exists
+    os.makedirs(output_dir, exist_ok=True)
+
+    # Convert to numpy if needed
+    if torch.is_tensor(pred_traj):
+        pred_traj = pred_traj.detach().cpu().numpy()
+    else:
+        pred_traj = np.asarray(pred_traj)
+
+    # Ensure 2D shape
+    if pred_traj.ndim == 3:
+        pred_traj = pred_traj[:, 0, :]  # Take first body if multiple
+
+    # Special handling for HNN: convert (q,p) to (x,v) if needed
+    # HNN outputs (q, p) where p = m*v, need to convert to (x, v)
+    m = 10.0  # mass
+    if model_type == 'HNN' and np.max(np.abs(pred_traj[:, 1])) > 5:
+        # Likely in (q, p) format, convert to (x, v)
+        pred_traj = pred_traj.copy()
+        pred_traj[:, 1] = pred_traj[:, 1] / m  # Convert momentum to velocity
+
+    num_steps = len(pred_traj)
+    if num_steps_test is None:
+        num_steps_test = num_steps
+
+    # Generate time array
+    t = np.arange(num_steps) * dt
+
+    # Generate analytical ground truth for Single_Mass_Spring
+    m = 10.0  # mass
+    k = 50.0  # spring constant
+    omega = np.sqrt(k / m)  # angular frequency
+
+    x_true = np.cos(omega * t)
+    v_true = -omega * np.sin(omega * t)
+
+    # Calculate energies
+    E_true = 0.5 * k * x_true[0]**2  # Constant total energy (initial)
+    E_pred = 0.5 * m * pred_traj[:, 1]**2 + 0.5 * k * pred_traj[:, 0]**2
+
+    # Set up the figure style
+    plt.rcParams.update({'font.size': 12})
+    plt.rcParams['xtick.labelsize'] = 11
+    plt.rcParams['ytick.labelsize'] = 11
+
+    # ========== Plot 1: Time Series ==========
+    fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(10, 8), sharex=True)
+
+    # Position subplot
+    ax1.plot(t, x_true, 'b-', linewidth=2, label='Ground truth')
+
+    # Split prediction into training and test regions
+    if training_size < num_steps:
+        # Training region (ID generalization)
+        ax1.plot(t[:training_size], pred_traj[:training_size, 0], 'r--',
+                linewidth=2, label='ID generalization')
+        # Test region (OOD generalization)
+        ax1.plot(t[training_size-1:], pred_traj[training_size-1:, 0], 'r:',
+                linewidth=2.5, label='OOD generalization')
+    else:
+        ax1.plot(t, pred_traj[:, 0], 'r--', linewidth=2, label=f'{model_type} prediction')
+
+    ax1.set_ylabel('Position x (m)', fontsize=12)
+    ax1.grid(True, alpha=0.3)
+    ax1.legend(loc='upper right', fontsize=11)
+    ax1.set_title(f'{model_type} Time Series Prediction', fontsize=14)
+
+    # Velocity subplot
+    ax2.plot(t, v_true, 'b-', linewidth=2, label='Ground truth')
+
+    if training_size < num_steps:
+        # Training region
+        ax2.plot(t[:training_size], pred_traj[:training_size, 1], 'r--',
+                linewidth=2, label='ID generalization')
+        # Test region
+        ax2.plot(t[training_size-1:], pred_traj[training_size-1:, 1], 'r:',
+                linewidth=2.5, label='OOD generalization')
+    else:
+        ax2.plot(t, pred_traj[:, 1], 'r--', linewidth=2, label=f'{model_type} prediction')
+
+    ax2.set_xlabel('Time (s)', fontsize=12)
+    ax2.set_ylabel('Velocity v (m/s)', fontsize=12)
+    ax2.grid(True, alpha=0.3)
+    ax2.legend(loc='upper right', fontsize=11)
+
+    plt.tight_layout()
+    plt.savefig(os.path.join(output_dir, f'{model_type}_time_series.png'), dpi=150, bbox_inches='tight')
+    plt.show()
+
+    # ========== Plot 2: Phase Space and Energy ==========
+    # Use GridSpec for equal subplot frames with 1:1 aspect ratio
+    from matplotlib.gridspec import GridSpec
+    fig = plt.figure(figsize=(12, 6))
+    gs = GridSpec(1, 2, figure=fig, wspace=0.25, width_ratios=[1, 1])
+    ax1 = fig.add_subplot(gs[0, 0])
+    ax2 = fig.add_subplot(gs[0, 1])
+
+    # Phase space subplot
+    ax1.plot(x_true, v_true, 'b-', linewidth=2, label='Ground truth', alpha=0.8)
+    ax1.plot(pred_traj[:, 0], pred_traj[:, 1], 'r-', linewidth=2,
+            label=f'{model_type} prediction', alpha=0.8)
+
+    # Mark initial condition
+    ax1.plot(x_true[0], v_true[0], 'go', markersize=8, label='Initial condition')
+
+    ax1.set_xlabel('Position x (m)', fontsize=12)
+    ax1.set_ylabel('Velocity v (m/s)', fontsize=12)
+    ax1.set_title('Phase Space', fontsize=14)
+    ax1.grid(True, alpha=0.3)
+    ax1.legend(loc='upper right', fontsize=11)
+
+    # Set equal aspect ratio with proper limits
+    ax1.set_aspect('equal', adjustable='datalim')
+    x_margin = 0.1
+    y_margin = 0.1
+    x_range = max(abs(x_true.max()), abs(x_true.min()), abs(pred_traj[:, 0].max()), abs(pred_traj[:, 0].min()))
+    y_range = max(abs(v_true.max()), abs(v_true.min()), abs(pred_traj[:, 1].max()), abs(pred_traj[:, 1].min()))
+    max_range = max(x_range, y_range)
+    ax1.set_xlim(-max_range - x_margin, max_range + x_margin)
+    ax1.set_ylim(-max_range - y_margin, max_range + y_margin)
+
+    # Energy subplot
+    ax2.axhline(y=E_true, color='b', linestyle='-', linewidth=2,
+               label=f'Ground truth (E={E_true:.2f} J)', alpha=0.8)
+    ax2.plot(t, E_pred, 'r-', linewidth=2, label=f'{model_type} prediction', alpha=0.8)
+
+    # Show absolute energy values (disable Matplotlib offset like "+2.499e1")
+    ax2.ticklabel_format(axis='y', style='plain', useOffset=False)
+
+    ax2.set_xlabel('Time (s)', fontsize=12)
+    ax2.set_ylabel('Total Energy (J)', fontsize=12)
+    ax2.set_title('Energy Conservation', fontsize=14)
+    ax2.grid(True, alpha=0.3)
+    ax2.legend(loc='upper right', fontsize=11)
+
+    # Set y-axis limits centered around E_true (e.g., ~25 J) with tight margin
+    # based on observed variation. This avoids unreadable offset/scaled ticks.
+    E_min, E_max = np.min(E_pred), np.max(E_pred)
+    E_range = E_max - E_min
+    energy_margin = max(1e-6, 1.2 * E_range)
+    ax2.set_ylim([E_true - energy_margin, E_true + energy_margin])
+
+    # Don't use tight_layout with GridSpec and aspect='equal' - it causes warnings
+    # bbox_inches='tight' in savefig handles the layout properly
+    plt.savefig(os.path.join(output_dir, f'{model_type}_phase_energy.png'), dpi=150, bbox_inches='tight')
+    plt.show()
+
+    # Log energy conservation metrics
+    energy_error = np.abs(E_pred - E_true) / E_true * 100
+    logger.info(f"{model_type} Energy Conservation:")
+    logger.info(f"  Mean relative error: {np.mean(energy_error):.2f}%")
+    logger.info(f"  Max relative error: {np.max(energy_error):.2f}%")
+    if training_size < num_steps:
+        logger.info(f"  Train region error: {np.mean(energy_error[:training_size]):.2f}%")
+        logger.info(f"  Test region error: {np.mean(energy_error[training_size:]):.2f}%")
+
+    # Save time cost if provided
+    if start_time is not None:
+        end_time = time.time()
+        logger.info(f"Total time: {end_time - start_time:.2f}s")
+
+
+# ---------------------------------------------------------------------------
+# Gibbs Phenomenon Trimming Functions (from gibbs_trim_benchmark.py)
+# ---------------------------------------------------------------------------
+
+from dataclasses import dataclass
+from typing import Dict
+
+@dataclass(frozen=True)
+class TrimResult:
+    """Result from automatic trimming methods."""
+    start: int
+    end: int
+    method: str
+    meta: Dict[str, float]
+
+    @property
+    def length(self) -> int:
+        return max(0, self.end - self.start)
+
+
+def compute_mad(x):
+    """Compute Median Absolute Deviation (MAD) - robust measure of variability."""
+    x = np.asarray(x)
+    med = np.median(x)
+    return float(np.median(np.abs(x - med)))
+
+
+def moving_average_filter(x, window):
+    """Apply moving average filter to signal."""
+    if window <= 1:
+        return x
+    window = int(window)
+    kernel = np.ones(window, dtype=float) / float(window)
+    return np.convolve(x, kernel, mode="same")
+
+
+def trim_method_2_robust_residual(
+    accel,
+    smooth_window=21,
+    mad_k=6.0,
+    stable_run=12,
+    max_trim_frac=0.25,
+    min_keep_frac=0.5,
+):
+    """
+    Auto-detect boundary artifact zones using robust residual threshold.
+
+    This method detects and removes Gibbs phenomenon artifacts at signal boundaries
+    by comparing the signal to a smoothed version and finding stable regions.
+
+    Steps:
+    1. Smooth signal with moving average
+    2. Compute residual = |signal - smooth|
+    3. Set threshold = median(residual) + mad_k * MAD(residual)
+    4. Find stable regions where residual stays below threshold
+    5. Trim boundaries outside stable regions
+
+    Args:
+        accel: Input acceleration signal (numpy array)
+        smooth_window: Window size for moving average (default: 21)
+        mad_k: MAD multiplier for threshold (default: 6.0)
+        stable_run: Required consecutive stable samples (default: 12)
+        max_trim_frac: Maximum fraction to trim from each side (default: 0.25)
+        min_keep_frac: Minimum fraction of signal to keep (default: 0.5)
+
+    Returns:
+        TrimResult: Object containing start/end indices and metadata
+    """
+    a = np.asarray(accel, dtype=float)
+    n = len(a)
+    if n < 32:
+        return TrimResult(0, n, "method2_residual", {"reason": "too_short"})
+
+    # Ensure odd window size
+    smooth_window = int(max(3, smooth_window))
+    if smooth_window % 2 == 0:
+        smooth_window += 1
+
+    # Compute smoothed signal and residual
+    smooth = moving_average_filter(a, smooth_window)
+    resid = np.abs(a - smooth)
+
+    # Compute robust threshold
+    med = float(np.median(resid))
+    mad = compute_mad(resid) + 1e-12
+    thr = med + float(mad_k) * mad
+
+    # Compute maximum trim limits
+    max_trim = int(max_trim_frac * n)
+    max_trim = min(max_trim, int((1.0 - min_keep_frac) * n / 2))
+    max_trim = max(0, max_trim)
+
+    # Find left boundary: first stable run
+    left = 0
+    for i in range(0, max_trim + 1):
+        j = i + stable_run
+        if j >= n:
+            break
+        if np.all(resid[i:j] <= thr):
+            left = i
+            break
+    else:
+        left = max_trim
+
+    # Find right boundary: last stable run
+    right = n
+    for i in range(0, max_trim + 1):
+        j = n - i - stable_run
+        if j <= 0:
+            break
+        if np.all(resid[j : n - i] <= thr):
+            right = n - i
+            break
+    else:
+        right = n - max_trim
+
+    # Fallback if boundaries overlap
+    if right <= left:
+        left = max_trim
+        right = n - max_trim
+
+    return TrimResult(
+        left,
+        right,
+        "method2_residual",
+        {
+            "smooth_window": float(smooth_window),
+            "mad_k": float(mad_k),
+            "stable_run": float(stable_run),
+            "threshold": thr,
+            "median": med,
+            "mad": mad,
+            "max_trim": float(max_trim),
+        },
+    )

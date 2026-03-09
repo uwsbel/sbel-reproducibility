@@ -12,7 +12,7 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # --- Standard Force Functions (Return Acceleration) ---
 
-def force_sms(bodys, model=None):
+def force_sms(bodys, model=None, **kwargs):
     """Acceleration for single mass-spring system."""
     # bodys: tensor shape [1, 2] -> [[position, velocity]]
     mass = 10.0;
@@ -22,15 +22,14 @@ def force_sms(bodys, model=None):
     return accel
 
 
-def force_smsd(bodys, model=None):
+def force_smsd(bodys, model=None, **kwargs):
     """Acceleration for single mass-spring-damper system."""
     # bodys: tensor shape [1, 2] -> [[position, velocity]]
     mass = 10.0;
     k_linear = 50.0;
-    k_cubic = 0.1;
     c_damping = 2.0
-    # Returns acceleration: (-k_linear*x - k_cubic*x^3 - c_damping*v) / m
-    accel = (-k_linear * bodys[:, 0] - k_cubic * bodys[:, 0] ** 3 - c_damping * bodys[:, 1]) / mass
+    # Returns acceleration: (-k_linear*x - c_damping*v) / m
+    accel = (-k_linear * bodys[:, 0] - c_damping * bodys[:, 1]) / mass
     return accel
 
 
@@ -96,6 +95,36 @@ def double_pendulum_derivs(t, state):
     return dydt
 
 
+def force_dp(bodys, model=None):
+    """Force function for Double Pendulum that returns accelerations."""
+    # bodys: tensor of shape [2, 2] where bodys[0] = [theta1, omega1], bodys[1] = [theta2, omega2]
+    # Returns: tensor of shape [2] containing [alpha1, alpha2] (angular accelerations)
+
+    # Convert to numpy if needed
+    if torch.is_tensor(bodys):
+        device = bodys.device
+        bodys_np = bodys.cpu().numpy()
+        use_torch = True
+    else:
+        bodys_np = bodys
+        use_torch = False
+
+    # Flatten to match double_pendulum_derivs format [theta1, omega1, theta2, omega2]
+    state = np.array([bodys_np[0, 0], bodys_np[0, 1], bodys_np[1, 0], bodys_np[1, 1]])
+
+    # Get derivatives
+    dydt = double_pendulum_derivs(0, state)
+
+    # Extract angular accelerations [alpha1, alpha2]
+    accelerations = np.array([dydt[1], dydt[3]])
+
+    # Convert back to torch if needed
+    if use_torch:
+        accelerations = torch.tensor(accelerations, dtype=torch.float32, device=device)
+
+    return accelerations
+
+
 # --- Analytical Solutions (if applicable) ---
 
 def analytic_sms(bodys, dt, model=None):
@@ -117,6 +146,35 @@ def analytic_sms(bodys, dt, model=None):
         x1 = A_amp * torch.cos(omega_freq * dt_tensor + phi_phase)
         v1 = -A_amp * omega_freq * torch.sin(omega_freq * dt_tensor + phi_phase)
     return torch.stack([x1, v1], dim=-1)
+
+
+def get_qdtt(q, qt, mass=10.0, k=50.0):
+    """
+    Analytic acceleration for a single mass-spring system.
+    Accepts torch or numpy arrays with shape [..., 1].
+    """
+    if isinstance(q, torch.Tensor):
+        return -k * q / mass
+    q = np.asarray(q)
+    return -k * q / mass
+
+
+def get_xt_anal(x, t=None, mass=10.0, k=50.0):
+    """
+    Analytical time derivatives for Single_Mass_Spring trajectories.
+    Returns [dx/dt, dv/dt] for each state in x.
+    """
+    if isinstance(x, torch.Tensor):
+        deriv = torch.zeros_like(x)
+        deriv[..., 0] = x[..., 1]
+        deriv[..., 1] = get_qdtt(x[..., 0], x[..., 1], mass=mass, k=k)
+        return deriv
+
+    x_np = np.asarray(x)
+    deriv = np.zeros_like(x_np)
+    deriv[..., 0] = x_np[..., 1]
+    deriv[..., 1] = get_qdtt(x_np[..., 0], x_np[..., 1], mass=mass, k=k)
+    return deriv
 
 
 def force_cp(bodys, model=None):
@@ -164,6 +222,31 @@ def force_cp(bodys, model=None):
     theta_ddot = theta_ddot_numerator / theta_ddot_denominator
 
     return torch.tensor([x_ddot, theta_ddot], dtype=torch.float32, device=bodys.device)
+
+
+def dH_dq_smp(bodys, mass=10.0, k1=50.0, model=None):
+    """
+    Derivative of potential energy for single-mass-spring Hamiltonian.
+    """
+    return k1 * bodys[:, 0]
+
+
+def dH_dp_smp(bodys, mass=10.0, model=None):
+    """
+    Derivative of kinetic energy for single-mass-spring Hamiltonian.
+    """
+    return bodys[:, 1] / mass
+
+
+def hamiltonian_spring_dynamics(t, coords, mass=10.0, k_spring=50.0):
+    """
+    Simple linear mass-spring Hamiltonian dynamics used for HNN data generation.
+    coords: [q, p] with q = displacement, p = momentum.
+    """
+    q, p = coords
+    dqdt = p / mass
+    dpdt = -k_spring * q
+    return np.array([dqdt, dpdt])
 
 
 def force_cp_controlled(state_and_control, model=None):

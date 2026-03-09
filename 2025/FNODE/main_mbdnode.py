@@ -33,8 +33,8 @@ def parse_arguments():
     parser = argparse.ArgumentParser(description="Main Script for MBDNODE Model")
 
     # Experiment Setup
-    parser.add_argument('--test_case', type=str, default='Cart_Pole',
-                        choices=['Single_Mass_Spring_Damper', 'Slider_Crank',
+    parser.add_argument('--test_case', type=str, default='Single_Mass_Spring',
+                        choices=['Single_Mass_Spring', 'Single_Mass_Spring_Damper', 'Slider_Crank',
                                  'Double_Pendulum', 'Triple_Mass_Spring_Damper', 'Cart_Pole'],
                         help="Dynamical system to simulate.")
     parser.add_argument('--seed', type=int, default=5, help='Global random seed.')
@@ -44,12 +44,15 @@ def parse_arguments():
     # Data Generation
     parser.add_argument('--generate_new_data', action='store_true', default=False,
                         help="Flag to generate new dataset.")
+    parser.add_argument('--gen_ode', type=str, default='analytical',
+                        choices=['rk4', 'analytical', 'rk45'],
+                        help="ODE generation method ('rk4', 'analytical', or 'rk45'). Default changed to 'rk4' to match sbel version.")
     parser.add_argument('--data_dt', type=float, default=0.01, help="Time step for data generation.")
-    parser.add_argument('--data_total_steps', type=int, default=400, help="Total steps for generated data.")
-    parser.add_argument('--train_ratio', type=float, default=0.75, help="Training data ratio (default 0.7).")
+    parser.add_argument('--data_total_steps', type=int, default=3000, help="Total steps for generated data.")
+    parser.add_argument('--train_ratio', type=float, default=0.1, help="Training data ratio (default 0.7).")
 
     # Model Hyperparameters
-    parser.add_argument('--layers', type=int, default=3, help="Number of layers for NN models.")
+    parser.add_argument('--layers', type=int, default=2, help="Number of layers for NN models.")
     parser.add_argument('--hidden_size', type=int, default=256, help="Hidden layer width.")
     parser.add_argument('--activation', type=str, default='tanh', choices=['relu', 'tanh'],
                         help="Activation function.")
@@ -57,20 +60,20 @@ def parse_arguments():
                         help="Weight initializer.")
 
     # Training Hyperparameters
-    parser.add_argument('--epochs', type=int, default=300, help="Number of training epochs.")
+    parser.add_argument('--epochs', type=int, default=10, help="Number of training epochs.")
     parser.add_argument('--batch_size', type=int, default=1, help="Batch size for MBDNODE training (fixed at 1).")
     parser.add_argument('--num_workers', type=int, default=0, help="Number of parallel workers for data loading (use 0 to avoid CUDA issues).")
     parser.add_argument('--verbose', action='store_true', help="Print detailed training progress.")
     parser.add_argument('--early_stop', type=str, default='False', help="Enable early stopping ('True' or 'False').")
     parser.add_argument('--patience', type=int, default=30, help="Patience for early stopping.")
     parser.add_argument('--step_delay', type=int, default=2, help="Number of steps to delay for MBDNODE training.")
-    parser.add_argument('--numerical_methods', type=str, default='rk4', choices=['fe', 'rk4', 'midpoint'],
+    parser.add_argument('--numerical_methods', type=str, default='rk4', choices=['fe', 'rk4', 'midpoint', 'sep_sv', 'yoshida4', 'fukushima6'],
                         help="Numerical method for integration.")
     parser.add_argument('--lr', type=float, default=0.001, help="Learning rate.")
     parser.add_argument('--lr_scheduler', type=str, default='exponential',
                         choices=['exponential', 'step', 'cosine'], help="LR scheduler type.")
     parser.add_argument('--lr_decay_rate', type=float, default=0.98, help="Decay rate for scheduler.")
-    parser.add_argument('--lr_decay_steps', type=int, default=100, help="Step size for StepLR or T_max for CosineAnnealingLR.")
+    parser.add_argument('--lr_decay_steps', type=int, default=10, help="Step size for StepLR or T_max for CosineAnnealingLR.")
 
     # Testing/Plotting
     parser.add_argument('--skip_train', action='store_true', default=False,
@@ -85,6 +88,7 @@ def parse_arguments():
 
 def main():
     args = parse_arguments()
+    start_time = time.time()  # Record start time for timing
 
     # Setup file logging
     log_dir = os.path.join(os.getcwd(), 'log', args.test_case)
@@ -117,6 +121,7 @@ def main():
 
     # Determine system structure
     test_case_config = {
+        "Single_Mass_Spring": (1, 2, 2),
         "Slider_Crank": (1, 2, 2),
         "Single_Mass_Spring_Damper": (1, 2, 2),
         "Double_Pendulum": (2, 2, 4),
@@ -138,7 +143,7 @@ def main():
             )
         else:
             generate_dataset(
-                test_case=args.test_case, numerical_methods="rk4", dt=args.data_dt,
+                test_case=args.test_case, numerical_methods=args.gen_ode, dt=args.data_dt,
                 num_steps=args.data_total_steps, seed=args.seed,
                 gen_train_num_steps=num_steps_train, output_root_dir='.',
                 if_noise=False, save_to_file=True
@@ -179,27 +184,20 @@ def main():
         logger.info("=== MBDNODE Training ===")
         training_start_time = time.time()
 
-        trained_model, loss_history = train_trajectory_MBDNODE(
+        trained_model = train_trajectory_MBDNODE(
             test_case=args.test_case,
             numerical_methods=args.numerical_methods,
             model=model,
             body_tensor=s_train,
-            step_delay=args.step_delay,
             training_size=s_train.shape[0],
+            step_delay=args.step_delay,
             num_epochs=args.epochs,
             dt=args.data_dt,
             device=device,
             verbose=args.verbose,
-            batch_size=args.batch_size,
-            num_workers=args.num_workers,
-            output_paths=output_paths,
-            train_ratio=args.train_ratio,
             lr=args.lr,
             lr_scheduler=args.lr_scheduler,
-            lr_decay_rate=args.lr_decay_rate,
-            lr_decay_steps=args.lr_decay_steps,
-            early_stop=(args.early_stop.lower() == 'true'),
-            patience=args.patience
+            lr_decay_rate=args.lr_decay_rate
         )
 
         total_training_time = time.time() - training_start_time
@@ -336,6 +334,26 @@ def main():
     time_path = os.path.join(output_paths["figures"], f"{args.test_case}_MBDNODE_{args.numerical_methods}_comparison_timeseries_epochs_{args.epochs}.png")
     logger.info(f"Phase space plot: {phase_path}")
     logger.info(f"Time series plot: {time_path}")
+
+    # Add special plotting for Single Mass Spring
+    if args.test_case == 'Single_Mass_Spring':
+        from Model.utils import plot_sms_results
+        logger.info("Generating Single Mass Spring specific plots...")
+        # Convert predictions to numpy for SMS plotting
+        # test_trajectory is [num_steps, num_bodies, 2]
+        pred_traj_np = test_trajectory.reshape(-1, 2).cpu().detach().numpy()
+
+        # Use the unified SMS plotting function
+        plot_sms_results(
+            pred_traj=pred_traj_np,
+            model_type='MBDNODE',
+            training_size=training_size,
+            dt=args.data_dt,
+            output_dir=output_paths['figures'],
+            num_steps_test=len(pred_traj_np),
+            start_time=start_time
+        )
+        logger.info("Single Mass Spring plots generated.")
 
     logger.info("=== MBDNODE Run Complete ===")
 

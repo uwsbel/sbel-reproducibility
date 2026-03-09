@@ -194,6 +194,7 @@ def main():
         if file.endswith('.npy'):
             model_name, train_size, test_size, dt = extract_file_info(file)
             if (model_name is not None and
+                model_name != 'Ground_truth' and  # Exclude ground truth files
                 train_size == target_train_size and
                 test_size == target_test_size and
                 dt == target_dt):

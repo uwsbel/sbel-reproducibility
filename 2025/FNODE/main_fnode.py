@@ -67,25 +67,26 @@ except ImportError as e:
 def parse_arguments():
     parser = argparse.ArgumentParser(description="Main Script for FNODE Model (State-to-Acceleration Mapping)")
 
-    parser.add_argument('--test_case', type=str, default='Double_Pendulum',
-                        choices=['Single_Mass_Spring_Damper', 'Double_Pendulum', 'Triple_Mass_Spring_Damper',
+    parser.add_argument('--test_case', type=str, default='Single_Mass_Spring',
+                        choices=['Single_Mass_Spring', 'Single_Mass_Spring_Damper', 'Double_Pendulum', 'Triple_Mass_Spring_Damper',
                                  'Slider_Crank', 'Cart_Pole'],
                         help="Dynamical system to simulate.")
     parser.add_argument('--seed', type=int, default=42, help='Global random seed.')
     parser.add_argument('--device', type=str, default='cuda' if torch.cuda.is_available() else 'cpu',
                         help="Computation device.")
-    parser.add_argument('--generate_new_data', action='store_true', default=False, help="Flag to generate new dataset.")
+    parser.add_argument('--generate_new_data', action='store_true', default=True, help="Flag to generate new dataset.")
     parser.add_argument('--data_dt', type=float, default=0.01, help="Time step for data generation.")
-    parser.add_argument('--data_total_steps', type=int, default=400,
+    parser.add_argument('--data_total_steps', type=int, default=8000,
                         help="Total steps for the FIRST generated trajectory (train+test). Additional trajectories use train portion length.")
-    parser.add_argument('--data_train_split', type=float, default=3/4,
-                        help="Fraction of FIRST trajectory for its training segment. Defines segment length.")
+    parser.add_argument('--data_generation_method', type=str, default='analytical',
+                        choices=['rk4', 'analytical', 'rk45'],
+                        help="Method for generating training data ('rk4', 'analytical', or 'rk45'). Default is 'rk4'.")
 
     # NEW: prob parameter for FFT truncation
-    parser.add_argument('--prob', type=int, default=100,
+    parser.add_argument('--prob', type=int, default=50,
                         help="Probability factor for FFT truncation. Used to calculate trunc = train_time_step//prob")
 
-    parser.add_argument('--layers', type=int, default=3, help="Number of layers for FNODE (input + hidden + output).")
+    parser.add_argument('--layers', type=int, default=2, help="Number of layers for FNODE (input + hidden + output).")
     parser.add_argument('--hidden_size', type=int, default=256, help="Hidden layer width for FNODE.")
     parser.add_argument('--activation', type=str, default='tanh', choices=['relu', 'tanh'], help="Activation function.")
     parser.add_argument('--initializer', type=str, default='xavier', choices=['xavier', 'kaiming'],
@@ -93,28 +94,53 @@ def parse_arguments():
     parser.add_argument('--d_interest', type=int, default=0,
                         help="Extra input features for FNODE. MUST BE 0 for state -> (a1,a2) mapping.")
 
-    parser.add_argument('--epochs', type=int, default=400, help="Number of training epochs.")
+    parser.add_argument('--epochs', type=int, default=450, help="Number of training epochs.")
     parser.add_argument('--early_stop', type=str, default='False',
                         help="Enable early stopping ('True' or 'False').")
     parser.add_argument('--patience', type=int, default=50,
                         help="Patience for early stopping (number of epochs without improvement).")
-    parser.add_argument('--lr', type=float, default=1e-3, help="Learning rate.")
-    parser.add_argument('--optimizer', type=str, default='adamw', choices=['adam', 'adamw'], help="Optimizer.")
+    parser.add_argument('--lr', type=float, default=1e-4, help="Learning rate.")
+    parser.add_argument('--optimizer', type=str, default='adam', choices=['adam', 'adamw'], help="Optimizer.")
     parser.add_argument('--lr_scheduler', type=str, default='exponential', choices=['none', 'exponential', 'step', 'cosine'],
                         help="LR scheduler.")
     parser.add_argument('--lr_decay_rate', type=float, default=0.98, help="Decay rate for schedulers.")
     parser.add_argument('--lr_decay_steps', type=int, default=1, help="Step size or T_max for schedulers.")
-    parser.add_argument('--out_time_log', type=int, default=10, help="Log training progress every N epochs.")
+    parser.add_argument('--out_time_log', type=int, default=1, help="Log training progress every N epochs.")
     parser.add_argument('--save_ckpt_freq', type=int, default=0, help="Save checkpoint every N epochs (0 to disable).")
 
     parser.add_argument('--fnode_loss_type', type=str, default='derivative', choices=['derivative'],
                         help="Loss type for FNODE. MUST be 'derivative' for state->acceleration mapping.")
-    parser.add_argument('--fnode_use_hybrid_target', action='store_true', default=False,
-                        help="Use hybrid FFT-FD target.")
+    parser.add_argument('--fnode_target_fd_order', type=int, default=2,
+                        help="Order for Finite Difference target derivative.")
+    parser.add_argument('--fnode_fd_drop_tail', type=int, default=0,
+                        help="For pure FD targets, drop last N training points to avoid boundary FD artifacts.")
+    parser.add_argument(
+        '--fnode_accel_mtd',
+        type=str,
+        default='fft',
+        choices=['fft', 'fd', 'analytical'],
+        help="How to generate FNODE acceleration targets: 'fft', 'fd', or 'analytical'.",
+    )
 
-    parser.add_argument('--ode_method', type=str, default="rk4", help="ODE solver for testing.")
-    parser.add_argument('--ode_rtol', type=float, default=1e-7, help="Relative tolerance for ODE solver (testing).")
-    parser.add_argument('--ode_atol', type=float, default=1e-9, help="Absolute tolerance for ODE solver (testing).")
+    parser.add_argument('--ode_method', type=str, default="dopri5",
+                       choices=['rk4', 'dopri5', 'stormer_verlet', 'yoshida4', 'fukushima6'],
+                       help="ODE solver or symplectic integrator for testing.")
+    parser.add_argument('--ode_rtol', type=float, default=1e-10, help="Relative tolerance for ODE solver (testing).")
+    parser.add_argument('--ode_atol', type=float, default=1e-12, help="Absolute tolerance for ODE solver (testing).")
+
+    parser.add_argument('--zero_v', action='store_true', default=False,
+                       help="Zero out velocity components in training data for position-only learning. "
+                            "Only effective for Single_Mass_Spring with symplectic integrators.")
+
+    parser.add_argument(
+        '--symplectic_use_analytic_dh',
+        action='store_true',
+        default=False,
+        help=(
+            "(Debug) For Single_Mass_Spring with symplectic integrators, bypass FNODE_Hamiltonian_Wrapper and use "
+            "analytical dH_dq_smp/dH_dp_smp from Model.force_fun. This ignores the trained model during rollout."
+        ),
+    )
 
     parser.add_argument('--plot_bodies', type=int, default=0, help="Max bodies for plots (0 for all).")
     parser.add_argument('--skip_train', action='store_true', default=False, help="Skip training, load model and test.")
@@ -122,9 +148,12 @@ def parse_arguments():
 
     # DataLoader and train/val/test split parameters
     parser.add_argument('--num_workers', type=int, default=0, help="Number of parallel workers for data loading.")
-    parser.add_argument('--train_ratio', type=float, default=0.75, help="Training set ratio.")
+    parser.add_argument('--train_ratio', type=float, default=0.1, help="Training set ratio.")
     parser.add_argument('--val_ratio', type=float, default=0, help="Validation set ratio (0 = no validation).")
 
+    # Slider Crank specific parameters
+    parser.add_argument('--slider_crank_r', type=float, default=1.0, help="Crank length (radius) for Slider Crank.")
+    parser.add_argument('--slider_crank_l', type=float, default=2.0, help="Rod length for Slider Crank.")
 
     args = parser.parse_args()
     args.model_type = 'FNODE'
@@ -141,23 +170,26 @@ def parse_arguments():
 # --- Main Execution ---
 def main():
     args = parse_arguments()
+    start_time = time.time()  # Record start time for timing calculations
 
     # --- Setup File Logging ---
     base_log_dir = os.path.join(os.getcwd(), 'log')
     log_directory = os.path.join(base_log_dir, args.test_case)
     os.makedirs(log_directory, exist_ok=True)
     log_file_path = os.path.join(log_directory, 'fnode.log')
+
     # Reconfigure logging with file output
     setup_logging(log_file_path)
     logger = logging.getLogger("FNODE_Main")
 
     # Fixed parameters for each test case: (weight_decay, grad_clip)
     test_case_params = {
+        'Single_Mass_Spring': (1e-3, 1.0),
         'Single_Mass_Spring_Damper': (9e-5, 0.3),
         'Double_Pendulum': (5e-4, 1.0),
         'Triple_Mass_Spring_Damper': (5e-5, 1.0),
-        'Slider_Crank': (1e-5, 1.0),
-        'Cart_Pole': (1e-3, 1.0)
+        'Slider_Crank': (1e-4, 1.0),
+        'Cart_Pole': (1e-5, 1.0)
     }
  
     weight_decay, grad_clip = test_case_params[args.test_case]
@@ -168,7 +200,28 @@ def main():
 
     set_seed(args.seed)
     current_device = torch.device(args.device)
-    output_paths = get_output_paths(args.test_case, args.model_type)
+
+    # Validate analytical method is only used for supported test cases
+    analytical_supported_cases = ['Single_Mass_Spring', 'Single_Mass_Spring_Damper',
+                                 'Triple_Mass_Spring_Damper']
+    if args.data_generation_method == 'analytical' and args.test_case not in analytical_supported_cases:
+        logger.warning(f"Analytical method not fully supported for {args.test_case}, falling back to rk4")
+        args.data_generation_method = 'rk4'
+
+    # Modify model type to include integrator for symplectic methods
+    model_type_for_paths = args.model_type
+    if args.ode_method == 'stormer_verlet':
+        model_type_for_paths = 'FNODE_LF'  # Leapfrog/Störmer-Verlet
+    elif args.ode_method == 'yoshida4':
+        model_type_for_paths = 'FNODE_yoshida4'
+    elif args.ode_method == 'fukushima6':
+        model_type_for_paths = 'FNODE_fukushima6'
+    elif args.ode_method == 'dopri5':
+        model_type_for_paths = 'FNODE_dopri5'
+    else:  # rk4 or default
+        model_type_for_paths = 'FNODE'
+
+    output_paths = get_output_paths(args.test_case, model_type_for_paths)
 
     logger.info(f"Using device: {current_device}")
     logger.info(f"Output paths: {output_paths}")
@@ -210,11 +263,16 @@ def main():
 
         if args.test_case == "Slider_Crank":
             slider_crank_args = {
-                'total_num_steps': args.data_total_steps * 10,
-                'train_num_steps': num_steps_for_train_segment * 10
+                'total_num_steps': args.data_total_steps,
+                'train_num_steps': num_steps_for_train_segment
             }
             try:
-                _ = generate_slider_crank_dataset(**slider_crank_args)
+                _ = generate_slider_crank_dataset(
+                    **slider_crank_args,
+                    dt=args.data_dt,
+                    root_dir='.',
+                    seed=args.seed,
+                )
                 logger.info(f"Slider-Crank dataset generation complete.")
             except Exception as gen_err:
                 logger.error(f"Slider-Crank dataset generation failed: {gen_err}", exc_info=True)
@@ -223,12 +281,13 @@ def main():
             # Use standard dataset generation for other test cases
             data_gen_kwargs_standard = {
                 'gen_train_num_steps': num_steps_for_train_segment,
+                'train_split_ratio': args.train_ratio,  # Pass the actual split ratio
                 'output_root_dir': '.',
                 'save_to_file': True
             }
             try:
                 generate_dataset(
-                    test_case=args.test_case, numerical_methods="rk4", dt=args.data_dt,
+                    test_case=args.test_case, numerical_methods=args.data_generation_method, dt=args.data_dt,
                     num_steps=args.data_total_steps, seed=args.seed, **data_gen_kwargs_standard
                 )
                 logger.info(f"Standard dataset generation complete for {args.test_case}.")
@@ -241,6 +300,7 @@ def main():
     # Data Loading
     try:
         s_train_df = pd.read_csv(required_s_train_file)
+        # Time files now have headers after the fix in Data_generator.py
         t_train_df = pd.read_csv(required_t_train_file)
         s_test_df = pd.read_csv(os.path.join(dataset_path, "s_test.csv"))
         t_test_df = pd.read_csv(os.path.join(dataset_path, "t_test.csv"))
@@ -330,7 +390,7 @@ def main():
         args.test_case,
         num_bodies,
         args,
-        output_paths["results"]
+        dataset_path
     )
 
     if selected_target_csv_path is None:
@@ -361,13 +421,17 @@ def main():
             'outime_log': args.out_time_log,
             'save_ckpt_freq': args.save_ckpt_freq,
             'fnode_loss_type': args.fnode_loss_type,
-            'fnode_use_hybrid_target': args.fnode_use_hybrid_target,
+            'fnode_accel_mtd': args.fnode_accel_mtd,
+            'fnode_fd_drop_tail': args.fnode_fd_drop_tail,
             'prob': args.prob,  # Pass prob parameter to training
             'num_workers': args.num_workers,  # Add batch size parameter
             'train_ratio': args.train_ratio,  # Add train ratio
             'val_ratio': 0,  # No validation set
             'early_stop': args.early_stop.lower() == 'true',  # Convert string to boolean
-            'patience': args.patience
+            'patience': args.patience,
+            'batch_size': 1,  # Batch size for training
+            'zero_v': args.zero_v,  # Pass zero_v flag to training
+            'test_case': args.test_case  # Pass test_case for potential use in training
         }
 
         logger.info(f"Training parameters: {train_params}")
@@ -435,22 +499,29 @@ def main():
             return
         logger.info(f"Successfully loaded best model from {best_model_path}")
 
+    # Sizes are still needed later for metrics/logging.
+    train_data_size = s_train_tensor.shape[0]
+    test_data_size = s_test_tensor.shape[0]
+    full_data_size = s_full_tensor.shape[0]
+
     # --- Testing ---
     logger.info("=== FNODE Testing ===")
     fnode_model.eval()
-
-    # Define data sizes for metrics (needed regardless of training or loading)
-    train_data_size = s_train_tensor.shape[0]
-    test_data_size = s_test_tensor.shape[0] if s_test_tensor is not None else 0
-    full_data_size = s_full_tensor.shape[0]
 
     # Get initial state for testing
     s0_for_test = s_train_tensor[0:1]
     logger.info(f"Initial state for testing: {s0_for_test.cpu().numpy()}")
 
     # Configure ODE parameters
+    # NOTE: `Model.model.test_fnode()` currently keys off `ode_method` (default: rk4).
+    # Keep a nested dict too for backwards compatibility with older call sites.
     test_ode_params = {
-        'ode_solver_params': {'method': args.ode_method, 'rtol': args.ode_rtol, 'atol': args.ode_atol}
+        'ode_method': args.ode_method,
+        'rtol': args.ode_rtol,
+        'atol': args.ode_atol,
+        'ode_solver_params': {'method': args.ode_method, 'rtol': args.ode_rtol, 'atol': args.ode_atol},
+        'test_case': args.test_case,
+        'symplectic_use_analytic_dh': bool(args.symplectic_use_analytic_dh),
     }
 
     # Generate trajectory predictions
@@ -478,24 +549,26 @@ def main():
 
     # Calculate MSE metrics - ensure tensors are on same device
     try:
-        full_mse = torch.mean((predictions_eval - ground_truth_eval.to(predictions_eval.device)) ** 2).item()
+        gt_eval_on_pred_device = ground_truth_eval.to(predictions_eval.device)
+
+        full_mse = torch.mean((predictions_eval - gt_eval_on_pred_device) ** 2).item()
 
         train_end_idx = min(actual_train_size, min_len)
-        train_mse = torch.mean((predictions_eval[:train_end_idx] - ground_truth_eval[:train_end_idx].to(predictions_eval.device)) ** 2).item()
+        train_mse = torch.mean((predictions_eval[:train_end_idx] - gt_eval_on_pred_device[:train_end_idx]) ** 2).item()
 
         if min_len > train_end_idx:
-            test_mse = torch.mean((predictions_eval[train_end_idx:] - ground_truth_eval[train_end_idx:].to(predictions_eval.device)) ** 2).item()
+            test_mse = torch.mean((predictions_eval[train_end_idx:] - gt_eval_on_pred_device[train_end_idx:]) ** 2).item()
         else:
             test_mse = float('nan')
 
         logger.info("=" * 70)
         logger.info("TEST MSE METRICS:")
-        logger.info(f"Overall MSE (FNODE vs GT, {full_data_size} steps): {full_mse:.6e}")
+        eval_len = min_len
+        logger.info(f"Overall MSE (FNODE vs GT, {eval_len} steps): {full_mse:.6e}")
         logger.info(f"Train Region MSE (first {train_data_size} steps): {train_mse:.6e}")
-        logger.info(f"Extrapolation Region MSE (steps {train_data_size} to {full_data_size}): {test_mse:.6e}")
+        logger.info(f"Extrapolation Region MSE (steps {train_data_size} to {eval_len}): {test_mse:.6e}")
         logger.info("=" * 70)
 
-        # Save metrics
         metrics_to_save = {
             'full_mse': [full_mse],
             'train_mse': [train_mse],
@@ -503,17 +576,16 @@ def main():
         }
         save_data_pd(metrics_to_save, output_paths["results"], f"{args.model_type}_test_metrics.csv")
 
-        # Save training time and MSE results to CSV
         if 'training_time_data' in locals():
             training_results_csv = os.path.join(output_paths["results"], "training_results.csv")
             import csv
             with open(training_results_csv, 'w', newline='') as f:
                 writer = csv.writer(f)
                 writer.writerow(['Model', 'Dataset', 'Training_Time_Seconds', 'Train_Size', 'Test_Size',
-                               'Overall_MSE', 'Train_MSE', 'Test_MSE'])
+                                 'Overall_MSE', 'Train_MSE', 'Test_MSE'])
                 writer.writerow(['FNODE', args.test_case, training_time_data['training_time'],
-                               training_time_data['train_size'], training_time_data['test_size'],
-                               full_mse, train_mse, test_mse])
+                                 training_time_data['train_size'], training_time_data['test_size'],
+                                 full_mse, train_mse, test_mse])
 
     except Exception as eval_err:
         logger.error(f"Error during metrics calculation: {eval_err}", exc_info=True)
@@ -538,6 +610,28 @@ def main():
 
         save_data_pd(results_df, output_paths["results"], f"{args.model_type}_predictions_vs_truth.csv")
         logger.info("Prediction results saved successfully")
+
+        # Save predictions as .npy for plot_all_models_sms.py compatibility
+        # Determine the file prefix based on integrator
+        if args.ode_method == 'stormer_verlet':
+            file_prefix = 'FNODE_LF'  # Use LF for Leapfrog/Störmer-Verlet
+        elif args.ode_method == 'yoshida4':
+            file_prefix = 'FNODE_yoshida4'
+        elif args.ode_method == 'fukushima6':
+            file_prefix = 'FNODE_fukushima6'
+        elif args.ode_method == 'dopri5':
+            file_prefix = 'FNODE_dopri5'
+        else:  # rk4 or default
+            file_prefix = 'FNODE'
+
+        # Save with proper naming convention for plot_all_models_sms.py
+        npy_filename = f"{file_prefix}_prediction_{actual_train_size}_{predictions_eval.shape[0]}_{args.data_dt}.npy"
+        npy_filepath = os.path.join(output_paths["results"], npy_filename)
+
+        # Save predictions in [time, 2] format for Single Mass Spring
+        # pred_np is already in the correct format
+        np.save(npy_filepath, pred_np)
+        logger.info(f"Saved .npy predictions to: {npy_filename}")
     except Exception as save_err:
         logger.error(f"Error saving prediction results: {save_err}", exc_info=True)
 
@@ -595,6 +689,24 @@ def main():
         )
         logger.info("Acceleration comparison plots generated.")
 
+        # Add special plotting for Single Mass Spring
+        if args.test_case == 'Single_Mass_Spring':
+            logger.info("Generating Single Mass Spring specific plots...")
+            # Convert predictions to numpy for SMS plotting
+            pred_traj_np = predictions_eval.detach().cpu().numpy()
+
+            # Use the unified SMS plotting function
+            plot_sms_results(
+                pred_traj=pred_traj_np,
+                model_type=args.model_type,
+                training_size=actual_train_size,
+                dt=args.data_dt,
+                output_dir=output_paths['figures'],
+                num_steps_test=min_len,
+                start_time=start_time
+            )
+            logger.info("Single Mass Spring plots generated.")
+
     except Exception as vis_err:
         logger.error(f"Error during visualization: {vis_err}", exc_info=True)
 
@@ -615,13 +727,14 @@ def main():
     logger.info(f"Prob parameter: {args.prob}")
 
     # Determine which target method was used
-    target_method = "Unknown"
-    if "analytical_accelerations.csv" in selected_target_csv_path:
-        target_method = "Analytical"
-    elif "hybrid_target.csv" in selected_target_csv_path:
-        target_method = "Hybrid FFT-FD"
-    elif "fd_target.csv" in selected_target_csv_path:
-        target_method = "Finite Difference"
+    target_method = args.fnode_accel_mtd
+    if selected_target_csv_path:
+        if os.path.basename(selected_target_csv_path) == "analytical_target.csv":
+            target_method = "analytical"
+        elif os.path.basename(selected_target_csv_path) == "fft_target.csv":
+            target_method = "fft"
+        elif os.path.basename(selected_target_csv_path) == "fd_target.csv":
+            target_method = "fd"
     logger.info(f"Target Method Used: {target_method}")
 
     try:

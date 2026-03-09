@@ -32,7 +32,7 @@ def parse_arguments():
 
     # Experiment Setup
     parser.add_argument('--test_case', type=str, default='Single_Mass_Spring_Damper',
-                        choices=['Single_Mass_Spring_Damper', 'Slider_Crank',
+                        choices=['Single_Mass_Spring', 'Single_Mass_Spring_Damper', 'Slider_Crank',
                                  'Double_Pendulum', 'Triple_Mass_Spring_Damper', 'Cart_Pole'],
                         help="Dynamical system to simulate.")
     parser.add_argument('--seed', type=int, default=42, help='Global random seed.')
@@ -40,14 +40,17 @@ def parse_arguments():
                         help="Computation device.")
 
     # Data Generation
-    parser.add_argument('--generate_new_data', action='store_true', default=False,
+    parser.add_argument('--generate_new_data', action='store_true', default=True,
                         help="Flag to generate new dataset.")
     parser.add_argument('--data_dt', type=float, default=0.01, help="Time step for data generation.")
     parser.add_argument('--data_total_steps', type=int, default=400, help="Total steps for generated data.")
     parser.add_argument('--train_ratio', type=float, default=0.75, help="Training data ratio.")
+    parser.add_argument('--data_generation_method', type=str, default='analytical',
+                        choices=['rk4', 'analytical', 'rk45'],
+                        help="Method for generating training data ('rk4', 'analytical', or 'rk45').")
 
     # Model Hyperparameters
-    parser.add_argument('--layers', type=int, default=3, help="Number of LSTM layers.")
+    parser.add_argument('--layers', type=int, default=2, help="Number of LSTM layers.")
     parser.add_argument('--hidden_size', type=int, default=256, help="LSTM hidden size.")
     parser.add_argument('--lstm_dropout', type=float, default=0.0, help="Dropout rate for LSTM.")
     parser.add_argument('--lstm_seq_len', type=int, default=16, help="Input sequence length for LSTM.")
@@ -72,6 +75,7 @@ def parse_arguments():
 
 def main():
     args = parse_arguments()
+    start_time = time.time()  # Record start time for timing
 
     # Setup file logging
     log_dir = os.path.join(os.getcwd(), 'log', args.test_case)
@@ -94,6 +98,13 @@ def main():
     os.makedirs(output_paths["results"], exist_ok=True)
     os.makedirs(output_paths["figures"], exist_ok=True)
 
+    # Validate analytical method is only used for supported test cases
+    analytical_supported_cases = ['Single_Mass_Spring', 'Single_Mass_Spring_Damper',
+                                 'Triple_Mass_Spring_Damper']
+    if args.data_generation_method == 'analytical' and args.test_case not in analytical_supported_cases:
+        logger.warning(f"Analytical method not fully supported for {args.test_case}, falling back to rk4")
+        args.data_generation_method = 'rk4'
+
     # Data Generation/Loading
     dataset_path = os.path.join('.', 'dataset', args.test_case)
     s_train_file = os.path.join(dataset_path, "s_train.csv")
@@ -110,7 +121,7 @@ def main():
             )
         else:
             generate_dataset(
-                test_case=args.test_case, numerical_methods="rk4", dt=args.data_dt,
+                test_case=args.test_case, numerical_methods=args.data_generation_method, dt=args.data_dt,
                 num_steps=args.data_total_steps, seed=args.seed,
                 gen_train_num_steps=num_steps_train, output_root_dir='.',
                 save_to_file=True
@@ -327,6 +338,25 @@ def main():
     time_path = os.path.join(output_paths["figures"], f"{args.test_case}_LSTM_comparison_timeseries_epochs_{args.epochs}.png")
     logger.info(f"Phase space plot: {phase_path}")
     logger.info(f"Time series plot: {time_path}")
+
+    # Add special plotting for Single Mass Spring
+    if args.test_case == 'Single_Mass_Spring':
+        from Model.utils import plot_sms_results
+        logger.info("Generating Single Mass Spring specific plots...")
+        # Convert predictions to numpy for SMS plotting
+        pred_traj_np = predictions.cpu().detach().numpy()
+
+        # Use the unified SMS plotting function
+        plot_sms_results(
+            pred_traj=pred_traj_np,
+            model_type='LSTM',
+            training_size=training_size,
+            dt=args.data_dt,
+            output_dir=output_paths['figures'],
+            num_steps_test=len(pred_traj_np),
+            start_time=start_time
+        )
+        logger.info("Single Mass Spring plots generated.")
 
     logger.info("=== LSTM Run Complete ===")
 

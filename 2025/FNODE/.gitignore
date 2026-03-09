@@ -1,50 +1,58 @@
-# Python cache files
+# Python bytecode cache
 __pycache__/
 *.py[cod]
 *$py.class
-*.so
-.Python
 
-# IDE and editor files
-.idea/
-.claude/
+# Node.js dependencies
+node_modules/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment variables
+.env
+
+# Build output
+dist/
+build/
+
+# Dependency directories
+jspm_packages/
+
+# IDE files
 .vscode/
-*.swp
-*.swo
-*~
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# OS files
 .DS_Store
-
-# Project-specific directories
-accel_analysis/
+Thumbs.db
+*.pdf
+figures/
 dataset/
-log/
-mpc_cartdp/
-saved_model/
 results/
+saved_model/
+log/
 
-# Project-specific figures
-figures/Cart_Pole/
-figures/Cart_Pole_Controlled/
-figures/Double_Pendulum/
-figures/Slider_Crank/
-figures/Single_Mass_Spring_Damper/
-figures/Triple_Mass_Spring_Damper/
+main_fnode_accel_dt.py
+main_fnode_error.py
+main_fnode_dt.py
+noise_test.py
 
-# Project-specific files
-main_accel.py
-
-# JetBrains IDE specific (legacy, covered by .idea/ above)
-shelf/
-workspace.xml
-httpRequests/
-dataSources/
-dataSources.local.xml
+Model/slider_crank.py
+Model/slider_crank_bb.py
 
 mpc_cartpole/results_baseline/
 mpc_cartpole/results_fnode/
-mpc_cartpole/*.png
 
-accel_comparison/
+friction.py
 
-plot.sh
-sc.sh
+main_fnode_veh.py

@@ -1,0 +1,10 @@
+python figures/plot_cp_phase.py
+python figures/plot_cp_xvt.py
+python figures/plot_dp_phase.py
+python figures/plot_dp_xvt.py
+python figures/plot_sc_phase.py
+python figures/plot_sc_xvt.py
+python figures/plot_smsd_phase.py
+python figures/plot_smsd_xvt.py
+python figures/plot_tmsd_phase.py
+python figures/plot_tmsd_xvt.py
