@@ -683,6 +683,9 @@ def train_fnode_with_csv_targets(model, s_train, t_train, train_params, optimize
     if model.d_interest == 0:
         # Pure state input
         model_input = s_train_effective
+    elif s_train_effective.shape[-1] == model.dim_input:
+        # State already includes d_interest features (e.g. friction parameter)
+        model_input = s_train_effective
     else:
         # State + additional features (e.g., time)
         time_feature = t_train_effective.unsqueeze(-1)

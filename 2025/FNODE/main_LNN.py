@@ -33,8 +33,8 @@ def parse_arguments():
     parser.add_argument('--test_case', type=str, default='Single_Mass_Spring',
                         choices=['Single_Mass_Spring', 'Single_Mass_Spring_Damper', 'Single_Mass_Spring_Symplectic'],
                         help="Dynamical system to simulate.")
-    parser.add_argument('--generation_method', type=str, default='hf',
-                        choices=['hf', 'rk4', 'fe', 'sep_sv', 'yoshida4', 'fukushima6'],
+    parser.add_argument('--generation_method', type=str, default='analytical',
+                        choices=['analytical', 'rk4'],
                         help="Integrator used to generate training data.")
     parser.add_argument('--dt', type=float, default=0.01, help="Time step for training data.")
     parser.add_argument('--num_steps', type=int, default=3000, help="Total steps for generated trajectory.")
@@ -87,7 +87,11 @@ def main():
     derivatives_np = get_xt_anal(trajectory.clone().cpu().numpy(), t_full.cpu().numpy())
     derivatives = torch.tensor(derivatives_np, dtype=torch.float32, device=device)
 
-    num_bodys = trajectory.shape[1]
+    # trajectory shape: [num_bodies, num_steps, 2]; train_lnn expects [num_steps, num_bodies, 2]
+    # Ensure float32 to match LNN model (avoids "mat1 and mat2 must have the same dtype" error)
+    trajectory_permuted = trajectory.permute(1, 0, 2).float()  # -> [num_steps, num_bodies, 2]
+    derivatives_permuted = derivatives.permute(1, 0, 2)  # -> [num_steps, num_bodies, 2]
+    num_bodys = trajectory.shape[0]  # number of bodies, not steps
     model = LNN(num_bodys=num_bodys).to(device)
     calculate_model_parameters(model)
 
@@ -100,7 +104,7 @@ def main():
             'training_size': args.training_size
         }
         logger.info(f"Training LNN for {args.num_epochs} epochs on {args.training_size} steps.")
-        train_lnn(model, trajectory.to(device), derivatives, train_params, optimizer, scheduler, output_paths)
+        train_lnn(model, trajectory_permuted.to(device), derivatives_permuted, train_params, optimizer, scheduler, output_paths)
         save_model_state(model, output_paths["model"], model_filename="LNN_final.pkl")
     else:
         loaded = load_model_state(model, output_paths["model"], model_filename=args.model_load_filename,
@@ -109,8 +113,8 @@ def main():
             logger.error("Requested skip_train but no checkpoint was found.")
             return
 
-    # Testing rollout
-    initial_state = trajectory[0, :, :].to(device)
+    # Testing rollout: state at t=0 (trajectory shape [num_bodies, num_steps, 2])
+    initial_state = trajectory[:, 0, :].to(device)
     t_eval = torch.linspace(0, args.dt_test * (args.num_steps_test - 1), args.num_steps_test)
     pred_traj = test_lnn(model, initial_state, t_eval.cpu().numpy())
 
