@@ -353,7 +353,7 @@ def main():
     # Configuration
     c_friction = 0.6  # Friction coefficient
     num_layers_list = [2, 3, 4, 5, 6]  # Different architectures to test
-    skip_train = True  # Skip training and load existing models
+    skip_train = False  # Skip training and load existing models
 
     # Hyperparameters from main_fnode_fric.py
     batch_size = 16
@@ -466,6 +466,14 @@ def main():
     print("="*80)
 
     predictions, errors = evaluate_models(trained_models, state_data, fd_accelerations, device)
+
+    if not errors:
+        print("\n" + "="*80)
+        print("No models available for evaluation.")
+        print("If using --skip_train, ensure model files exist in saved_models/")
+        print("(e.g., sc_accel_layers_2.pth, sc_accel_layers_4.pth, etc.)")
+        print("="*80)
+        return
 
     # Step 5: Plot results
     print("\nGenerating comparison plots...")
