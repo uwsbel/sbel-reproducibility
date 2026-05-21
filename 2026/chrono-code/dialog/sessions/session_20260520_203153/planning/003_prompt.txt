@@ -1,0 +1,12 @@
+# Agent: PlanningAgent
+# Timestamp: 2026-05-20T20:37:39.752845
+# Metadata: {
+  "system_message": true,
+  "temperature": 1.0,
+  "parse_json": false,
+  "has_images": false,
+  "attempt": 1
+}
+################################################################################
+
+Output the finalized plan markdown now.

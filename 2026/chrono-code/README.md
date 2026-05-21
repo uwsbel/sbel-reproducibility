@@ -1,218 +1,81 @@
-# README.md
+# Chrono-Code
 
-This file provides guidance when working with code in this repository.
+Chrono-Code is a multi-agent system that turns natural-language descriptions into runnable [PyChrono](https://projectchrono.org/pychrono/) physics simulations. Four LLM agents (planning, code generation, execution, visual review) cooperate in an async pipeline that loops on failure.
 
-## What This Project Does
+## Install
 
-Chrono-Agent-Claude is a multi-agent system that translates natural language descriptions into executable PyChrono physics simulations. It uses the Anthropic Claude SDK directly (no LangGraph/LangChain) with four specialized agents: Planning, Code Generation, Execution, and Visual Review.
+### 1. PyChrono (required)
 
-This is a fork of [Chrono-Agent](../Chrono-Agent/) rebuilt on the native Claude SDK.
+`pychrono` is **not on PyPI** — it ships only via the `projectchrono` conda channel. See the official guide: <https://api.projectchrono.org/pychrono_installation.html>.
 
-## Commands
-
-### Install
-
-`pychrono` is **not on PyPI** — it is only distributed via the `projectchrono`
-conda channel. We therefore offer two installation paths, mirroring
-[chrono-ray](../chrono-ray/ReadMe.md).
-
-#### System requirements (sensor module)
-
-The example scenes (e.g. `prompts/assets_robot/`) and the bundled
-`history/iteration_*/simulation.py` files use `pychrono.sensor`, which
-links against NVIDIA OptiX at runtime. The conda-distributed
-`projectchrono::pychrono >= 10.0.0` is built against **OptiX 9.1**, which
-requires an **NVIDIA driver R590 or newer**.
-
-Check your driver:
+Quick install:
 ```bash
-nvidia-smi | head -3
+conda install -c projectchrono pychrono
 ```
-If `Driver Version` is below `590`, upgrade before continuing. On a driver
-older than R590 you will see:
-```
-OPTIX_ERROR_UNSUPPORTED_ABI_VERSION: Unsupported ABI version
-```
-the first time anything constructs `ChOptixEngine` (camera / lidar / radar).
 
-References:
-- [Chrono::Sensor installation](https://api.projectchrono.org/module_sensor_installation.html)
-- [OptiX 9.1 release notes — R590 driver required](https://videocardz.com/newz/nvidia-optix-9-1-0-released-r590-driver-required-optix-6-no-longer-supported)
+> **Sensor module note.** Demos under `prompts/` use `pychrono.sensor`, which links against NVIDIA OptiX 9.1 and requires NVIDIA driver **R590+**. Older drivers fail with `OPTIX_ERROR_UNSUPPORTED_ABI_VERSION` the first time a camera/lidar is created. Check with `nvidia-smi | head -3`. Reference: <https://api.projectchrono.org/module_sensor_installation.html>.
 
-#### Option 1 — You already have PyChrono
+### 2. chrono-code
 
-Use this if `pychrono` is already importable in your active environment.
-
+**Option A — you already have PyChrono.** Install into your active environment:
 ```bash
 python -m pip install -e .
 ```
 
-This installs `chrono-agent` and its remaining PyPI dependencies in-place.
-Use `python -m pip` (not bare `pip`) so the install targets the active
-Python; a stray `~/.local/bin/pip` on `PATH` will otherwise write into the
-system Python.
+**Option B — start fresh.** Build the bundled conda env:
+```bash
+conda env create -f environment.yml
+conda activate chrono-code
+python -m pip install -e .
+```
 
-#### Option 2 — You need everything (including PyChrono)
+> Open a new terminal first and `conda deactivate` until no other Chrono env is active — stray `PYTHONPATH` / `LD_LIBRARY_PATH` entries from a previous PyChrono install can cause `ImportError: undefined symbol` against the new `_core.so`.
 
-Use this if you are starting fresh. This creates a full conda environment
-(`chrono-code`) with PyChrono and all dependencies.
+Sanity check:
+```bash
+python -c "import pychrono.core, chrono_code; print('ok')"
+```
 
-> **Start from a clean shell.** Open a new terminal and ensure no other
-> Chrono-related conda env is active (`conda deactivate` until you're back
-> at `base` or no env). Some Chrono installs ship activate scripts that
-> prepend `PYTHONPATH` / `LD_LIBRARY_PATH` / `LD_PRELOAD` to point at their
-> own `pychrono` build; those entries can leak into the next env you
-> activate and cause `ImportError: ... undefined symbol` from a mismatched
-> `_core.so`. Verify with `echo $PYTHONPATH $LD_LIBRARY_PATH $LD_PRELOAD` —
-> all three should be empty (or at least free of any chrono path) before
-> proceeding.
-
-1. Create the environment (miniconda or equivalent required):
-   ```bash
-   conda env create -f environment.yml
-   ```
-2. Activate it:
-   ```bash
-   conda activate chrono-code
-   ```
-3. Install chrono-agent (use `python -m pip` to make sure pip targets the
-   conda env, not a system-wide pip on `PATH`):
-   ```bash
-   python -m pip install -e .
-   ```
-4. Sanity-check the install:
-   ```bash
-   python -c "import pychrono.core, pychrono.sensor, chrono_agent; print('ok')"
-   ```
-   If this raises `OPTIX_ERROR_UNSUPPORTED_ABI_VERSION`, your NVIDIA driver
-   is older than R590 — see *System requirements* above.
-
-### Run
-
-Make sure `conda activate chrono-code` (or whatever env you installed into)
-is active in the current shell — every command below runs in that env.
+### 3. API keys
 
 ```bash
-chrono-agent generate "Simulate a bouncing ball"
-python -m chrono_agent.main generate --mode detailed "Double pendulum"
+cp .env.example .env
 ```
+Then fill in the providers you use. `.env.example` lists everything supported.
 
-Example prompt file:
+## Commands
+
+Activate the env in every new shell (`conda activate chrono-code`), then:
+
 ```bash
-chrono-agent generate --prompt-file prompts/assets_robot/prompt.md
+# Generate from an inline prompt
+chrono-code generate "Simulate a bouncing ball"
+
+# Detailed planning mode
+chrono-code generate --mode detailed "Double pendulum"
+
+# Generate from a prompt file (multimodal — images in the .md are picked up)
+chrono-code generate --prompt-file prompts/assets_robot/prompt.md
 ```
 
-`prompts/assets_robot/prompt.md` asks for a Unitree Go2 robot dog in a
-furnished room:
+Equivalent: `python -m chrono_code.main generate ...`.
 
-```text
-Put a Unitree Go2 robot dog in a 12m x 12m x 3m room with 2 tables and 7 chairs and let it walk around using its RL locomotion policy, bumping into these furnitures.
-```
-
-### Lint / Format
-```bash
-black chrono_agent
-ruff check chrono_agent
-```
-
-The dev tools (`black`, `ruff`, `mypy`) are listed under the `dev`
-dependency group in [pyproject.toml](pyproject.toml). Install them with:
-```bash
-python -m pip install -e ".[dev]"
-```
-or, equivalently, `python -m pip install black ruff mypy`.
+Bundled example prompts live in [prompts/](prompts/): `assets_robot`, `custom_assets_scene`, `demo_SEN_HMMWV_offroad_vsg`, `veh_fsi_floating`.
 
 ## Architecture
 
-### Four-Agent Pipeline
+Chrono-Code wires four LLM agents into an async pipeline: **planning → code generation → execution → visual review**, with automatic loop-back on build failures or physics issues. State is a plain `TypedDict` and routing lives in [chrono_code/workflow/conditions.py](chrono_code/workflow/conditions.py) — no LangGraph / LangChain.
 
-| Agent | File | Role |
-|-------|------|------|
-| Planning | `agents/planning_agent.py` | Parse prompt into SimulationPlan |
-| Code Generation | `agents/code_generation_agent.py` | Skills-backed PyChrono code synthesis |
-| Execution | `agents/execution_agent.py` | Run simulation subprocess, capture output |
-| Review | `agents/review_agent.py` | VLM visual review of frames |
+| Agent      | File                                                                                       | Role                              |
+|------------|--------------------------------------------------------------------------------------------|-----------------------------------|
+| Planning   | [chrono_code/agents/planning_agent.py](chrono_code/agents/planning_agent.py)             | Prompt → `SimulationPlan`         |
+| CodeGen    | [chrono_code/agents/code_generation_agent.py](chrono_code/agents/code_generation_agent.py) | Skills-backed PyChrono code      |
+| Execution  | [chrono_code/agents/execution_agent.py](chrono_code/agents/execution_agent.py)           | Runs sim subprocess               |
+| Review     | [chrono_code/agents/review_agent.py](chrono_code/agents/review_agent.py)                 | VLM review of rendered frames     |
 
-### Workflow (Plain Async Python)
+Entry point: [chrono_code/main.py](chrono_code/main.py) · Engine: [chrono_code/workflow/engine.py](chrono_code/workflow/engine.py) · Skills (framework-independent `SKILL.md` library): [chrono_code/skills/](chrono_code/skills/).
 
-Root workflow (`workflow/engine.py`):
-```
-planning -> plan_approval -> step_router -> codegen -> run_simulation -> visual_review -> physics_analysis -> END
-                                  ^__________failed execution________________________|
-                                  ^__________physics issues__________________________|
-```
+## LLM Providers
 
-- No LangGraph - uses explicit async control flow
-- State is a plain dict (WorkflowState TypedDict)
-- Routing via condition functions in `workflow/conditions.py`
-- Event system via callbacks in `workflow/events.py`
+Each agent's provider and model are configured independently in `.env`. Anthropic, OpenAI, Google Gemini, MiniMax, DeepSeek, Ollama, OpenRouter, and NGC are all supported — see [.env.example](.env.example) for the variable names and recommended defaults.
 
-### LLM Integration
-
-Uses `anthropic` and `openai` Python SDKs directly:
-- `BaseAgent._init_client()` creates SDK client instances
-- `BaseAgent.invoke_llm()` dispatches to provider-specific API calls
-- `BaseAgent.run_tool_loop()` implements Claude's native tool_use API
-- Multi-provider: Anthropic, OpenAI, Google Gemini, Ollama, MiniMax, NGC
-
-### Code Generation Tools
-
-Tools use Claude's native JSON schema format (no LangChain @tool decorator):
-- `make_code_agent_tools()` returns `(tool_definitions, tool_executors)`
-- Tool definitions are dicts with `name`, `description`, `input_schema`
-- Tool executors are plain Python functions
-
-### Skills System
-
-Same as original Chrono-Agent - framework-independent SKILL.md files with YAML frontmatter.
-
-## Key File Locations
-
-| Concern | Path |
-|---------|------|
-| Entry point (CLI) | `chrono_agent/main.py` |
-| Workflow engine | `chrono_agent/workflow/engine.py` |
-| Workflow state | `chrono_agent/workflow/state.py` |
-| Routing conditions | `chrono_agent/workflow/conditions.py` |
-| Base agent (SDK) | `chrono_agent/agents/base.py` |
-| Pydantic models | `chrono_agent/models/` |
-| Prompt templates | `chrono_agent/agents/prompts/` |
-| Tool definitions | `chrono_agent/tools/` |
-| Skills | `chrono_agent/skills/` |
-| Configuration | `chrono_agent/config.py` |
-
-## Production provider recommendations
-
-Each agent has an independent provider/model configured via `.env`
-(`PLANNING_AGENT_PROVIDER`, `PLANNING_AGENT_MODEL`, etc. — see
-`chrono_agent/config.py`). Provider choice materially affects reliability
-because different endpoints have different levels of support for
-schema-constrained output. The failure modes and what they trigger:
-
-| Agent | Recommended provider / model | Why |
-|-------|------------------------------|-----|
-| `PlanningAgent` | `anthropic` / `claude-sonnet-4-6` (preferred) or `anthropic` / `claude-opus-4-7` | Anthropic's `tool_use` path gives server-side schema validation of plan output, preventing the nested shape errors (`milestones[].constraints` as string, `verify.csv_cols` as list-of-strings, etc.) that trigger `PlanModificationValidationError`. |
-| `PlanningAgent` (alt.) | **real** `openai` / `gpt-4.1` (not a MiniMax / DeepSeek / other compat endpoint) | Real OpenAI honors `response_format={"type":"json_schema", "strict":true}` at token-decode time. OpenAI-compat endpoints mostly do not. |
-| `CodeGenerationAgent` | `anthropic` / `claude-sonnet-4-6` or `openai` / `gpt-4.1` (real OpenAI) | Codegen needs to faithfully follow the skill-required / utils-required instructions in the system prompt. Weaker instruction-following models skip the required `read_skill(...)` call and forget `setup_preview_camera(...)`. |
-| `ExecutionAgent` | any capable model (e.g. `openai` / `gpt-4o`) | Thin orchestration layer; just runs subprocess and formats output. |
-| `ReviewAgent` / VLM | `google` / `gemini-2.5-pro` or `google` / `gemini-2.5-flash` (video) / `anthropic` / `claude-sonnet-4-6` (image) | Needs vision. Gemini is cost-effective and handles video directly; Claude has slightly better spatial reasoning on images. |
-
-**What not to use for `PlanningAgent`** (observed to trigger silent plan
-corruption or `PlanModificationValidationError` chains):
-- `openai` base_url pointed at MiniMax / DeepSeek / NGC / Moonshot / other
-  non-OpenAI endpoints — these silently ignore `response_format={"type":"json_schema"}`
-  and return markdown-wrapped JSON that breaks nested schema validation.
-- Small (<13B) local models via `ollama` — instruction-following on nested
-  Pydantic schemas is too brittle.
-- Older GPT-3.5-class models — same reason.
-
-`modify_plan` now retries once with the validation errors fed back into
-the prompt (see `PlanningAgent._build_validation_repair_suffix`), but the
-retry cannot recover from a provider that has fundamentally weak schema
-compliance. Pick a strong provider for `PlanningAgent` first; retry is
-a safety net, not a substitute.
-
-When to accept the tradeoff: if `PlanningAgent` is stuck on MiniMax /
-compat for cost reasons, keep the retry as your backstop and expect
-occasional user-visible red "plan validation error" panels. Switch the
-provider if you see this more than once per session.

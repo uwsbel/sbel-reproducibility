@@ -3,7 +3,7 @@ requires = ["setuptools>=68.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "chrono-agent-claude"
+name = "chrono-code"
 version = "0.1.0"
 description = "Multi-agent framework for PyChrono simulation code generation (Claude SDK)"
 readme = "README.md"
@@ -44,12 +44,12 @@ dev = [
 ]
 
 [project.scripts]
-chrono-agent = "chrono_agent.main:app"
+chrono-code = "chrono_code.main:app"
 
 [tool.setuptools]
 
 [tool.setuptools.packages.find]
-include = ["chrono_agent*"]
+include = ["chrono_code*"]
 
 [tool.black]
 line-length = 100

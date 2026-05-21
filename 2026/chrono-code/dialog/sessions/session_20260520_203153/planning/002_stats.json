@@ -1,0 +1,17 @@
+{
+  "agent": "PlanningAgent",
+  "session_kind": "invoke_llm",
+  "timestamp": "2026-05-20T20:37:30.079340",
+  "elapsed_seconds": 300.2936625480652,
+  "usage": {
+    "input": 0,
+    "output": 0,
+    "cache_read": 0,
+    "cache_creation": 0,
+    "total": 0
+  },
+  "calls": 0,
+  "turns": 0,
+  "provider": "openai",
+  "model": "gpt-5"
+}

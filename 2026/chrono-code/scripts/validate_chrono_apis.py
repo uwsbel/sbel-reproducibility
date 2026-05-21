@@ -292,7 +292,7 @@ def resolve_method_return_type(cls, method_name: str, modules=None):
 
 # Module alias literals that are conventional pychrono import targets in
 # this codebase (mirrors the system prompt's import rule and the helper
-# imports in ``chrono_agent.utils``). When code uses ``veh.WheeledVehicle``
+# imports in ``chrono_code.utils``). When code uses ``veh.WheeledVehicle``
 # or ``fsi.ChFsiSystemSPH`` etc. without binding the alias via
 # ``import pychrono.vehicle as veh``, the runtime raises ``NameError`` —
 # the visitor catches that statically here so codegen sees the bug on the

@@ -1,0 +1,49 @@
+{
+  "session_id": "session_20260520_203153",
+  "timestamp": "20260520_203153",
+  "user_prompt": "unknown",
+  "agents": {
+    "PlanningAgent": {
+      "prompts": [
+        "001_prompt.txt",
+        "002_prompt.txt",
+        "003_prompt.txt"
+      ],
+      "responses": [
+        "001_response.txt",
+        "002_response.txt"
+      ],
+      "sessions": [
+        {
+          "file": "001_stats.json",
+          "session_kind": "invoke_llm",
+          "elapsed_seconds": 35.81734895706177,
+          "usage": {
+            "input": 1780,
+            "output": 3012,
+            "cache_read": 0,
+            "cache_creation": 0,
+            "total": 4792
+          },
+          "calls": 1,
+          "turns": 0
+        },
+        {
+          "file": "002_stats.json",
+          "session_kind": "invoke_llm",
+          "elapsed_seconds": 300.2936625480652,
+          "usage": {
+            "input": 0,
+            "output": 0,
+            "cache_read": 0,
+            "cache_creation": 0,
+            "total": 0
+          },
+          "calls": 0,
+          "turns": 0
+        }
+      ]
+    }
+  },
+  "created_at": "2026-05-20T20:31:53.967107"
+}

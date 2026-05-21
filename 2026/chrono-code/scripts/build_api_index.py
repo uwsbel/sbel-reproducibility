@@ -188,7 +188,7 @@ def build_embeddings(
     in float32 before casting down to float16 for on-disk storage.
     """
     # Lazy import so --no-embed path doesn't need the dep.
-    from chrono_agent.tools.embeddings import encode, get_embedding_dim
+    from chrono_code.tools.embeddings import encode, get_embedding_dim
 
     dim = get_embedding_dim(model_name)
     print(f"Embedding {len(chunks)} chunks with {model_name} (dim={dim})...")

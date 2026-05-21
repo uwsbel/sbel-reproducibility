@@ -1,0 +1,16 @@
+# Agent: PlanningAgent
+# Timestamp: 2026-05-20T20:32:29.785739
+# Metadata: {
+  "system_message": true,
+  "temperature": 1.0,
+  "parse_json": false,
+  "has_images": false,
+  "attempt": 1
+}
+################################################################################
+
+Put a Unitree Go2 robot dog in a 12m x 12m x 3m room with 2 tables and 7 chairs and let it walk around using its RL locomotion policy, bumping into these furnitures.
+
+User-clarified parameters:
+- time_step: 0.001
+- simulation_duration: 4s
