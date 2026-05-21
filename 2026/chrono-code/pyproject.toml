@@ -1,0 +1,63 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "chrono-agent-claude"
+version = "0.1.0"
+description = "Multi-agent framework for PyChrono simulation code generation (Claude SDK)"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+keywords = ["ai", "agents", "pychrono", "simulation", "claude"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+dependencies = [
+    "anthropic>=0.45.0",
+    "openai>=1.50.0",
+    "google-generativeai>=0.8.0",
+    "requests>=2.31.0",
+    "pydantic>=2.5.0",
+    "pydantic-settings>=2.1.0",
+    "python-dotenv>=1.0.0",
+    "tenacity>=8.2.0",
+    "matplotlib>=3.8.0",
+    "numpy>=1.26.0,<2",
+    "typer>=0.9.0",
+    "rich>=13.7.0",
+    "strictyaml>=1.7.3",
+    "sentence-transformers>=2.5.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "black>=23.12.0",
+    "ruff>=0.1.9",
+    "mypy>=1.8.0",
+]
+
+[project.scripts]
+chrono-agent = "chrono_agent.main:app"
+
+[tool.setuptools]
+
+[tool.setuptools.packages.find]
+include = ["chrono_agent*"]
+
+[tool.black]
+line-length = 100
+target-version = ['py310']
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "W", "UP"]

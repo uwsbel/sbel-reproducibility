@@ -1,0 +1,13 @@
+name: chrono-code
+channels:
+  - projectchrono
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.12
+  - projectchrono::pychrono
+  - numpy
+  - scipy
+  - fsspec
+  - ray-tune
+  - pip
