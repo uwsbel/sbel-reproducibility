@@ -2,11 +2,11 @@
 
 ## Installation
 
-The code was originally tested with Python 3.10.19, CUDA 12.1.
-For RTX 5090 / Blackwell-class GPUs, use the 5090 setup script.
+The code was originally tested with Python 3.10.19, CUDA 12.1 on RTX 5090
 
-### Recommended 5090 Setup
-DSInC includes the VLFM code needed for evaluation under `third_party/vlfm`. The setup below is intended for headless Docker/Linux environments with CUDA support.
+
+### Recommended Setup
+DSInC includes the [VLFM code](https://github.com/rai-opensource/vlfm) needed for evaluation under `third_party/vlfm`. The setup below is intended for headless Docker/Linux environments with CUDA support.
 
 Run these scripts from the DSInC repo root. `setup_env_5090.sh` creates the evaluation environment, `hb`. `setup_vlfm_server_env.sh` creates the VLM server environment, `cr_vlfm`, downloads public model weights, and prepares the YOLOv7/GroundingDINO runtime folders.
 ```
