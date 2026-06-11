@@ -3,7 +3,7 @@
 ## Installation
 
 The code was originally tested with Python 3.10.19, CUDA 12.1.
-For RTX 5090 / Blackwell-class GPUs, use the 5090 setup script below instead of the older CUDA 12.1 PyTorch pin.
+For RTX 5090 / Blackwell-class GPUs, use the 5090 setup script.
 
 ### Recommended 5090 Setup
 DSInC includes the VLFM code needed for evaluation under `third_party/vlfm`. The setup below is intended for headless Docker/Linux environments with CUDA support.
@@ -86,9 +86,9 @@ From the DSInC repo root:
 conda activate hb
 ```
 
-Communication is enabled by default. The default benchmark settings are `--comm_fuse_window 8`, `--comm_novelty_threshold 0.85`, `--comm_novelty_beta 0.003`, `--max_episode_length 500`, and `--success_dist 1.0`.
+Communication/Collaboration is enabled by default. The default benchmark settings are `--comm_fuse_window 8`, `--comm_novelty_threshold 0.85`, `--comm_novelty_beta 0.003`, `--max_episode_length 500`, and `--success_dist 1.0`.
 
-Run the 1000-episode local HM3D val set as two 500-episode shards:
+You can run the local HM3D val set as 500-episode shards, for example:
 ```
 python eval.py \
   -d ./DSInC_EXP/multi_hm3d_2-robot/ \
@@ -124,7 +124,7 @@ python eval.py \
   --no_comm
 ```
 
-To resume a shard from a local episode index:
+To resume a shard from a local episode index (ex. 259):
 ```
 python eval.py \
   -d ./DSInC_EXP/multi_hm3d_2-robot/ \
