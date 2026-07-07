@@ -15,43 +15,102 @@ subsections in `results.tex`:
 | 4.3 MGRU3 Wheel (constant depth) | Single-wheel slope sweep | `demo_FSI_SlopedSingleWheelTest` | `shell_scripts/viper_wheel_paperRuns.sh` | `python_scripts/viper_singleWheel_plotting.py` |
 | 4.3 MGRU3 Wheel (depth sensitivity) | Slope × bin-depth sweep | `demo_FSI_SlopedSingleWheelTest` | `shell_scripts/viper_wheel_paperRuns_DepthVar.sh` | `python_scripts/viper_singleWheel_DepthVar_plotting.py` |
 | 4.4 Lunar Lander | MCC parameter sweep + μ(I) baseline | `demo_ROBOT_Lander_CRM` | `shell_scripts/lander_runs_sbatch.sh` | `python_scripts/plot_lander_crm_sweep.py` |
-| 4.5 Efficiency (RTF) | Wheel/lander wall-clock | `demo_FSI_SlopedSingleWheelRTFBenchmark`, `demo_ROBOT_Lander_CRM_RTFBenchmark` | Run by hand (see §5) | n/a (Table 1 in paper) |
+| 4.5 Efficiency (RTF) | Wheel/lander wall-clock | `demo_FSI_SlopedSingleWheelRTFBenchmark`, `demo_ROBOT_Lander_CRM_RTFBenchmark` | Run by hand (see §4.5) | n/a (Table 1 in paper) |
 
-All scripts are copied from `build_new/bin/` and therefore assume a build-tree
-working directory: they expect to be launched from `<build>/bin/` and read/write
-relative paths such as `./DEMO_OUTPUT`, `./paper_plots`, and (for the lander
-sweep) `./DEMO_OUTPUT_NREL_LANDER`.
+The intended workflow now keeps **Chrono itself** and the **paper/demo project**
+separate. Chrono is configured and built once, and the custom demos are built in
+a separate build directory that links against that Chrono build.
 
 ---
 
-# 1. Source Repository
+# 1. Intended Directory Layout
+
+Use one top-level workspace directory with sibling folders for Chrono, external
+dependencies, and this demo/reproducibility project:
+
+```text
+project_top_folder/
+├── chrono/                              # Chrono source tree
+│   └── build/                           # Chrono build tree, generated locally
+├── dependencies/
+│   └── vsg/                             # VSG install tree, if using Chrono::VSG
+└── MCC/                                 # the contents of this project (sbel-reproducibility/2026/MCC)
+    ├── README.md
+    ├── CMakeLists.txt                   # demo-specific CMake project
+    ├── build_chrono_and_project.sh      # full build script (chrono source code and demos)
+    ├── rebuild_project.sh               # quick rebuild script (just demos)
+    ├── demo_FSI_ConePenetrometer.cpp
+    ├── demo_FSI_NormalBevameter.cpp
+    ├── demo_FSI_SlopedSingleWheelTest.cpp
+    ├── demo_FSI_SlopedSingleWheelRTFBenchmark.cpp
+    ├── demo_ROBOT_Lander_CRM.cpp
+    ├── demo_ROBOT_Lander_CRM_RTFBenchmark.cpp
+    ├── generate_heightmap.py            # heightmap generator for the lander non-flat terrain (see note below)
+    ├── shell_scripts/
+    └── build/                           # demo build tree, generated locally
+```
+
+Important points:
+
+- `chrono/` is the only Chrono source checkout.
+- `chrono/build/` is the Chrono build used by this project.
+- `MCC/build/` is only for the custom demo executables.
+- Do not build inside the Chrono source tree except for the dedicated
+  `chrono/build/` out-of-source build directory.
+- The custom project finds Chrono through `Chrono_DIR=<workspace>/chrono/build/cmake`.
+
+This README is intended to live inside `MCC/`, next to
+the demo-specific `CMakeLists.txt`, build scripts, demo sources, and run scripts.
+
+> **Note on `generate_heightmap.py`.** This helper script generates the randomized
+> crater/bump heightmap used by the lander demos when they run with non-flat
+> terrain (the default for `demo_ROBOT_Lander_CRM`). It lives in `MCC/` alongside
+> the demo sources rather than in the Chrono data tree. The project `CMakeLists.txt`
+> passes the demo source directory to the build via the `DEMO_SOURCE_DIR` compile
+> definition so the lander demos can locate this script regardless of the working
+> directory they are launched from. It requires Python 3 with `numpy` and `Pillow`
+> (and, optionally, the `noise` package for faster Perlin noise). It is only needed
+> for non-flat terrain runs; runs with `--flat_terrain true` do not invoke it.
+
+---
+
+# 2. Source Repositories
+
+## 2.1 Chrono source
 
 | Item | Value |
 | --- | --- |
-| Repository | `git@github.com:uwsbel/chrono-wisc.git` |
-| Branch | `feature/crm_models` |
+| Repository | `git@github.com:projectchrono/chrono.git` |
+| Branch | `main` |
+
+From the desired root:
 
 ```bash
-git clone git@github.com:uwsbel/chrono-wisc.git
-cd chrono-wisc
-git checkout feature/crm_models
+mkdir -p ~/project_top_folder 
+cd ~/project_top_folder
+
+git clone git@github.com:projectchrono/chrono.git
 ```
 
-All demos, shell scripts (`shell_scripts/`), and plotting scripts
-(`python_scripts/`) used in the paper are tracked on this branch. If you do not
-have access to `uwsbel/chrono-wisc`, the same code base is mirrored on the
-public Project Chrono repository (`github.com/projectchrono/chrono`); however,
-the curated `shell_scripts/` and `python_scripts/` folders and the MCC changes
-in the CRM solver are only on the branch above.
+## 2.2 Demo/reproducibility project
 
-If you only want to **use** Chrono::CRM with MCC (not reproduce the paper),
-build the `main` branch of Project Chrono once the MCC work has been merged.
+This project should be placed as a sibling of `chrono/`:
+
+```text
+project_top_folder/
+├── chrono/
+└── MCC/
+```
+
+The MCC directory owns the demo `.cpp` files, run scripts,
+plotting scripts, and its own `CMakeLists.txt`. It does not modify the Chrono
+source tree during normal use.
 
 ---
 
-# 2. Dependencies
+# 3. Dependencies
 
-## 2.1 Build-time
+## 3.1 Build-time
 
 | Dependency | Version | Notes |
 | --- | --- | --- |
@@ -60,8 +119,9 @@ build the `main` branch of Project Chrono once the MCC work has been merged.
 | CUDA Toolkit | ≥ 12.0 (12.3 recommended) | Required by Chrono::FSI SPH / CRM |
 | Eigen3 | ≥ 3.4.0 | |
 | OpenMP | | |
+| Ninja or Make | | Used by CMake build backend |
 | (optional) Intel MKL | 2024.0 | Only if `CH_ENABLE_MODULE_PARDISO_MKL=ON` |
-| (optional) VulkanSceneGraph (VSG) | latest | Runtime visualization |
+| (optional) VulkanSceneGraph (VSG) | Chrono-compatible version | Runtime visualization |
 
 On the NREL / NCSA clusters used for the paper runs, the compilation
 environment is loaded with:
@@ -71,10 +131,38 @@ module load intel-oneapi-mkl
 module load cuda/12.3
 ```
 
-## 2.2 Python runtime (plotting)
+For local Linux workstations, verify the NVIDIA driver and CUDA Toolkit
+separately:
 
-The plotting scripts require a Python ≥ 3.10 interpreter with the following
-packages:
+```bash
+nvidia-smi        # driver/GPU visibility
+nvcc --version    # CUDA Toolkit compiler
+```
+
+## 3.2 VSG dependency
+
+If building with `CH_ENABLE_MODULE_VSG=ON`, install/build VSG first. The Chrono
+VSG build script should install VSG under:
+
+```text
+<workspace>/dependencies/vsg/
+```
+
+The Chrono configure step then needs either:
+
+```bash
+-DCMAKE_PREFIX_PATH=<workspace>/dependencies/vsg
+```
+
+or the exact VSG CMake package directory:
+
+```bash
+-Dvsg_DIR=<workspace>/dependencies/vsg/lib/cmake/vsg
+```
+
+## 3.3 Python runtime for plotting
+
+The plotting scripts require Python ≥ 3.10 with:
 
 ```text
 numpy
@@ -91,25 +179,58 @@ source mcc_venv/bin/activate
 pip install numpy pandas matplotlib seaborn
 ```
 
----
-
-# 3. Building Chrono
-
-Chrono forbids in-source builds. Create a dedicated build directory at the top
-of the repository (the scripts assume the name `build_new/`, but any name
-works as long as the shell scripts are launched from `<build>/bin/`).
+The lander heightmap generator (`generate_heightmap.py`, see §1 and §5.4)
+additionally requires `numpy` and `Pillow`, plus the optional `noise` package for
+faster Perlin noise. These are only needed for non-flat lander terrain runs:
 
 ```bash
-cd chrono-wisc
-mkdir build_new
-cd build_new
+pip install numpy Pillow
+pip install noise   # optional, faster Perlin noise
 ```
 
-Configure with the module set actually used for the paper (verified from the
-`build_new/CMakeCache.txt` of the authors' environment):
+---
+
+# 4. Building and Rebuilding
+
+There are two build layers:
+
+1. **Chrono build**: configures and compiles Chrono with FSI/CRM, Vehicle,
+   Postprocess, and optional VSG support.
+2. **Custom demo build**: compiles the paper demo executables and links them
+   against the existing Chrono build.
+
+## 4.1 Full build: Chrono + custom demos
+
+Use the full build script when setting up the workspace for the first time, when
+Chrono has not been built yet, or when changing Chrono module options.
+
+From `MCC`:
 
 ```bash
-cmake -S .. -B . \
+chmod +x build_chrono_and_project.sh
+./build_chrono_and_project.sh
+```
+
+The script should follow this pattern:
+
+```bash
+#!/usr/bin/env bash
+set -e
+
+ROOT="$(realpath ..)"
+
+CHRONO_SRC="$ROOT/chrono"
+CHRONO_BUILD="$ROOT/chrono/build"
+
+PROJECT_SRC="$ROOT/MCC"
+PROJECT_BUILD="$PROJECT_SRC/build"
+
+VSG_PREFIX="$ROOT/dependencies/vsg"
+VSG_DIR="$VSG_PREFIX/lib/cmake/vsg"
+
+mkdir -p "$CHRONO_BUILD"
+
+cmake -S "$CHRONO_SRC" -B "$CHRONO_BUILD" \
   -DCMAKE_BUILD_TYPE=Release \
   -DBUILD_DEMOS=ON \
   -DBUILD_DEMOS_FSI=ON \
@@ -121,65 +242,196 @@ cmake -S .. -B . \
   -DCH_ENABLE_MODULE_VEHICLE_MODELS=ON \
   -DCH_ENABLE_MODULE_POSTPROCESS=ON \
   -DCH_ENABLE_MODULE_VSG=ON \
-  -DCH_USE_FSI_DOUBLE=OFF
+  -DCH_USE_FSI_DOUBLE=OFF \
+  -DCMAKE_PREFIX_PATH="$VSG_PREFIX" \
+  -Dvsg_DIR="$VSG_DIR"
+
+cmake --build "$CHRONO_BUILD" -j"$(nproc)"
+
+mkdir -p "$PROJECT_BUILD"
+
+cmake -S "$PROJECT_SRC" -B "$PROJECT_BUILD" \
+  -DCMAKE_BUILD_TYPE=Release \
+  -DChrono_DIR="$CHRONO_BUILD/cmake"
+
+cmake --build "$PROJECT_BUILD" -j"$(nproc)"
 ```
 
 Notes:
-- `CH_USE_FSI_DOUBLE=OFF` (single precision) matches the numerics in the paper.
-- VSG is optional but recommended; if it is not available, drop
-  `-DBUILD_DEMOS_VSG=ON -DCH_ENABLE_MODULE_VSG=ON` and pass `--no_vis` when
-  running the demos (all paper runs already do).
-- If you need the PARDISO sparse solver, add
-  `-DCH_ENABLE_MODULE_PARDISO_MKL=ON` (requires Intel oneAPI MKL 2024.0).
-- CUDA architecture is normally auto-detected; if not, set
-  `-DCMAKE_CUDA_ARCHITECTURES=<arch>` for your GPU (e.g. `80` for A100,
-  `89` for RTX 4080, `90` for H100).
 
-Compile:
+- `CH_USE_FSI_DOUBLE=OFF` uses single precision, matching the paper runs.
+- `BUILD_DEMOS_*` builds Chrono's own demos. The custom paper demos are built
+  by this project's `CMakeLists.txt` in the second configure/build step.
+- If VSG is not available, remove the VSG flags and use `--no_vis` when running
+  demos.
+- If you need PARDISO MKL, add `-DCH_ENABLE_MODULE_PARDISO_MKL=ON` and make
+  sure Intel oneAPI MKL is loaded/found.
+- If CUDA architecture is not auto-detected, set
+  `-DCMAKE_CUDA_ARCHITECTURES=<arch>` for your GPU.
 
-```bash
-cmake --build . -j
+## 4.2 Custom project CMake pattern
+
+The demo-specific `CMakeLists.txt` should find the already-built Chrono package:
+
+```cmake
+find_package(Chrono
+             COMPONENTS FSI
+             OPTIONAL_COMPONENTS VSG PardisoMKL Postprocess
+             CONFIG REQUIRED)
 ```
 
-After the build completes, the executables used by the paper are installed in
-`build_new/bin/`:
+Each demo executable is a separate CMake target. A compact pattern is:
 
-- `demo_FSI_ConePenetrometer`
-- `demo_FSI_NormalBevameter`
-- `demo_FSI_SlopedSingleWheelTest`
-- `demo_FSI_SlopedSingleWheelRTFBenchmark`
-- `demo_ROBOT_Lander_CRM`
-- `demo_ROBOT_Lander_CRM_RTFBenchmark`
+```cmake
+set(DEMOS
+    demo_FSI_ConePenetrometer
+    demo_FSI_NormalBevameter
+    demo_FSI_SlopedSingleWheelTest
+    demo_FSI_SlopedSingleWheelRTFBenchmark
+    demo_ROBOT_Lander_CRM
+    demo_ROBOT_Lander_CRM_RTFBenchmark
+)
 
-Please open an issue on `uwsbel/chrono-wisc` (and tag `@Huzaifg`) for any
-build problems.
+foreach(demo ${DEMOS})
+    add_executable(${demo} ${demo}.cpp)
+    target_include_directories(${demo} PRIVATE ${CHRONO_INCLUDE_DIRS})
+    set_target_properties(${demo} PROPERTIES
+        COMPILE_FLAGS "${CHRONO_CXX_FLAGS}"
+        LINK_FLAGS    "${CHRONO_LINKER_FLAGS}"
+    )
+    target_link_libraries(${demo} ${CHRONO_LIBRARIES})
+
+    # Make the demo source directory available at compile time so the lander demos
+    # can locate generate_heightmap.py regardless of the working directory.
+    target_compile_definitions(${demo} PRIVATE
+        DEMO_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}")
+endforeach()
+```
+
+The `DEMO_SOURCE_DIR` compile definition is what lets `demo_ROBOT_Lander_CRM` and
+`demo_ROBOT_Lander_CRM_RTFBenchmark` find `generate_heightmap.py` in the `MCC/`
+source directory rather than in the Chrono data tree.
+
+## 4.3 Quick rebuild after editing a demo
+
+After the project has been configured once, ordinary edits to a demo `.cpp` file
+do not require rebuilding Chrono and usually do not require rerunning CMake.
+Only rebuild the custom project:
+
+```bash
+cmake --build build -j"$(nproc)"
+```
+
+A minimal `rebuild_project.sh` can be:
+
+```bash
+#!/usr/bin/env bash
+set -e
+
+ROOT="$(realpath ..)"
+PROJECT_BUILD="$ROOT/MCC/build"
+
+cmake --build "$PROJECT_BUILD" -j"$(nproc)"
+```
+
+To rebuild only one executable:
+
+```bash
+cmake --build build --target demo_FSI_ConePenetrometer -j"$(nproc)"
+```
+
+or through a target-aware script:
+
+```bash
+#!/usr/bin/env bash
+set -e
+
+ROOT="$(realpath ..)"
+PROJECT_BUILD="$ROOT/MCC/build"
+TARGET="${1:-}"
+
+if [ -z "$TARGET" ]; then
+    cmake --build "$PROJECT_BUILD" -j"$(nproc)"
+else
+    cmake --build "$PROJECT_BUILD" --target "$TARGET" -j"$(nproc)"
+fi
+```
+
+Usage:
+
+```bash
+./rebuild_project.sh
+./rebuild_project.sh demo_ROBOT_Lander_CRM
+```
+
+## 4.4 When to rerun configure
+
+Rerun the custom project configure step if you:
+
+- edit `CMakeLists.txt`,
+- add or remove a demo executable,
+- delete `MCC/build/`,
+- switch to a different Chrono build, or
+- change the `Chrono_DIR` path.
+
+Use:
+
+```bash
+cmake -S . -B build \
+  -DCMAKE_BUILD_TYPE=Release \
+  -DChrono_DIR="$(realpath ../chrono/build/cmake)"
+```
+
+Then rebuild:
+
+```bash
+cmake --build build -j"$(nproc)"
+```
 
 ---
 
-# 4. Reproducing the Results
+# 5. Running the Demos
 
-All shell scripts in `shell_scripts/` are copies of the exact scripts used to
-generate the paper data. Copy the one you want to run into `build_new/bin/`
-(which is where the executables live) and launch it from that directory.
+The custom demo executables are built in this project's build directory. Unless
+your `CMakeLists.txt` sets a different `RUNTIME_OUTPUT_DIRECTORY`, run from:
 
 ```bash
-cp shell_scripts/<script>.sh build_new/bin/
-cd build_new/bin
+cd MCC/build
+```
+
+The run scripts expect to be launched from the directory containing the demo
+executables. They read and write relative paths such as:
+
+```text
+./DEMO_OUTPUT
+./paper_plots
+./DEMO_OUTPUT_NREL_LANDER
+```
+
+To run a script:
+
+```bash
+cd build
+cp ../shell_scripts/<script>.sh .
 chmod +x <script>.sh
 ./<script>.sh
 ```
 
-On SLURM clusters, the scripts with `#SBATCH` headers can be submitted
-directly via `sbatch <script>.sh`; adjust the partition / account lines to
-match your allocation before doing so.
+On SLURM clusters, scripts with `#SBATCH` headers can be submitted directly:
+
+```bash
+sbatch <script>.sh
+```
+
+Adjust partition/account lines to match your allocation.
 
 Each demo writes into a sub-folder of `./DEMO_OUTPUT/` in the current working
-directory (the default returned by `GetChronoOutputPath()`), keyed by the run
-parameters. The plot scripts in `python_scripts/` read back from that folder.
+directory, keyed by the run parameters. The plot scripts in `python_scripts/`
+read back from that folder.
 
-Sections 4.1–4.5 below correspond one-to-one to the paper sub-sections.
+Sections 5.1 through 5.5 below correspond one-to-one to the paper subsections.
 
-## 4.1 Cone Penetrometer Test (§4.1, Fig. 2)
+## 5.1 Cone Penetrometer Test (§4.1, Fig. 2)
 
 Setup: 60° cone, base area 323 mm², penetrating at 0.3 cm/s to 18 cm, in a
 0.3 × 0.3 × 0.24 m bin of GRC-1 at ρ = 1600 kg/m³. The script runs one MCC
@@ -187,70 +439,67 @@ case (`OCR = 10`, κ = 0.00625, λ = 0.025 in the demo's defaults) and a μ(I)
 cohesion sweep `c ∈ {0, 100, 1000, 5000} Pa`.
 
 ```bash
-# From <repo>/build_new/bin/
-cp ../../shell_scripts/cone_nrel.sh .
+# From MCC/build/
+cp ../shell_scripts/cone_nrel.sh .
 ./cone_nrel.sh
 ```
 
 Output is written into `DEMO_OUTPUT/FSI_ConePenetrometer_GRC1_*`.
 
-The CPT demo accepts the following CLI options (see
-`src/demos/fsi/demo_FSI_ConePenetrometer.cpp`):
+The CPT demo accepts the following CLI options:
 `--rheology_model_crm {MU_OF_I|MCC}`, `--pre_pressure_scale <OCR>`,
 `--cohesion <Pa>`, `--container_height <m>`, `--initial_spacing <m>`,
 `--mu_s`, `--mu_2`, `--density`, `--y_modulus`, `--penetration_depth`.
 
-## 4.2 Normal Bevameter Test (§4.2, Fig. 3)
+## 5.2 Normal Bevameter Test (§4.2, Fig. 3)
 
-Setup: 19 cm plate, pressure ramp 0 → 30 kPa over 3 s, soil bin
+Setup: 19 cm plate, pressure ramp 0 to 30 kPa over 3 s, soil bin
 0.584 × 0.584 × 0.24 m, GRC-1 at ρ = 1670 kg/m³. The script sweeps cohesion
 `c ∈ {0, 100, 1000, 5000} Pa` × bin heights `{0.024, 0.12, 0.24} m`; the
 paper figure uses only the 0.24 m cases. MCC uses `OCR = 20`, κ = 0.00625,
 λ = 0.025.
 
 ```bash
-# From <repo>/build_new/bin/
-cp ../../shell_scripts/bev_nrel.sh .
+# From MCC/build/
+cp ../shell_scripts/bev_nrel.sh .
 ./bev_nrel.sh
 ```
 
 Output: `DEMO_OUTPUT/FSI_NormalBevameter_GRC1_<heightCm>_<model>_58.4cm*`.
 
-Relevant CLI flags (`src/demos/fsi/demo_FSI_NormalBevameter.cpp`):
+Relevant CLI flags:
 `--rheology_model_crm`, `--pre_pressure_scale`, `--cohesion`,
 `--container_height`, `--plate_diameter`, `--max_pressure`.
 
-## 4.3 MGRU3 Single-Wheel Test (§4.3, Figs. 4–5)
+## 5.3 MGRU3 Single-Wheel Test (§4.3, Figs. 4 to 5)
 
-### 4.3.1 Constant-depth slope sweep (Fig. 4)
+### 5.3.1 Constant-depth slope sweep (Fig. 4)
 
 Single MGRU3 wheel, 24 grousers (height 0.03 m), ω = 0.8 rad/s,
-sprung mass 17.5 kg (one quarter of the rover), soil bin
-5 × 0.8 × 0.2 m, GRC-1 at ρ = 1760 kg/m³. Slope angles
-`{0, 2.5, 5, 10, 15, 20, 25}°` for MCC (`OCR = 2`, κ = 0.2, λ = 0.8)
-only; rerun with `RHEOLOGY_MODEL_CRM_VALUES=("MU_OF_I")` at the top of the
-script for the μ(I) curve.
+sprung mass 17.5 kg, soil bin 5 × 0.8 × 0.2 m, GRC-1 at ρ = 1760 kg/m³.
+Slope angles `{0, 2.5, 5, 10, 15, 20, 25}°` for MCC (`OCR = 2`, κ = 0.2,
+λ = 0.8) only; rerun with `RHEOLOGY_MODEL_CRM_VALUES=("MU_OF_I")` at the top
+of the script for the μ(I) curve.
 
 ```bash
-# From <repo>/build_new/bin/
-cp ../../shell_scripts/viper_wheel_paperRuns.sh .
+# From MCC/build/
+cp ../shell_scripts/viper_wheel_paperRuns.sh .
 ./viper_wheel_paperRuns.sh
 ```
 
 Output: `DEMO_OUTPUT/FSI_SlopedSingleWheelTest/...`.
 
-### 4.3.2 Depth-sensitivity sweep (Fig. 5)
+### 5.3.2 Depth-sensitivity sweep (Fig. 5)
 
 Same wheel and constitutive parameters as above, but with an additional
-`--container_depth` sweep over `{0.1, 0.5, 1.0} m`, run for both MCC and
-μ(I):
+`--container_depth` sweep over `{0.1, 0.5, 1.0} m`, run for both MCC and μ(I):
 
 ```bash
-cp ../../shell_scripts/viper_wheel_paperRuns_DepthVar.sh .
+cp ../shell_scripts/viper_wheel_paperRuns_DepthVar.sh .
 ./viper_wheel_paperRuns_DepthVar.sh
 ```
 
-## 4.4 Lunar Lander Drop Test (§4.4, Figs. 6–7)
+## 5.4 Lunar Lander Drop Test (§4.4, Figs. 6 to 7)
 
 Simplified four-legged rigid lander (body 4 m × 1 m Ø × 2000 kg; four 0.5 m Ø
 footpads; total ~2048 kg) dropped at 1 m/s under lunar gravity onto a
@@ -263,19 +512,29 @@ The paper reports a 168-run MCC sweep:
 
 plus a single μ(I) baseline (μs = μd = 0.6, c = 0 Pa).
 
+> **Terrain and `generate_heightmap.py`.** `demo_ROBOT_Lander_CRM` defaults to
+> non-flat terrain, which is generated at run time by `generate_heightmap.py`
+> (see §1 and §3.3). The demo locates the script through the `DEMO_SOURCE_DIR`
+> compile definition set by the project `CMakeLists.txt`, so the script must be
+> present in the `MCC/` source directory and the project must have been
+> (re)configured after that definition was added. The script needs Python 3 with
+> `numpy` and `Pillow`. To skip heightmap generation entirely (flat 6 × 6 × 0.3 m
+> bed, no rocks), pass `--flat_terrain true`; the paper sweep below uses the
+> default non-flat terrain.
+
 On a SLURM cluster:
 
 ```bash
-cp shell_scripts/lander_runs_sbatch.sh build_new/bin/
-cd build_new/bin
+# From MCC/build/
+cp ../shell_scripts/lander_runs_sbatch.sh .
 sbatch lander_runs_sbatch.sh
 ```
 
-The array job submits tasks `0–167` with up to 8 concurrent GPUs
+The array job submits tasks `0-167` with up to 8 concurrent GPUs
 (`--array=0-167%8`). Task 0 additionally runs the μ(I) baseline once.
 
 On a workstation (serial), you can replace the SLURM dispatch with a nested
-loop (the parameter arrays in the script can be reused verbatim):
+loop:
 
 ```bash
 for pps in 1.1 2 5 10 15 20; do
@@ -296,17 +555,16 @@ Output folders follow the pattern
 `DEMO_OUTPUT/ROBOT_Lander_CRM_<model>_gravity_planet_moon_*_pre_pressure_scale_<OCR>_kappa_<κ>_lambda_<λ>/`.
 
 > **Post-run rename.** `plot_lander_crm_sweep.py` defaults to
-> `build_new/bin/DEMO_OUTPUT_NREL_LANDER/`. Either rename the sweep folder to
-> that name, or pass the actual path via `--input-dir`. The latter is
-> recommended.
+> `build/DEMO_OUTPUT_NREL_LANDER/`. Either rename the sweep folder to that name,
+> or pass the actual path via `--input-dir`. The latter is recommended.
 
-Relevant CLI flags (`src/demos/robot/lander/demo_ROBOT_Lander_CRM.cpp`):
+Relevant CLI flags:
 `--rheology_model_crm`, `--pre_pressure_scale`, `--kappa`, `--lambda`,
 `--flat_terrain`, `--no_vis`, `--particle_output`, `--blender_output`,
 `--gravity_planet {earth|mars|moon}`, `--gravity_polar_deg`,
 `--gravity_azimuth_deg`.
 
-## 4.5 Efficiency Comparison (§4.5, Table 1)
+## 5.5 Efficiency Comparison (§4.5, Table 1)
 
 Runs one wheel case and one lander case under matched numerical settings on a
 single GPU, with visualization, particle output, and body-trajectory output
@@ -329,20 +587,20 @@ disabled. These two benchmarks generate the wall-clock numbers in Table 1.
     --flat_terrain true --rheology_model_crm MU_OF_I --no_vis
 ```
 
-The wall-clock time printed at the end of each run is divided by the
-simulated duration (0.5 s) to obtain the RTF values in Table 1.
+The Table 1 lander benchmarks use `--flat_terrain true`, so they do not invoke
+`generate_heightmap.py`. The wall-clock time printed at the end of each run is
+divided by the simulated duration (0.5 s) to obtain the RTF values in Table 1.
 
 ---
 
-# 5. Reproducing the Figures
+# 6. Reproducing the Figures
 
-Copy the plotting scripts into `build_new/bin/` (same working directory as the
-`DEMO_OUTPUT` tree) and run them with the Python environment from §2.2. Each
-script creates or uses a sibling `./paper_plots/` directory for output.
+Copy the plotting scripts into the custom project build directory, which should
+also contain the `DEMO_OUTPUT` tree:
 
 ```bash
-cp python_scripts/*.py build_new/bin/
-cd build_new/bin
+cd MCC/build
+cp ../python_scripts/*.py .
 mkdir -p paper_plots
 ```
 
@@ -353,24 +611,23 @@ mkdir -p paper_plots
 | Fig. 4 (Wheel, const. depth) | `python viper_singleWheel_plotting.py` | `paper_plots/Viper_slip_vs_slope_rheology_comparison_ps*.png` |
 | Fig. 5a (Wheel, MCC depth sweep) | `python viper_singleWheel_DepthVar_plotting.py --rheology mcc` | `paper_plots/Viper_slip_vs_slope_depth_comparison_mcc_only.png` |
 | Fig. 5b (Wheel, μ(I) depth sweep) | `python viper_singleWheel_DepthVar_plotting.py --rheology mu_i` | `paper_plots/Viper_slip_vs_slope_depth_comparison_mu_i_only.png` |
-| Figs. 6–7 (Lander) | `python plot_lander_crm_sweep.py --input-dir DEMO_OUTPUT --output-dir paper_plots` | `paper_plots/lander_grouped_profiles.png`, `paper_plots/lander_main_effects.png` |
+| Figs. 6 to 7 (Lander) | `python plot_lander_crm_sweep.py --input-dir DEMO_OUTPUT --output-dir paper_plots` | `paper_plots/lander_grouped_profiles.png`, `paper_plots/lander_main_effects.png` |
 
 Notes:
 
 - `penetrometer_plot_single.py` imports `penetrometer_folderParser.py` and
   `penetrometer_plotting.py`; copy all three into the working directory.
 - The cone and bevameter plotters use a fixed query dictionary matching the
-  `shell_scripts/*.sh` defaults. If you change SPH spacing, cohesion, or
-  bin height in the run scripts, edit the `query_dict` / `RUN_CONFIGS` at the
-  top of the corresponding plot script to match.
+  `shell_scripts/*.sh` defaults. If you change SPH spacing, cohesion, or bin
+  height in the run scripts, edit the `query_dict` / `RUN_CONFIGS` at the top
+  of the corresponding plot script.
 - `plot_lander_crm_sweep.py --input-dir` must point at the directory that
-  contains the `ROBOT_Lander_CRM_*` sub-folders. By default it looks at
-  `build_new/bin/DEMO_OUTPUT_NREL_LANDER`; pass `--input-dir DEMO_OUTPUT` if
-  you kept the default output location from §4.4.
+  contains the `ROBOT_Lander_CRM_*` sub-folders. Pass `--input-dir DEMO_OUTPUT`
+  if you kept the default output location from §5.4.
 
 ---
 
-# 6. Expected Wall-Clock
+# 7. Expected Wall-Clock
 
 All paper runs were performed on NVIDIA H100 GPUs (NREL Kestrel) except the
 Table 1 RTF benchmarks, which were run on a single NVIDIA GeForce RTX 4080.
@@ -383,21 +640,37 @@ Order-of-magnitude costs on the RTX 4080:
 | CPT (Δx = 1 mm, 0.24 m bin) | ~60 s | ~4 h |
 | Bevameter (Δx = 2 mm, 0.24 m bin) | ~3 s | ~30 min |
 
-Full sweeps (lander 168-case, wheel 7-slope × 3-depth × 2-rheology) should be
-distributed across multiple GPUs.
+Full sweeps should be distributed across multiple GPUs.
 
 ---
 
-# 7. Troubleshooting & Contact
+# 8. Troubleshooting
 
-- Build issues: open an issue on
-  [`uwsbel/chrono-wisc`](https://github.com/uwsbel/chrono-wisc/issues) and
-  tag `@Huzaifg`.
-- Missing `DEMO_OUTPUT/...` folders when plotting: confirm that the run
-  scripts finished successfully (check the per-run logs under
-  `viper_wheel_logs/` or the SLURM `*.out`/`*.err` files) and that you launched
-  them from `build_new/bin/`, not from the repository root.
-- Plot scripts that raise `FileNotFoundError`: the `query_dict` /
-  `path_components` at the top of each plot script hard-codes the exact run
-  configuration used for the paper. If you intentionally changed a run
-  parameter, update those dictionaries to match.
+- **Chrono cannot find VSG:** verify that
+  `<workspace>/dependencies/vsg/lib/cmake/vsg/vsgConfig.cmake` exists and pass either
+  `-Dvsg_DIR=<workspace>/dependencies/vsg/lib/cmake/vsg` or
+  `-DCMAKE_PREFIX_PATH=<workspace>/dependencies/vsg` during the Chrono configure step.
+- **`nvcc` is not found:** the NVIDIA driver may be installed even if the CUDA
+  Toolkit is not on `PATH`. Check `nvidia-smi`, `nvcc --version`, and the CUDA
+  Toolkit install path.
+- **Custom project cannot find Chrono:** verify that
+  `<workspace>/chrono/build/cmake/ChronoConfig.cmake` exists and configure the
+  custom project with `-DChrono_DIR=<workspace>/chrono/build/cmake`.
+- **Edits to a demo do not appear:** rebuild the custom project with
+  `cmake --build build -j"$(nproc)"` from `MCC/`.
+- **Lander demo reports "Heightmap generator script not found":** the lander
+  demos expect `generate_heightmap.py` in the `MCC/` source directory and locate
+  it through the `DEMO_SOURCE_DIR` compile definition. Confirm the script is
+  present next to the demo sources, that `CMakeLists.txt` sets `DEMO_SOURCE_DIR`
+  (see §4.2), and that you re-ran configure after adding it. As a quick
+  workaround, run with `--flat_terrain true` to skip heightmap generation.
+- **Lander heightmap generation fails (Python error):** ensure Python 3 with
+  `numpy` and `Pillow` is available on `PATH` (see §3.3), or run with
+  `--flat_terrain true`.
+- **Missing `DEMO_OUTPUT/...` folders when plotting:** confirm that the run
+  scripts finished successfully and that they were launched from the directory
+  containing the demo executables.
+- **Plot scripts raise `FileNotFoundError`:** the query dictionaries at the top
+  of the plotting scripts hard-code the exact run configuration used for the
+  paper. If you intentionally changed a run parameter, update those dictionaries
+  to match.
