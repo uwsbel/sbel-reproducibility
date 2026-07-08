@@ -128,6 +128,16 @@ Before any of the plotting/analysis scripts can be run, make sure to run the Bay
 | `global_sens_single_newParams.py` | Builds a surrogate model and computes Sobol (Saltelli/Jansen) sensitivity indices |
 | `global_sens_stControllerOnly.py` | Sobol sensitivity for steering-controller-only BO runs; includes optional ICE/PDP plots |
 
+### Convergence and Variability Analysis (Revision)
+
+Added during the journal revision: `analyze_convergence_variability.py` (in this folder) regenerates the manuscript's best-so-far convergence figure and the run-to-run variability numbers (bootstrap re-initialization spread of each campaign's Sobol stage, near-optimal plateau statistics) from the archived per-trial records. Download the `BayesianOptimizationData` folder from [Box](https://uwmadison.box.com/s/vsi8hw3e3jicrb79mg8evk71fnvatuzn) and run:
+
+```bash
+python analyze_convergence_variability.py --data-root /path/to/BayesianOptimizationData
+```
+
+Outputs (in `analysis_out/` by default): `bo_convergence.png`, `results.json`, and `notes.md`. Requires only `numpy`, `pandas`, and `matplotlib` from `requirements.txt`. The bootstrap seed is fixed, so the reported numbers regenerate exactly.
+
 ### Testing Optimized Controller and Wheels
 
 After Bayesian Optimization, the best controller and wheels can be tested on the same sine maneuver using the `run_best_wheel_and_controller.py` script. For instance, to test the controller and wheels obtained using the joint optimization approach, run the following command (data folders from [Box](https://uwmadison.box.com/s/vsi8hw3e3jicrb79mg8evk71fnvatuzn)):
