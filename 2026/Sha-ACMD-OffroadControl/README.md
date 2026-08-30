@@ -9,8 +9,8 @@ October 25-29, 2026, Okinawa, Japan.
 - **Implementation, benchmarks, and evidence**:
   https://github.com/ksha23/acmd-offroad-control (public). The repository is the paper-value closure: every tracked
   file participates in producing a figure, table, or number in the
-  manuscript, `docs/PAPER_TABLE_VALUE_PROVENANCE.md` maps each published
-  value to the generation and command that regenerate it, and the
+  manuscript, the claim-by-claim provenance registry and the preregistrations
+  accompany the paper as supplementary material, and the
   publish boundary (`benchmarking/publish_paper_figures.py`) refuses any
   result that cannot verify its recorded source digests against the
   commit it names. `benchmarking/verify_provenance_chain.py` enforces
