@@ -7,8 +7,7 @@ October 25-29, 2026, Okinawa, Japan.
 ## Where everything lives
 
 - **Implementation, benchmarks, and evidence**:
-  https://github.com/ksha23/acmd-offroad-control (public upon
-  publication). The repository is the paper-value closure: every tracked
+  https://github.com/ksha23/acmd-offroad-control (public). The repository is the paper-value closure: every tracked
   file participates in producing a figure, table, or number in the
   manuscript, `docs/PAPER_TABLE_VALUE_PROVENANCE.md` maps each published
   value to the generation and command that regenerate it, and the
