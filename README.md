@@ -3,6 +3,8 @@ The repo contains assets, obj files, json files, scripts, Chrono models, etc., n
 
 **This repo is organized by year of when the metadata was first added to the repo. Each year shows as a folder in this repo.**
 
+Unless noted otherwise in a subfolder, all code and data in this repository are released under the BSD-3-Clause license (see [LICENSE](LICENSE)).
+
 ## Info for SBEL members
 - Subfolders are meant to contain information associated with a certain paper, tech report, thesis, etc. Feel free to use subfolders in subfolders.
 - The naming convention is as follows:
