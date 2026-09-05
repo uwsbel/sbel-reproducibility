@@ -22,7 +22,7 @@ Unless noted otherwise in a subfolder, all code and data in this repository are 
   title = {{TR-2020-02 Public Metadata}}, \
   note              = {{Simulation-Based Engineering Laboratory, University of Wisconsin-Madison}}, \
   year              = {2020}, \
-  howpublished      = {\url{https://github.com/uwsbel/public-metadata/tree/master/2020/TR-2020-02}} \
+  howpublished      = {\url{https://github.com/uwsbel/sbel-reproducibility/tree/master/2020/TR-2020-02}} \
   }*
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;To maintain consistency, please copy/paste/edit the sample above to fit your needs when dropping in **refsSBELspecific.bib**.
