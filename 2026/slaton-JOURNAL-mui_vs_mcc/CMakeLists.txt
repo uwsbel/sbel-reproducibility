@@ -19,8 +19,8 @@ find_package(Chrono
 set(DEMOS
     demo_FSI_ConePenetrometer
     demo_FSI_NormalBevameter
-    demo_FSI_SlopedSingleWheelRTFBenchmark
-    demo_FSI_SlopedSingleWheelTest
+    demo_FSI_SlopedSingleWheel_RTFBenchmark
+    demo_FSI_SlopedSingleWheel_Test
     demo_ROBOT_Lander_CRM_RTFBenchmark
     demo_ROBOT_Lander_CRM
 )

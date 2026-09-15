@@ -33,7 +33,7 @@ PRE_PRESSURE_SCALE=2.0
 KAPPA_VALUES=(0.2)
 LAMBDA=0.8
 # Directory containing the executable
-EXEC="./../build/demo_FSI_SlopedSingleWheelTest"
+EXEC="./../build/demo_FSI_SlopedSingleWheel_Test"
 
 # Check if executable exists
 if [ ! -f "$EXEC" ]; then
