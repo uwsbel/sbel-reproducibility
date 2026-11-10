@@ -1,0 +1,86 @@
+{
+  "configuration": {
+    "case": "spatial",
+    "n_bodies": 2,
+    "joint_types": [
+      "spherical",
+      "spherical"
+    ],
+    "fixed_support": [
+      0,
+      0,
+      4
+    ],
+    "gravity": [
+      0,
+      0,
+      -9.81
+    ],
+    "calibration_s": 10,
+    "sg_windows": [
+      11,
+      11
+    ],
+    "max_nfev": [
+      2000,
+      2000
+    ],
+    "solver_tolerance": 1e-06,
+    "initialization_seed": 20261006,
+    "random_starts": false,
+    "axis_updates": false,
+    "initial_state_sd": [
+      0.05,
+      0.1,
+      0.08726646259971647,
+      0.02,
+      0.002
+    ],
+    "acc_noise_sd": 0.01,
+    "gyro_noise_sd": 0.001,
+    "ba_rw_sd": 0.0001,
+    "bg_rw_sd": 1e-05,
+    "constraint_sd": {
+      "point_p": 0.01,
+      "point_v": 0.05
+    },
+    "exclude_s": 0,
+    "simulation_duration_s": 20.0,
+    "simulation_dt_s": 0.001,
+    "generation_block_s": 10.0,
+    "noise_seeds": [
+      20261007,
+      20261008
+    ],
+    "stage2_fix": {
+      "propagation": "midpoint",
+      "oc_heading": true
+    },
+    "stage1_gyro_range_rad_s": 34.90658503988659,
+    "stage1_exclusion_half_width": 10
+  },
+  "source_hashes": {
+    "audit_extension.py": "65fed5cacb1c29d24316d8ea632186d8b15d5337b6631edc2f21e9ccb45d9ac5",
+    "audit_time_increment.py": "b9f095279f5c1b679129f19a5477dfad43fc9351d75df39ebcf198e0fd0c4865",
+    "export_results.py": "01cdfba3429b073258b991284fa424f7cbfac0159ffdad9dbe511ea75eebf716",
+    "reproduce.py": "1524e6efa75d3ba7a26904548b6a96cd0537c57aa4f6fcb9224678e6131a5579",
+    "run_case.py": "d8710b0de8147154b347d99af50e4608907f0d72ea93b6edb9b49589fead8efe",
+    "validate_run.py": "1827d8673096a5616a2b5597858aab46e1449e249f8cb27b11a826369a61ee67",
+    "src/calibration.py": "9faaca4f35e70e110a1bdb9dd63e65349ae0463bc1dc89abff4de252d994ef3d",
+    "src/core.py": "5f7f848827483a04e479a849247b284f93bbeb7ae9f1434d8b79cc7c4eb29ad4",
+    "src/generate_spatial.py": "27dcc30aaca6f7c80bbf57b02cb3341df8c29dee5f5614c80bceefd0bf7f61ea",
+    "configs/reproduction_tolerances.json": "ddf467bd1a11c1821ee1526e2a9ece3e419dce6fe8210ff103491faf82bd9d6c",
+    "configs/spatial.json": "f186827842d7fed635417348f3c69e2bd6d0bb1105268091e74615f4d4d11ff0",
+    "configs/spatial_rule.json": "2854c92869dbb8c598aa3b1607fd83a40027feebd8bdebff0ad96e2fd9d24aed"
+  },
+  "software": {
+    "python": "3.9.13 (main, Aug 25 2022, 23:51:50) [MSC v.1916 64 bit (AMD64)]",
+    "numpy": "1.26.4",
+    "scipy": "1.13.1",
+    "platform": "Windows-10-10.0.26200-SP0"
+  },
+  "truth_access": "Estimation accepts measurement channels and declared boundary inputs. Scoring opens reference files only after estimates are saved and hashed.",
+  "gauge": "Estimated anchor fixes a coordinate azimuth; no true attitude initializes STEP.",
+  "selection": "Minimum finite measurement residual across fixed starts; convergence checked separately.",
+  "numerical_settings_origin": "Record length 20 s: Stage I 10 s, Stage II 20 s. Integration and noise are generated in fixed 10 s blocks, so the first 10 s of the record do not depend on its length."
+}

@@ -1,0 +1,77 @@
+{
+ "run_case.py": {
+  "source": "<workspace>\\Diagnostics\\stage1_final_261015\\code_s31f\\run_case.py",
+  "sha256": "d8710b0de8147154b347d99af50e4608907f0d72ea93b6edb9b49589fead8efe"
+ },
+ "src/core.py": {
+  "source": "<workspace>\\Diagnostics\\stage1_final_261015\\code_s31f\\src\\core.py",
+  "sha256": "5f7f848827483a04e479a849247b284f93bbeb7ae9f1434d8b79cc7c4eb29ad4"
+ },
+ "src/calibration.py": {
+  "source": "<workspace>\\Diagnostics\\stage1_final_261015\\code_s31f\\src\\calibration.py",
+  "sha256": "0dd9c61c77395b4b23dfab08ffab94eee5310da223233c6aa1859aa3e1073c80"
+ },
+ "src/generate_spatial.py": {
+  "source": "<workspace>\\Diagnostics\\stage1_final_261015\\code_s31f\\src\\generate_spatial.py",
+  "sha256": "27dcc30aaca6f7c80bbf57b02cb3341df8c29dee5f5614c80bceefd0bf7f61ea"
+ },
+ "configs/spatial.json": {
+  "source": "<workspace>\\Diagnostics\\stage1_final_261015\\code_s31f\\configs\\spatial.json",
+  "sha256": "f186827842d7fed635417348f3c69e2bd6d0bb1105268091e74615f4d4d11ff0"
+ },
+ "configs/spatial_eiv.json": {
+  "source": "<workspace>\\Diagnostics\\stage1_final_261015\\code_s31f\\configs\\spatial_eiv.json",
+  "sha256": "64bbdcb5633ddcc3a16b1b0b0fbf072659a5885c5b3d697f07c0e59fa0ef2a86"
+ },
+ "configs/spatial_eiv_sd0.json": {
+  "source": "<workspace>\\Diagnostics\\stage1_final_261015\\code_s31f\\configs\\spatial_eiv_sd0.json",
+  "sha256": "0dd0963c319d753085061479a510617f48837f04be88d9af3110f5387e181802"
+ },
+ "configs/spatial_eiv_x0p5.json": {
+  "source": "<workspace>\\Diagnostics\\stage1_final_261015\\code_s31f\\configs\\spatial_eiv_x0p5.json",
+  "sha256": "6191f56ea0d06f53325ed18b8729bfd9573164a61659b60bbf1b51687577dd01"
+ },
+ "configs/spatial_eiv_x0p8.json": {
+  "source": "<workspace>\\Diagnostics\\stage1_final_261015\\code_s31f\\configs\\spatial_eiv_x0p8.json",
+  "sha256": "cdfbd5064f711eca897ffae6bd98d7c408df518e49101096e8de781f1066db30"
+ },
+ "configs/spatial_eiv_x1p2.json": {
+  "source": "<workspace>\\Diagnostics\\stage1_final_261015\\code_s31f\\configs\\spatial_eiv_x1p2.json",
+  "sha256": "1f2eebeb0099b68f27fec2e39c3bbfa37cd6515fbf63f073b73de23bd62d049e"
+ },
+ "configs/spatial_eiv_x2.json": {
+  "source": "<workspace>\\Diagnostics\\stage1_final_261015\\code_s31f\\configs\\spatial_eiv_x2.json",
+  "sha256": "931e69681dbdc348197e95f789c94dc0a916367e3203242f01b382d9fa73aaef"
+ },
+ "configs/spatial_rule.json": {
+  "source": "<workspace>\\Diagnostics\\stage1_final_261015\\code_s31f\\configs\\spatial_rule.json",
+  "sha256": "2854c92869dbb8c598aa3b1607fd83a40027feebd8bdebff0ad96e2fd9d24aed"
+ },
+ "expected/body1_stageI.json": {
+  "source": "<workspace>\\Diagnostics\\stage1_final_261015\\code_s31f\\runs\\eiv\\body1_stageI.json"
+ },
+ "expected/body2_stageI.json": {
+  "source": "<workspace>\\Diagnostics\\stage1_final_261015\\code_s31f\\runs\\eiv\\body2_stageI.json"
+ },
+ "expected/metrics.json": {
+  "source": "<workspace>\\Diagnostics\\stage1_final_261015\\code_s31f\\runs\\eiv\\metrics.json"
+ },
+ "expected/geometry_metrics.json": {
+  "source": "<workspace>\\Diagnostics\\stage1_final_261015\\code_s31f\\runs\\eiv\\geometry_metrics.json"
+ },
+ "expected/STAGE1_RANGE_RULE.json": {
+  "source": "<workspace>\\Diagnostics\\stage1_final_261015\\code_s31f\\runs\\eiv\\STAGE1_RANGE_RULE.json"
+ },
+ "expected/INPUT_HASHES.json": {
+  "source": "<workspace>\\Diagnostics\\stage1_final_261015\\code_s31f\\runs\\eiv\\INPUT_HASHES.json"
+ },
+ "expected/data/spatial_measurements.npz": {
+  "source": "<workspace>\\Diagnostics\\stage1_final_261015\\code_s31f\\runs\\eiv\\data\\spatial_measurements.npz"
+ },
+ "expected/data/spatial_reference.npz": {
+  "source": "<workspace>\\Diagnostics\\stage1_final_261015\\code_s31f\\runs\\eiv\\data\\spatial_reference.npz"
+ },
+ "expected/data/spatial_generation.json": {
+  "source": "<workspace>\\Diagnostics\\stage1_final_261015\\code_s31f\\runs\\eiv\\data\\spatial_generation.json"
+ }
+}

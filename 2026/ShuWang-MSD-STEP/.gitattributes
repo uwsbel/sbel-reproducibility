@@ -1,0 +1,3 @@
+# Store every file byte for byte, without line-ending conversion, so that the
+# SHA-256 values in SOURCES.json and the data checks hold on every system.
+* -text

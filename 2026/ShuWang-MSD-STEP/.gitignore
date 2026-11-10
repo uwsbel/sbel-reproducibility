@@ -1,0 +1,14 @@
+runs/
+__pycache__/
+*.pyc
+*.nbi
+*.nbc
+.venv/
+# records written by prepare_data.py
+section4_three_link/step/data/noise_only/
+section4_three_link/step/data/noise_bias/
+section4_chains/step/data/
+section4_chains/nbody/data/
+section4_chains/parity/data_c/
+section4_timing/step/data/
+section4_timing/nbody/data/

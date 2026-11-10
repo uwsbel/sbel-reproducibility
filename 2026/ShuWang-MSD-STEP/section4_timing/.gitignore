@@ -1,0 +1,7 @@
+review/out_*/
+nbody/out/
+parity/out/
+**/.numba_cache/
+**/__pycache__/
+logs/
+tables/

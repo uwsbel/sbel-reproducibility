@@ -1,0 +1,32 @@
+{
+ "run_case.py": {
+  "source": "<workspace>\\Diagnostics\\stage1_final_261015\\slider_f\\run_case.py",
+  "sha256": "df67d884e531d449a7e4e8fd229630528ada377e3d0eca476049672f70a02638"
+ },
+ "run_slider.py": {
+  "source": "<workspace>\\Diagnostics\\stage1_final_261015\\slider_f\\run_slider.py",
+  "sha256": "e138c8a33c0ade39d1f504c424789f75a59f6cfa3dd654cfe0605645ab47cf45"
+ },
+ "src/core.py": {
+  "source": "<workspace>\\Diagnostics\\stage1_final_261015\\slider_f\\src\\core.py",
+  "sha256": "aaad2ac8854cf41da8e0d7a3a30d20ac99c9b6e2494cce5b1ed3f6e8e469f135"
+ },
+ "src/generate_slider.py": {
+  "source": "<workspace>\\Diagnostics\\stage1_final_261015\\slider_f\\src\\generate_slider.py",
+  "sha256": "cdde65918cf9aad5701cb9042909a32c956e12ba6ccf535a945037f7dc0f59d9"
+ },
+ "src/slider_support.py": {
+  "source": "<workspace>\\Diagnostics\\stage1_final_261015\\slider_f\\src\\slider_support.py",
+  "sha256": "cd670bb156aded8370f3b9e14c517c12fdbd1e9c4f29ea578a0bef080dca3073"
+ },
+ "configs/slider_eiv_p.json": {
+  "source": "<workspace>\\Diagnostics\\stage1_final_261015\\slider_f\\configs\\slider_eiv_p.json",
+  "sha256": "cac0e7cfb3d60148da6b51522b8a2316773b073391f2d5c7547283e93b5b96a0"
+ },
+ "expected/FROZEN_PROTOCOL.json": {
+  "source": "<workspace>\\Diagnostics\\stage1_final_261015\\slider_f\\runs\\eiv_p\\FROZEN_PROTOCOL.json"
+ },
+ "expected/results": {
+  "source": "<workspace>\\Diagnostics\\stage1_final_261015\\slider_f\\runs\\eiv_p\\results"
+ }
+}

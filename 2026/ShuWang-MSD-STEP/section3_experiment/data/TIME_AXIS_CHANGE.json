@@ -1,0 +1,7 @@
+{
+  "change": "IMU time axis: t_k = k / 198.575 s (host-clock regression, mean of both WT901 devices) instead of the nominal k * 0.005 s.",
+  "previous_dt_s": 0.004999999999999893,
+  "new_dt_s": 0.005035880649628604,
+  "source": "regression of the host-clock time stamps of the IMU samples (not included)",
+  "accelerometer_gyroscope_arrays": "unchanged"
+}

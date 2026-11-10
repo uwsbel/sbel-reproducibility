@@ -1,0 +1,13 @@
+{
+  "fps": 240,
+  "offset_video_minus_imu_s": 0.0,
+  "lengths_m": [
+    0.14,
+    0.25,
+    0.12
+  ],
+  "uniform_dt": 0.005,
+  "velocity_sg_window": 31,
+  "velocity_sg_order": 3,
+  "status": "Camera rate 240 fps; IMU sample rate 198.575 Hz from the host clock; video-IMU offset from the cross-correlation of gyroscope and optical angular velocity."
+}

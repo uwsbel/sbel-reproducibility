@@ -1,0 +1,368 @@
+{
+ "step/run_error_comparison.py": {
+  "source": "<workspace>\\Diagnostics\\stage1_final_261015\\code_s4f\\run_error_comparison.py",
+  "sha256": "40dccfe21024d7bd0d2f4ce593467d3312e790d44cf74e9bed0b27859aaffd65"
+ },
+ "step/workflow_io.py": {
+  "source": "<workspace>\\Diagnostics\\stage1_final_261015\\code_s4f\\workflow_io.py",
+  "sha256": "b6fd4613923500cea2aa06d2b6a2d2242e9a41adcd1f27c71da4d326dc03de1f"
+ },
+ "step/generate_measurement_errors.py": {
+  "source": "<workspace>\\Diagnostics\\stage1_final_261015\\code_s4f\\generate_measurement_errors.py",
+  "sha256": "b01a1cb365edf5b0c553a80626d20d1c8abfd9ec43a8615f34bf131fbccd0fd1"
+ },
+ "step/src/calibration.py": {
+  "source": "<workspace>\\Diagnostics\\stage1_final_261015\\code_s4f\\src\\calibration.py",
+  "sha256": "0dd9c61c77395b4b23dfab08ffab94eee5310da223233c6aa1859aa3e1073c80"
+ },
+ "step/src/core.py": {
+  "source": "<workspace>\\Diagnostics\\stage1_final_261015\\code_s4f\\src\\core.py",
+  "sha256": "5f7f848827483a04e479a849247b284f93bbeb7ae9f1434d8b79cc7c4eb29ad4"
+ },
+ "step/src/compiled_step.py": {
+  "source": "<workspace>\\Diagnostics\\stage1_final_261015\\code_s4f\\src\\compiled_step.py",
+  "sha256": "c3f89c5bd7e878e9280408ce83c4f4326266302fb5ddf2d48579ba606fedb336"
+ },
+ "step/src/jt_checked.py": {
+  "source": "<workspace>\\Diagnostics\\stage1_final_261015\\code_s4f\\src\\jt_checked.py",
+  "sha256": "01cce110de0cf91ce33b720573d756b445be58a193ac30ad9b0c4ec590be9920"
+ },
+ "step/configs/step.json": {
+  "source": "<workspace>\\Diagnostics\\stage1_final_261015\\code_s4f\\configs\\step.json",
+  "sha256": "62a450c2600d3e9433406bd9c95074f5e5eac23ea660b5bf3f1f59a6efb3c140"
+ },
+ "step/configs/step_rule.json": {
+  "source": "<workspace>\\Diagnostics\\stage1_final_261015\\code_s4f\\configs\\step_rule.json",
+  "sha256": "c3d01b60c5aba878e3c5f36a72795a79cfada746582a169cb28832eeada014b3"
+ },
+ "step/configs/step_eiv.json": {
+  "source": "<workspace>\\Diagnostics\\stage1_final_261015\\code_s4f\\configs\\step_eiv.json",
+  "sha256": "5c769a77a7f10b54c4b4cfed8c64a94596cd78aafa0997171e66bd9da6eb1aef"
+ },
+ "step/configs/step_eiv_x0p5.json": {
+  "source": "<workspace>\\Diagnostics\\stage1_final_261015\\code_s4f\\configs\\step_eiv_x0p5.json",
+  "sha256": "ea9c2a716edf925425eaea94584c8375af27a4ab342c05df8d0a44cb20f208d9"
+ },
+ "step/configs/step_eiv_x0p8.json": {
+  "source": "<workspace>\\Diagnostics\\stage1_final_261015\\code_s4f\\configs\\step_eiv_x0p8.json",
+  "sha256": "7f329824bd0a59dd8588bd4be571177dfeb4df5dc90c1ca2acd1eeb517be52b2"
+ },
+ "step/configs/step_eiv_x1p2.json": {
+  "source": "<workspace>\\Diagnostics\\stage1_final_261015\\code_s4f\\configs\\step_eiv_x1p2.json",
+  "sha256": "e2440e9ff7db1e1c9205b5e87a255b52035214f89c1d6ba99446752bc36e0951"
+ },
+ "step/configs/step_eiv_x2.json": {
+  "source": "<workspace>\\Diagnostics\\stage1_final_261015\\code_s4f\\configs\\step_eiv_x2.json",
+  "sha256": "37f93fcad9e6f0cce1776e855abad3eb30639fc8cc8bbd14dbc2f230e36a4fd5"
+ },
+ "step/configs/measurement_errors.json": {
+  "source": "<workspace>\\Diagnostics\\stage1_final_261015\\code_s4f\\configs\\measurement_errors.json",
+  "sha256": "4d4e2dc759b0fa97f732e5fcabc2f9b32ec1766647012dfc1a3c0f8b1d94cfa3"
+ },
+ "step/configs/comparison_noise_bias.json": {
+  "source": "<workspace>\\Diagnostics\\stage1_final_261015\\code_s4f\\configs\\comparison_noise_bias.json",
+  "sha256": "fdbcf8cbc124eac4b84f5a6424fce13737d42d85c0e835eaedbd9d8888eaa5a6"
+ },
+ "step/data/clean/measurements.npz": {
+  "source": "<workspace>\\Diagnostics\\stage1_final_261015\\code_s4f\\data\\clean\\measurements.npz",
+  "sha256": "3bd3390dfd7623253adeb14750debbecb04bce43ddf38ae7f3057dd770dbd547"
+ },
+ "step/data/clean/reference.npz": {
+  "source": "<workspace>\\Diagnostics\\stage1_final_261015\\code_s4f\\data\\clean\\reference.npz",
+  "sha256": "0c3ec40c2b156ad8febfa0715f969634c5f1f7453e239232861e7c2a147b9e7b"
+ },
+ "review/jt_stepR.py": {
+  "source": "<workspace>\\Diagnostics\\review_261020\\jt_stepR.py",
+  "sha256": "cd622590cfa7b5db3d1a81753528d7f9c30fc09ca7eb248ecc6b66c8c57b4ff5"
+ },
+ "review/jt_bias_oc.py": {
+  "source": "<workspace>\\Diagnostics\\review_261020\\jt_bias_oc.py",
+  "sha256": "43cb8ea7d8ac7540f05191e4a3dde92c7d176796648778a08906e1494eb7fdbb"
+ },
+ "review/jt_bias_diag.py": {
+  "source": "<workspace>\\Diagnostics\\review_261020\\jt_bias_diag.py",
+  "sha256": "44b7c7ae6ca66c61df0a5e880da6af568b3d13bade39ea639d20b3434c680603"
+ },
+ "review/c2bc_sens_attrib.py": {
+  "source": "<workspace>\\Diagnostics\\review_261020\\c2bc_sens_attrib.py",
+  "sha256": "e9ad5b87e211239af87996e33060bda929be71cff99e4de23f2f59e5e61dec78"
+ },
+ "review/c1g_jt_prior_mid.py": {
+  "source": "<workspace>\\Diagnostics\\review_261020\\c1g_jt_prior_mid.py",
+  "sha256": "41ea21730374c23d519f532b7f0c79abf682d3e924fecc67f2a2b5c64f5b342e"
+ },
+ "nbody/nbody_jobs.py": {
+  "source": "<workspace>\\Diagnostics\\stage1_final_261015\\nbody_compare\\nbody_jobs.py",
+  "sha256": "13afc98fe3730305d4c2e6e79b7bc226383bf37143b33a3cf45e9d9786d3ce22"
+ },
+ "nbody/jt_nbody_struct.py": {
+  "source": "<workspace>\\Diagnostics\\stage1_final_261015\\nbody_compare\\jt_nbody_struct.py",
+  "sha256": "828209f2c74699230e671117e39d6349c6d38af1d641783f355da2b51db1c9e4"
+ },
+ "nbody/jt_nbody_dense.py": {
+  "source": "<workspace>\\Diagnostics\\stage1_final_261015\\nbody_compare\\jt_nbody_dense.py",
+  "sha256": "bb6fe7705573104c2e6d64b521c797722193b35125cab926e8ecc2af835fbe1d"
+ },
+ "nbody/run_single.py": {
+  "source": "<workspace>\\Diagnostics\\stage1_final_261015\\nbody_compare\\run_single.py",
+  "sha256": "e0b6151f9d956a127724acede203451b1d9734906657ae62293e5eff39f212ec"
+ },
+ "expected/review/out_d/C2_STEP10.json": {
+  "source": "<workspace>\\Diagnostics\\review_261020\\out_d\\C2_STEP10.json",
+  "sha256": "1651678cf2298de49005af3e6db48fd9a31dfe108df062daf1327ad169bfcee1"
+ },
+ "expected/review/out_d/C2bc_SENS_ATTRIB.json": {
+  "source": "<workspace>\\Diagnostics\\review_261020\\out_d\\C2bc_SENS_ATTRIB.json",
+  "sha256": "faf23ae6e1693ef33aa7d4b1a6da937a3675dfd0fb1bf4cc4870d53c061b6981"
+ },
+ "expected/review/out_e/APRIME_OC_STEPR.json": {
+  "source": "<workspace>\\Diagnostics\\review_261020\\out_e\\APRIME_OC_STEPR.json",
+  "sha256": "24cc58aaf32d5f9bcd90bb3b3d2e22f0779d7ef47572ed3e75176d3f87014cb3"
+ },
+ "expected/review/out_f/C1F_JT_VARIANTS_STEPR.json": {
+  "source": "<workspace>\\Diagnostics\\review_261020\\out_f\\C1F_JT_VARIANTS_STEPR.json",
+  "sha256": "c19b41f458eb6d41e0e1daf95efae54e3392d72b62600db20c8b50d4c95013f7"
+ },
+ "expected/review/out_g/C1G_JT_PRIOR_MID.json": {
+  "source": "<workspace>\\Diagnostics\\review_261020\\out_g\\C1G_JT_PRIOR_MID.json",
+  "sha256": "144af753c2fa724c50c7fc47f6af8ea15ffc813d49b45fe64b9af7b3308f71c4"
+ },
+ "expected/nbody/out/single/N03_noise_only.json": {
+  "source": "<workspace>\\Diagnostics\\stage1_final_261015\\nbody_compare\\out\\single\\N03_noise_only.json",
+  "sha256": "ad8168ef3206bf19d3a5e7a49082b79a43ad7a7559b924b97761f87582d79115"
+ },
+ "expected/nbody/out/single/N03_noise_bias.json": {
+  "source": "<workspace>\\Diagnostics\\stage1_final_261015\\nbody_compare\\out\\single\\N03_noise_bias.json",
+  "sha256": "38d6041c2db3bb36d84ef9873701e83e0f3c5976b197dc7191daf9b6ffb3e527"
+ },
+ "expected/spatial/no0/geometry_metrics.json": {
+  "source": "<workspace>\\Diagnostics\\stage1_final_261015\\code_s31f\\runs\\repro_off\\geometry_metrics.json",
+  "sha256": "f4c8a9ae1245fd15246bcfb45dfc2152653e90d95b149917d7c7749be13f7b48"
+ },
+ "expected/spatial/no0/state_metrics.csv": {
+  "source": "<workspace>\\Diagnostics\\stage1_final_261015\\code_s31f\\runs\\repro_off\\state_metrics.csv",
+  "sha256": "a9597f8abc98c61fb4af91c4195abf00fd15a56726ef142eeb3d7cd5bb316eb7"
+ },
+ "expected/spatial/no0/metrics.json": {
+  "source": "<workspace>\\Diagnostics\\stage1_final_261015\\code_s31f\\runs\\repro_off\\metrics.json",
+  "sha256": "ee2864487f09de358bdef343cda3b6e543fc32f0e66906fe06530352a576240d"
+ },
+ "expected/spatial/no0/FROZEN_PROTOCOL.json": {
+  "source": "<workspace>\\Diagnostics\\stage1_final_261015\\code_s31f\\runs\\repro_off\\FROZEN_PROTOCOL.json",
+  "sha256": "0f09e0837025a9483a12832f5a6dd7ad48f7db8c5062ec099a2eb7aa746d5f4f"
+ },
+ "expected/spatial/yes0/geometry_metrics.json": {
+  "source": "<workspace>\\Diagnostics\\stage1_range_rule_261014\\code_s31\\runs\\rule_v1\\geometry_metrics.json",
+  "sha256": "9ae73a56fda29a762ace7ba00ed57e940bdfff2270b5bbba2d574cdba3c6d138"
+ },
+ "expected/spatial/yes0/state_metrics.csv": {
+  "source": "<workspace>\\Diagnostics\\stage1_range_rule_261014\\code_s31\\runs\\rule_v1\\state_metrics.csv",
+  "sha256": "9cd7e89d2d31e78bb10a41c565414007e9e590b88d1fe89f0225ed891498509c"
+ },
+ "expected/spatial/yes0/metrics.json": {
+  "source": "<workspace>\\Diagnostics\\stage1_range_rule_261014\\code_s31\\runs\\rule_v1\\metrics.json",
+  "sha256": "ab2964c4f1482eef2d23dad3b1a6247da1396cf0f69fb9ccc5761ffa104b3632"
+ },
+ "expected/spatial/yes0/FROZEN_PROTOCOL.json": {
+  "source": "<workspace>\\Diagnostics\\stage1_range_rule_261014\\code_s31\\runs\\rule_v1\\FROZEN_PROTOCOL.json",
+  "sha256": "0e63689049734b32b66646939a854b254b6dddca6b3b7fd40e3b2dc9862049d0"
+ },
+ "expected/spatial/yes0/STAGE1_RANGE_RULE.json": {
+  "source": "<workspace>\\Diagnostics\\stage1_range_rule_261014\\code_s31\\runs\\rule_v1\\STAGE1_RANGE_RULE.json",
+  "sha256": "1a454b9ff58abea469b0e0b96530c31bc17723b9126ad692598f7e507eaf1ed4"
+ },
+ "expected/spatial/x0p5/geometry_metrics.json": {
+  "source": "<workspace>\\Diagnostics\\stage1_final_261015\\code_s31f\\runs\\eiv_x0p5\\geometry_metrics.json",
+  "sha256": "a33c037f07ef48f7fed99a54af833d0582d3ad9090df12c4d0c12d2d716ad54d"
+ },
+ "expected/spatial/x0p5/state_metrics.csv": {
+  "source": "<workspace>\\Diagnostics\\stage1_final_261015\\code_s31f\\runs\\eiv_x0p5\\state_metrics.csv",
+  "sha256": "3b8108081667272e0bf155324ccc8219631ab1f89c585fb9b9e87d5442ac8175"
+ },
+ "expected/spatial/x0p5/metrics.json": {
+  "source": "<workspace>\\Diagnostics\\stage1_final_261015\\code_s31f\\runs\\eiv_x0p5\\metrics.json",
+  "sha256": "128058f66a5acbf89f4355acd8a62f1041ddd9aa8b2ba37acf4c6b018113529d"
+ },
+ "expected/spatial/x0p5/FROZEN_PROTOCOL.json": {
+  "source": "<workspace>\\Diagnostics\\stage1_final_261015\\code_s31f\\runs\\eiv_x0p5\\FROZEN_PROTOCOL.json",
+  "sha256": "99898b18869dc71d412d4672999065a8ff9b6d87df0dfd7d153d5b0e096aacf8"
+ },
+ "expected/spatial/x0p5/STAGE1_RANGE_RULE.json": {
+  "source": "<workspace>\\Diagnostics\\stage1_final_261015\\code_s31f\\runs\\eiv_x0p5\\STAGE1_RANGE_RULE.json",
+  "sha256": "1a454b9ff58abea469b0e0b96530c31bc17723b9126ad692598f7e507eaf1ed4"
+ },
+ "expected/spatial/x0p8/geometry_metrics.json": {
+  "source": "<workspace>\\Diagnostics\\stage1_final_261015\\code_s31f\\runs\\eiv_x0p8\\geometry_metrics.json",
+  "sha256": "3fd1007428ac36c7beab33a8a04026d50e548fb27cedb8f93ef613086cc6c490"
+ },
+ "expected/spatial/x0p8/state_metrics.csv": {
+  "source": "<workspace>\\Diagnostics\\stage1_final_261015\\code_s31f\\runs\\eiv_x0p8\\state_metrics.csv",
+  "sha256": "2f4fa9ab5fd9222e36b4b820234fc5330107af0237d1a083e7c185d415d95aea"
+ },
+ "expected/spatial/x0p8/metrics.json": {
+  "source": "<workspace>\\Diagnostics\\stage1_final_261015\\code_s31f\\runs\\eiv_x0p8\\metrics.json",
+  "sha256": "bb237248ea957e2862fcf42751b517aa1e49004bc7937e80fdbfe20d23c85a03"
+ },
+ "expected/spatial/x0p8/FROZEN_PROTOCOL.json": {
+  "source": "<workspace>\\Diagnostics\\stage1_final_261015\\code_s31f\\runs\\eiv_x0p8\\FROZEN_PROTOCOL.json",
+  "sha256": "80677a012e30f0add7ea98ba5827c97c285f59ca70c0837ff9773cb908af9003"
+ },
+ "expected/spatial/x0p8/STAGE1_RANGE_RULE.json": {
+  "source": "<workspace>\\Diagnostics\\stage1_final_261015\\code_s31f\\runs\\eiv_x0p8\\STAGE1_RANGE_RULE.json",
+  "sha256": "1a454b9ff58abea469b0e0b96530c31bc17723b9126ad692598f7e507eaf1ed4"
+ },
+ "expected/spatial/x1/geometry_metrics.json": {
+  "source": "<workspace>\\Diagnostics\\stage1_final_261015\\code_s31f\\runs\\eiv\\geometry_metrics.json",
+  "sha256": "3e018ccf275e72bbf995b453208d54173edc676b6855f50c90b8ca4d3726d68a"
+ },
+ "expected/spatial/x1/state_metrics.csv": {
+  "source": "<workspace>\\Diagnostics\\stage1_final_261015\\code_s31f\\runs\\eiv\\state_metrics.csv",
+  "sha256": "9974916326970882405bc508b730af189f4ade5ce02ffbef174ab1c530693d63"
+ },
+ "expected/spatial/x1/metrics.json": {
+  "source": "<workspace>\\Diagnostics\\stage1_final_261015\\code_s31f\\runs\\eiv\\metrics.json",
+  "sha256": "cca19fbcce7a8a72d51b98000aa1860cd913d8d7d7b841471c96b08d210ce7c9"
+ },
+ "expected/spatial/x1/FROZEN_PROTOCOL.json": {
+  "source": "<workspace>\\Diagnostics\\stage1_final_261015\\code_s31f\\runs\\eiv\\FROZEN_PROTOCOL.json",
+  "sha256": "ab3586cc5751e88121947fb771a04ea491993295b6e396eae87386735609fb5b"
+ },
+ "expected/spatial/x1/STAGE1_RANGE_RULE.json": {
+  "source": "<workspace>\\Diagnostics\\stage1_final_261015\\code_s31f\\runs\\eiv\\STAGE1_RANGE_RULE.json",
+  "sha256": "1a454b9ff58abea469b0e0b96530c31bc17723b9126ad692598f7e507eaf1ed4"
+ },
+ "expected/spatial/x1p2/geometry_metrics.json": {
+  "source": "<workspace>\\Diagnostics\\stage1_final_261015\\code_s31f\\runs\\eiv_x1p2\\geometry_metrics.json",
+  "sha256": "fa01509a71c0b3bd1529e71d52bba998d65cd3346443f5bf5d8e8f19b6038a90"
+ },
+ "expected/spatial/x1p2/state_metrics.csv": {
+  "source": "<workspace>\\Diagnostics\\stage1_final_261015\\code_s31f\\runs\\eiv_x1p2\\state_metrics.csv",
+  "sha256": "60f8ac3d56ccfc7a165eab5d5678af3bf3fac54e4d27128df88ea6ac34c69350"
+ },
+ "expected/spatial/x1p2/metrics.json": {
+  "source": "<workspace>\\Diagnostics\\stage1_final_261015\\code_s31f\\runs\\eiv_x1p2\\metrics.json",
+  "sha256": "4f83386039741cdaa6ccef821f7bc7239a3539ec6b5a5e930667b9783fa54a8d"
+ },
+ "expected/spatial/x1p2/FROZEN_PROTOCOL.json": {
+  "source": "<workspace>\\Diagnostics\\stage1_final_261015\\code_s31f\\runs\\eiv_x1p2\\FROZEN_PROTOCOL.json",
+  "sha256": "79382d8292e8b41ae6b15ffbc8039c557f649fddba36149942d37fff2fa038ef"
+ },
+ "expected/spatial/x1p2/STAGE1_RANGE_RULE.json": {
+  "source": "<workspace>\\Diagnostics\\stage1_final_261015\\code_s31f\\runs\\eiv_x1p2\\STAGE1_RANGE_RULE.json",
+  "sha256": "1a454b9ff58abea469b0e0b96530c31bc17723b9126ad692598f7e507eaf1ed4"
+ },
+ "expected/spatial/x2/geometry_metrics.json": {
+  "source": "<workspace>\\Diagnostics\\stage1_final_261015\\code_s31f\\runs\\eiv_x2\\geometry_metrics.json",
+  "sha256": "dafe48d596d803dd343eff372545784a6fd46e520c1a1309ed3367077556b4fe"
+ },
+ "expected/spatial/x2/state_metrics.csv": {
+  "source": "<workspace>\\Diagnostics\\stage1_final_261015\\code_s31f\\runs\\eiv_x2\\state_metrics.csv",
+  "sha256": "8502d636d186474fff4bb66f7b961217e92930bece735baeef288b3ce394abf8"
+ },
+ "expected/spatial/x2/metrics.json": {
+  "source": "<workspace>\\Diagnostics\\stage1_final_261015\\code_s31f\\runs\\eiv_x2\\metrics.json",
+  "sha256": "62048f960d1a5c287cc04d627929bd0e397b60c010404529e77d9ef97d1b68ec"
+ },
+ "expected/spatial/x2/FROZEN_PROTOCOL.json": {
+  "source": "<workspace>\\Diagnostics\\stage1_final_261015\\code_s31f\\runs\\eiv_x2\\FROZEN_PROTOCOL.json",
+  "sha256": "3e01168a99f9e711dd1a3315e0edeaef596d29db8f36147460851af536f2a98a"
+ },
+ "expected/spatial/x2/STAGE1_RANGE_RULE.json": {
+  "source": "<workspace>\\Diagnostics\\stage1_final_261015\\code_s31f\\runs\\eiv_x2\\STAGE1_RANGE_RULE.json",
+  "sha256": "1a454b9ff58abea469b0e0b96530c31bc17723b9126ad692598f7e507eaf1ed4"
+ },
+ "expected/spatial/SENSITIVITY_S31.json": {
+  "source": "<workspace>\\Diagnostics\\stage1_final_261015\\SENSITIVITY_S31.json",
+  "sha256": "cf23b999ebb912f440612fb9828f559574ae18adda8d0e2a334d4adce6fac650"
+ },
+ ".gitignore": {
+  "source": "new_files",
+  "sha256": "c8f2bd15b7c9ae4f9e9fecda0533bd854d1f5f229227609c2c440e0ec2f5357c"
+ },
+ "CHANGES.md": {
+  "source": "new_files",
+  "sha256": "04bdcda6f80b7dc22f28f6647636318ab42663a17076a5424c8965f44ebb973a"
+ },
+ "make_table10.py": {
+  "source": "new_files",
+  "sha256": "f9a8fed9c55ffe3351007ecd2bc201b5a778f7676a8a667ce04d7568709e9b11"
+ },
+ "make_table5.py": {
+  "source": "new_files",
+  "sha256": "64120984f0322db2bd865f35eb43a88502a2a8f4951c3c821464c8efe43381db"
+ },
+ "make_table6.py": {
+  "source": "new_files",
+  "sha256": "25e01a3008a348c07cd2ae39ea473824bfc800f65074e84ce4b5d66c0700a399"
+ },
+ "make_table7.py": {
+  "source": "new_files",
+  "sha256": "552a1087114fdf68196a00122e0c0cb85a14853c5b2c5f669879a5c8c3192521"
+ },
+ "make_table9.py": {
+  "source": "new_files",
+  "sha256": "683e5d27eff41e0e02a7e13b215f5aa50e1ea2a9b3fe7413f05058d3080529ec"
+ },
+ "nbody/nbody_common.py": {
+  "source": "new_files (modified copy, see CHANGES.md)",
+  "sha256": "b53f69ecca1cde95f66216237f9ecb36124d2dba6082acc0e47c91eeb793fe89",
+  "modified_from": "<workspace>\\Diagnostics\\stage1_final_261015\\nbody_compare\\nbody_common.py",
+  "modified_from_sha256": "016f00b54ae275360e34c40bbf734d7ea1e7caf250bcd1f55e52fc827bd84853"
+ },
+ "nbody/run_jtbs_single.py": {
+  "source": "new_files",
+  "sha256": "080e66e565f65a23c5409855182007a45966d8360a4f77f8359a2c809690b7f0"
+ },
+ "pathcheck.py": {
+  "source": "new_files",
+  "sha256": "d37a9bb845b4150086af3113559d5a1b5e31a1ede4ad979c5bb93f31772d4e48"
+ },
+ "review/c1f_jt_variants_stepR.py": {
+  "source": "new_files (modified copy, see CHANGES.md)",
+  "sha256": "70fa2aa724e8e5ea884a53a0edfad9899aa5bc5624a046a857eeaf4e1e4395b3",
+  "modified_from": "<workspace>\\Diagnostics\\review_261020\\c1f_jt_variants_stepR.py",
+  "modified_from_sha256": "e7818b287af56e7edc53d4290c95582363bb3bd2c2421aa1bc26c95e1cdab8c8"
+ },
+ "review/c2_step10.py": {
+  "source": "new_files (modified copy, see CHANGES.md)",
+  "sha256": "a0a9639fef9599dbed21eb3b273c579315fd76ace44a1fd9df29e5da50ea74a2",
+  "modified_from": "<workspace>\\Diagnostics\\review_261020\\c2_step10.py",
+  "modified_from_sha256": "4b3152ce9b546a3cb3b1237d236b7af1a7e27534f7b666029c813231d7850e62"
+ },
+ "review/d_common.py": {
+  "source": "new_files (modified copy, see CHANGES.md)",
+  "sha256": "0ba470c43ef4a82aa85414136e89a272ef3068380723fd1106a070d4906e7950",
+  "modified_from": "<workspace>\\Diagnostics\\review_261020\\d_common.py",
+  "modified_from_sha256": "c9db6feb44b3e6f549486d9a3a0b45f1c961c968f81cb61a23bc867d481013b7"
+ },
+ "review/jt_bias.py": {
+  "source": "new_files (modified copy, see CHANGES.md)",
+  "sha256": "6720bdaec1042d8d7892d14118a269489651eda62cea5e486cae4f36e7904d45",
+  "modified_from": "<workspace>\\Diagnostics\\review_261020\\jt_bias.py",
+  "modified_from_sha256": "ea7e92fc06539c443b3830200ebbf01a880ef163f6eb6f69aada175af3151ddb"
+ },
+ "review/jt_t1_diag.py": {
+  "source": "new_files (modified copy, see CHANGES.md)",
+  "sha256": "9bef4965b986ff96310728a09339ed865149dbc3b45aaa16b784a71094782f96",
+  "modified_from": "<workspace>\\Diagnostics\\review_261020\\jt_t1_diag.py",
+  "modified_from_sha256": "2c6c604b383cda2ade1a08d35a0f808a5fdcd94b5e70193c3b3d55c5176e394d"
+ },
+ "review/run_Aprime_oc_stepR.py": {
+  "source": "new_files (modified copy, see CHANGES.md)",
+  "sha256": "eef1b167da3c0b8ec5fc53052a6bae091d8ee249b8688728de9f11b1388e332f",
+  "modified_from": "<workspace>\\Diagnostics\\review_261020\\run_Aprime_oc_stepR.py",
+  "modified_from_sha256": "ff34806963ebe4f7a00cea4550cea471c530c797d4c1617964bb6c2a880fcf87"
+ },
+ "run_section4_three_link.py": {
+  "source": "new_files",
+  "sha256": "727cd07096bc15225c4b5d565717289b7fa245ce5919af965f350da9230c2c6f"
+ },
+ "run_table9_spatial.py": {
+  "source": "new_files",
+  "sha256": "a568c55e9661c5d130503c97c7b842fbca78c2f258ba9ccd9acc762d7ab5bf3a"
+ },
+ "tables_common.py": {
+  "source": "new_files",
+  "sha256": "a337e693cf918ee0acda74e47f74baeecd7fdf2b2a16d56ee71173d1423d02ff"
+ }
+}

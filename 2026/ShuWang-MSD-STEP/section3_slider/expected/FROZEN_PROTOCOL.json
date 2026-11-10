@@ -1,0 +1,101 @@
+{
+  "configuration": {
+    "case": "slider",
+    "gravity": [
+      0.0,
+      -9.81,
+      0.0
+    ],
+    "fixed_support": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "guide_point": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "slider_lever": [
+      -0.15,
+      0.1,
+      0.05
+    ],
+    "calibration_s": 10.0,
+    "sg_windows": [
+      7,
+      17,
+      17
+    ],
+    "axis_residual_multipliers": [
+      1.0,
+      1.0
+    ],
+    "max_nfev": [
+      600,
+      1200,
+      600
+    ],
+    "solver_tolerance": 1e-08,
+    "initial_state_sd": [
+      0.05,
+      0.1,
+      0.08726646259971647,
+      0.02,
+      0.002
+    ],
+    "acc_noise_sd": 0.01,
+    "gyro_noise_sd": 0.001,
+    "ba_rw_sd": 0.0001,
+    "bg_rw_sd": 1e-05,
+    "axis_updates": true,
+    "constraint_sd": {
+      "point_p": 0.01,
+      "point_v": 0.05,
+      "axis": 0.017453292519943295,
+      "guide_p": 0.01,
+      "guide_v": 0.05,
+      "fixed_attitude": 0.017453292519943295
+    },
+    "stage2_fix": {
+      "propagation": "midpoint",
+      "oc_heading": false
+    },
+    "initialization_seed": 20261006,
+    "stage1_gyro_range_rad_s": 34.90658503988659,
+    "stage1_exclusion_half_width": 16,
+    "stage1_eiv": true,
+    "stage1_eiv_mc": 50,
+    "stage1_eiv_seed": 20261014,
+    "stage1_eiv_gtol": 1e-08,
+    "stage1_eiv_gyro_sd": 0.001,
+    "stage1_eiv_project_axis": true
+  },
+  "source_hashes": {
+    "export_results.py": "4ea8513180cedbcd61bf8304b6575c48a60961a06d77f6215fadcf5ae42399a9",
+    "export_results_qlim.py": "b8be69419f85fb11120faf25a6cceb876a0e9a285f6ebf2173df7fee15de4b29",
+    "reproduce.py": "55bea33ac3ec5fe2ab94af9c3a40c8a1f908fb21c74f8e42c833045df8b5c50d",
+    "run_case.py": "df67d884e531d449a7e4e8fd229630528ada377e3d0eca476049672f70a02638",
+    "run_slider.py": "e138c8a33c0ade39d1f504c424789f75a59f6cfa3dd654cfe0605645ab47cf45",
+    "validate_run.py": "1827d8673096a5616a2b5597858aab46e1449e249f8cb27b11a826369a61ee67",
+    "verify_integrity.py": "48cbaedfae998de7215eece6b64b415d2c880cb3d60a0a4d770f5aaf0764e646",
+    "src/core.py": "aaad2ac8854cf41da8e0d7a3a30d20ac99c9b6e2494cce5b1ed3f6e8e469f135",
+    "src/generate_slider.py": "cdde65918cf9aad5701cb9042909a32c956e12ba6ccf535a945037f7dc0f59d9",
+    "src/slider_support.py": "cd670bb156aded8370f3b9e14c517c12fdbd1e9c4f29ea578a0bef080dca3073",
+    "configs/reproduction_tolerances.json": "ddf467bd1a11c1821ee1526e2a9ece3e419dce6fe8210ff103491faf82bd9d6c",
+    "configs/slider.json": "d3f7b3215aa7662216eee0b55778d65cd6a01f24a1f5a6c9d3b0c58f4325eb1b",
+    "configs/slider_eiv.json": "2836ce32e0ddf5614f0e78f00522c95e3d9f5289d3dad1dcdbb9ab7228ec1d5b",
+    "configs/slider_eiv_p.json": "cac0e7cfb3d60148da6b51522b8a2316773b073391f2d5c7547283e93b5b96a0"
+  },
+  "software": {
+    "python": "3.9.13 (main, Aug 25 2022, 23:51:50) [MSC v.1916 64 bit (AMD64)]",
+    "numpy": "1.26.4",
+    "scipy": "1.13.1",
+    "platform": "Windows-10-10.0.26200-SP0"
+  },
+  "version": "Slider IMU mounting offset: [-0.15, 0.10, 0.05] m.",
+  "truth_access": "Estimator accepts measurements and prescribed mounting/boundary inputs. Estimates are saved and hashed before scoring. No truth-based initialization or selection.",
+  "guide": "Known point at world origin; estimated direction. The guided point is joint C, not the offset IMU center.",
+  "selection": "Minimum finite measurement residual across predefined starts (the same starts as for a zero IMU offset). Convergence checked separately.",
+  "settings": "Estimator equations, noise seeds, tolerances and weights are the same as for a zero IMU offset."
+}

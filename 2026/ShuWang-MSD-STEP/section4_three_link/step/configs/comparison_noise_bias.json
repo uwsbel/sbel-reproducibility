@@ -1,0 +1,94 @@
+{
+  "case": "three_link_noise_bias",
+  "duration_s": 30.0,
+  "exclude_s": 3.0,
+  "primary_frame": "declared_heading_chart",
+  "secondary_frame": "raw_world_with_inverse_known_chart_transform",
+  "coordinate_policy": "Canonical world chart sets initial Body 1 local x azimuth to world x. Reference and JT initialization use one gravity-axis rotation G around fixed support; STEP chart is measurement-defined. No per-body or trajectory-fitted alignment.",
+  "perturbation_component_percent": [
+    0,
+    10,
+    -10,
+    20,
+    -20,
+    50,
+    -50,
+    100,
+    -100
+  ],
+  "perturbation_signs": [
+    [
+      1,
+      -1,
+      1
+    ],
+    [
+      -1,
+      1,
+      -1
+    ],
+    [
+      1,
+      1,
+      -1
+    ],
+    [
+      -1,
+      -1,
+      1
+    ],
+    [
+      1,
+      -1,
+      -1
+    ]
+  ],
+  "perturbation_rule": "ell_init=ell_true+(component_percent/100)*norm(ell_true)*sign; norm_percent=sqrt(3)*abs(component_percent)",
+  "noise_and_bias": "See configs/measurement_errors.json; both methods read the same measurement files, without correction by the true biases.",
+  "jt_initialization": "true initial position velocity and attitude in canonical chart; perturbed initial lever vectors",
+  "jt_Qd_diagonal": [
+    1e-06,
+    0.0001,
+    1e-05,
+    1e-09
+  ],
+  "jt_Qd_units": [
+    "m^2 per sample",
+    "m^2/s^2 per sample",
+    "rad^2 per sample",
+    "m^2 per sample"
+  ],
+  "jt_constraint_sd": {
+    "position_m": 0.005,
+    "velocity_m_s": 0.005
+  },
+  "jt_P0_scalar": 0.001,
+  "jt_n_iters": 1,
+  "jt_updates": "one EKF update; repeated nonlinear updates without an IEKF prior correction are forbidden",
+  "jt_numerics": {
+    "full_jacobian": true,
+    "aligned_time": true,
+    "midpoint_propagation": true,
+    "exact_attitude_transition": true,
+    "exact_reset_jacobian": true
+  },
+  "step_config_file": "configs/step.json",
+  "step_method": "Stage I calibration; Stage II with midpoint specific-force propagation (all bodies) and the heading-consistent (OC-EKF) projection (Body 1, spherical anchor). Four random starts per body, minimum finite measurement residual selection.",
+  "primary_attitude_metric": "mean geodesic angle deg",
+  "secondary_attitude_metric": "RMS geodesic angle deg",
+  "geometry_metric": "Euclidean relative lever error; JT final sample and STEP Stage I estimate",
+  "timing_scope": "Stage I separate; compiled Stage II / JT full-record calls include history allocation and parent reference construction; exclude compilation, scoring, archive I/O and periodic numerical diagnostics.",
+  "timing_repetitions": 3,
+  "selection_rule": "No tuning of covariance or trajectory against reference errors; numerical modifications justified by independent derivative checks.",
+  "data_model_scope": "Synthetic two-angle link directions and endpoint point masses, regularized generalized acceleration solve. Not a full three-dimensional rigid-body rotational inertia model.",
+  "data_noise_choice": "Noise and bias are added to the clean record (see configs/measurement_errors.json).",
+  "input_files": "data/{scenario}/measurements.npz and reference.npz",
+  "scenarios": [
+    "noise_only",
+    "bias_only",
+    "noise_bias"
+  ],
+  "jt_bias_states": false,
+  "step_bias_states": true,
+  "clean_control": "<workspace>\\STEPv2_three_link_resolution_20261008\\runs\\clean_checked_v1"
+}

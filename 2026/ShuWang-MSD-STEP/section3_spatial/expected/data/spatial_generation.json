@@ -1,0 +1,21 @@
+{
+  "checks": {
+    "relative_energy_range": 1.0853896144378134e-12
+  },
+  "noise_seed": [
+    20261007,
+    20261008
+  ],
+  "noise_sd": [
+    0.01,
+    0.001
+  ],
+  "bias_bounds": [
+    0.02,
+    0.002
+  ],
+  "duration_s": 20.0,
+  "noise_block_s": 10.0,
+  "origin": "Spatial double-pendulum simulation, 20 s; integration and noise draws in fixed 10 s blocks, so the first 10 s do not depend on the record length.",
+  "measurement_sha256": "a61e75acfb0d0a2bf6d392d7a9fbc448285d244d4af57e7ec3427082ca8b33dd"
+}

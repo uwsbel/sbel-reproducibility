@@ -1,0 +1,96 @@
+{
+ "step/run_error_comparison.py": {
+  "source": "<workspace>\\Diagnostics\\stage1_final_261015\\code_s4f\\run_error_comparison.py",
+  "sha256": "40dccfe21024d7bd0d2f4ce593467d3312e790d44cf74e9bed0b27859aaffd65"
+ },
+ "step/workflow_io.py": {
+  "source": "<workspace>\\Diagnostics\\stage1_final_261015\\code_s4f\\workflow_io.py",
+  "sha256": "b6fd4613923500cea2aa06d2b6a2d2242e9a41adcd1f27c71da4d326dc03de1f"
+ },
+ "step/src/calibration.py": {
+  "source": "<workspace>\\Diagnostics\\stage1_final_261015\\code_s4f\\src\\calibration.py",
+  "sha256": "0dd9c61c77395b4b23dfab08ffab94eee5310da223233c6aa1859aa3e1073c80"
+ },
+ "step/src/core.py": {
+  "source": "<workspace>\\Diagnostics\\stage1_final_261015\\code_s4f\\src\\core.py",
+  "sha256": "5f7f848827483a04e479a849247b284f93bbeb7ae9f1434d8b79cc7c4eb29ad4"
+ },
+ "step/src/compiled_step.py": {
+  "source": "<workspace>\\Diagnostics\\stage1_final_261015\\code_s4f\\src\\compiled_step.py",
+  "sha256": "c3f89c5bd7e878e9280408ce83c4f4326266302fb5ddf2d48579ba606fedb336"
+ },
+ "step/src/jt_checked.py": {
+  "source": "<workspace>\\Diagnostics\\stage1_final_261015\\code_s4f\\src\\jt_checked.py",
+  "sha256": "01cce110de0cf91ce33b720573d756b445be58a193ac30ad9b0c4ec590be9920"
+ },
+ "step/configs/step_eiv.json": {
+  "source": "<workspace>\\Diagnostics\\stage1_final_261015\\code_s4f\\configs\\step_eiv.json",
+  "sha256": "5c769a77a7f10b54c4b4cfed8c64a94596cd78aafa0997171e66bd9da6eb1aef"
+ },
+ "step/configs/measurement_errors.json": {
+  "source": "<workspace>\\Diagnostics\\stage1_final_261015\\code_s4f\\configs\\measurement_errors.json",
+  "sha256": "4d4e2dc759b0fa97f732e5fcabc2f9b32ec1766647012dfc1a3c0f8b1d94cfa3"
+ },
+ "nbody/jt_nbody_struct.py": {
+  "source": "<workspace>\\Diagnostics\\stage1_final_261015\\nbody_compare\\jt_nbody_struct.py",
+  "sha256": "828209f2c74699230e671117e39d6349c6d38af1d641783f355da2b51db1c9e4"
+ },
+ "nbody/jt_nbody_dense.py": {
+  "source": "<workspace>\\Diagnostics\\stage1_final_261015\\nbody_compare\\jt_nbody_dense.py",
+  "sha256": "bb6fe7705573104c2e6d64b521c797722193b35125cab926e8ecc2af835fbe1d"
+ },
+ "parity/compiled_step_struct.py": {
+  "source": "<workspace>\\Diagnostics\\stage1_final_261015\\step_parity_261103\\compiled_step_struct.py",
+  "sha256": "b9cb0e4df6efd46f6eb687a064b9bcced675765217b997a3acc970e3fc50d8ce"
+ },
+ "parity/timing_paper.py": {
+  "source": "<workspace>\\Diagnostics\\stage1_final_261015\\step_parity_261103\\timing_paper.py",
+  "sha256": "4c73389f49ed928d01b164024ff16e430af8f321c77d07b3ac360cb33d91bd54"
+ },
+ "expected/parity/out/paper/timing/TIMING_P.json": {
+  "source": "<workspace>\\Diagnostics\\stage1_final_261015\\step_parity_261103\\out\\paper\\timing\\TIMING_P.json",
+  "sha256": "712fb90abd1648a42c9876010cf4d59e59e217ad61985e93b7e5f7bd672c2c99"
+ },
+ ".gitignore": {
+  "source": "new_files",
+  "sha256": "c8f2bd15b7c9ae4f9e9fecda0533bd854d1f5f229227609c2c440e0ec2f5357c"
+ },
+ "CHANGES.md": {
+  "source": "new_files",
+  "sha256": "20b98f6d1656ef98dcbd3096c6d617abc365684eb7e7c81f6da46f9c9aa26a68"
+ },
+ "make_table12.py": {
+  "source": "new_files",
+  "sha256": "dd91843d435df33b65d88350990dec06e98b58360bbd626bb5cd5a231cc50fab"
+ },
+ "nbody/nbody_common.py": {
+  "source": "new_files (modified copy, see CHANGES.md)",
+  "sha256": "b53f69ecca1cde95f66216237f9ecb36124d2dba6082acc0e47c91eeb793fe89",
+  "modified_from": "<workspace>\\Diagnostics\\stage1_final_261015\\nbody_compare\\nbody_common.py",
+  "modified_from_sha256": "016f00b54ae275360e34c40bbf734d7ea1e7caf250bcd1f55e52fc827bd84853"
+ },
+ "parity/parity_common.py": {
+  "source": "new_files (modified copy, see CHANGES.md)",
+  "sha256": "69c7593777856d3339b95a425dfd70e7945b957400274df41f85be492200816a",
+  "modified_from": "<workspace>\\Diagnostics\\stage1_final_261015\\step_parity_261103\\parity_common.py",
+  "modified_from_sha256": "4fae9e2f7cff9abf4844eaa0fa51f0750e51b1e37802966f709581657ae790ee"
+ },
+ "pathcheck.py": {
+  "source": "new_files",
+  "sha256": "d37a9bb845b4150086af3113559d5a1b5e31a1ede4ad979c5bb93f31772d4e48"
+ },
+ "review/jt_bias.py": {
+  "source": "new_files (modified copy, see CHANGES.md)",
+  "sha256": "6720bdaec1042d8d7892d14118a269489651eda62cea5e486cae4f36e7904d45",
+  "modified_from": "<workspace>\\Diagnostics\\review_261020\\jt_bias.py",
+  "modified_from_sha256": "ea7e92fc06539c443b3830200ebbf01a880ef163f6eb6f69aada175af3151ddb"
+ },
+ "run_timing.py": {
+  "source": "new_files",
+  "sha256": "d19ac9d8538b027695e01b0799b7f509e45b7af42c967fdbeb825ce85cef6c67"
+ },
+ "tables_common.py": {
+  "source": "new_files",
+  "sha256": "a337e693cf918ee0acda74e47f74baeecd7fdf2b2a16d56ee71173d1423d02ff"
+ }
+}

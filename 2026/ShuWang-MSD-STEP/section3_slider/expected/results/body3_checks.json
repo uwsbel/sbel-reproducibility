@@ -1,0 +1,6 @@
+{
+  "min_covariance_eigenvalue": 7.146433267841084e-10,
+  "max_covariance_asymmetry": 6.6280328122649e-20,
+  "max_correction_angle_rad": 0.00039865707101939454,
+  "max_rotation_orthogonality_error": 8.060219158778636e-14
+}

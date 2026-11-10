@@ -1,0 +1,25 @@
+{
+  "duration_s": 30.0,
+  "sample_dt_s": 0.001,
+  "acc_white_noise_sd_m_s2": 0.01,
+  "gyro_white_noise_sd_rad_s": 0.001,
+  "acc_bias_component_bounds_m_s2": [
+    -0.02,
+    0.02
+  ],
+  "gyro_bias_component_bounds_rad_s": [
+    -0.002,
+    0.002
+  ],
+  "bias_model": "One independent constant vector per body and sensor over the whole record; no drift.",
+  "noise_model": "Independent per-sample, per-channel zero-mean Gaussian; values are sample standard deviations, not continuous spectral densities.",
+  "body_seeds": {
+    "1": 20261009,
+    "2": 20261010,
+    "3": 20261011
+  },
+  "draw_order": "For each body: ba uniform(3), bg uniform(3), acc Gaussian(N,3), gyro Gaussian(N,3). Whole record, not blocks.",
+  "scenario_coupling": "The SAME drawn noise arrays and bias vectors are reused across corresponding groups: noise_only=clean+noise; bias_only=clean+bias; noise_bias=clean+noise+bias. This permits separating the two effects without changing random realizations.",
+  "primary_realization_count": 1,
+  "selection": "Fixed seeds before estimator execution; no run/seed selection by reference accuracy."
+}

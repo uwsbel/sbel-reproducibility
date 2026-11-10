@@ -1,0 +1,58 @@
+{
+ "run_case.py": {
+  "source": "<workspace>\\Diagnostics\\stage1_final_261015\\exp_f\\run_case.py",
+  "sha256": "f0dc84262fb6271c7bef3d9b551bd1f59d0418c5ecb59ad5f0ee56c79092cc2d"
+ },
+ "evaluate_experiment.py": {
+  "source": "<workspace>\\Diagnostics\\stage1_final_261015\\exp_f\\evaluate_experiment.py",
+  "sha256": "f03c52aebf493f6793a5b2d00c30183d88b1644fb53e78e128e205ebf6d97c68"
+ },
+ "src/core.py": {
+  "source": "<workspace>\\Diagnostics\\stage1_final_261015\\exp_f\\src\\core.py",
+  "sha256": "5f7f848827483a04e479a849247b284f93bbeb7ae9f1434d8b79cc7c4eb29ad4"
+ },
+ "src/calibration.py": {
+  "source": "<workspace>\\Diagnostics\\stage1_final_261015\\exp_f\\src\\calibration.py",
+  "sha256": "1f2ec959d50efc097600d1613ab4b13b2131555999e2130e4a57379bc5c86068"
+ },
+ "configs/experimental_eiv.json": {
+  "source": "<workspace>\\Diagnostics\\stage1_final_261015\\exp_f\\configs\\experimental_eiv.json",
+  "sha256": "bc3389b249407bb7870af17e641b5f220c93483b1c65190cc8aa85856bfe1e54"
+ },
+ "configs/experimental_eiv_p.json": {
+  "source": "<workspace>\\Diagnostics\\stage1_final_261015\\exp_f\\configs\\experimental_eiv_p.json",
+  "sha256": "abdeb8748e78ab0df2c46732f5402510f969634be213985fff466e1b830ba252"
+ },
+ "configs/experimental_reference.json": {
+  "source": "<workspace>\\Diagnostics\\review_261020\\exp10_root\\configs\\experimental_reference.json",
+  "sha256": "ca9889e8ef99a47e9e6a4a9b7e365b300a79c6c7997c7d05a1d5afcb700b0124"
+ },
+ "data/experimental_measurements.npz": {
+  "source": "<workspace>\\Diagnostics\\review_261020\\exp10_root\\data\\experimental_measurements.npz",
+  "sha256": "8b4326d26f82f41ed401b3bfa9373c9b3cadb746764f81931cb6656779f4e206"
+ },
+ "data/experimental_optical_angles.csv": {
+  "source": "<workspace>\\Diagnostics\\review_261020\\exp10_root\\data\\experimental_optical_angles.csv",
+  "sha256": "1c4372b46eb8845cf539411a7fc7b51dd98423fc488592f79a6c28261b107335"
+ },
+ "data/TIME_AXIS_CHANGE.json": {
+  "source": "<workspace>\\Diagnostics\\stage1_final_261015\\exp_f\\data\\TIME_AXIS_CHANGE.json",
+  "sha256": "dadbdeccffa718f073c5105036aa2746095240d738bfdb26f093afc02cc6468a"
+ },
+ "expected/body1_stageI.json": {
+  "source": "<workspace>\\Diagnostics\\review_261020\\exp10_root\\runs\\cal10\\body1_stageI.json"
+ },
+ "expected/body2_stageI.json": {
+  "source": "<workspace>\\Diagnostics\\review_261020\\exp10_root\\runs\\cal10\\body2_stageI.json"
+ },
+ "expected/reference_notebook/metrics.csv": {
+  "source": "<workspace>\\Diagnostics\\review_261020\\exp10_root\\runs\\cal10\\reference_notebook\\metrics.csv"
+ },
+ "expected/reference_notebook/geometry.json": {
+  "source": "<workspace>\\Diagnostics\\review_261020\\exp10_root\\runs\\cal10\\reference_notebook\\geometry.json"
+ },
+ "run_experiment.py": {
+  "source": "new_files",
+  "sha256": "3be6ba6f73e4dfca940954a564c1eff7928fdcd41c134c66bd5ae49b5566d7f1"
+ }
+}

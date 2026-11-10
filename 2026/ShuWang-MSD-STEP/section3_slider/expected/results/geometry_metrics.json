@@ -1,0 +1,87 @@
+[
+  {
+    "vector": "1A",
+    "estimated": true,
+    "estimate_m": [
+      -1.0015462399351498,
+      0.003606037804217625,
+      -0.00041315401459780625
+    ],
+    "ground_truth_m": [
+      -1.0,
+      0.0,
+      0.0
+    ],
+    "in_plane_relative_error_percent": 0.39235655445651363,
+    "axial_component_m": -0.00041315401459780625,
+    "full_vector_difference_m": 0.003945258270668347
+  },
+  {
+    "vector": "1B",
+    "estimated": true,
+    "estimate_m": [
+      1.002159126248209,
+      0.003596440712366321,
+      0.0004184019444617008
+    ],
+    "ground_truth_m": [
+      1.0,
+      0.0,
+      0.0
+    ],
+    "in_plane_relative_error_percent": 0.41947838982802355,
+    "axial_component_m": 0.0004184019444617008,
+    "full_vector_difference_m": 0.0042155986692758675
+  },
+  {
+    "vector": "2B",
+    "estimated": true,
+    "estimate_m": [
+      -2.004416841046539,
+      -0.0072350839834237745,
+      0.0010848104944171126
+    ],
+    "ground_truth_m": [
+      -2.0,
+      0.0,
+      0.0
+    ],
+    "in_plane_relative_error_percent": 0.4238364220946197,
+    "axial_component_m": 0.0010848104944171126,
+    "full_vector_difference_m": 0.008545860921310674
+  },
+  {
+    "vector": "2C",
+    "estimated": true,
+    "estimate_m": [
+      1.9985622976551227,
+      0.001598981580191555,
+      -0.0010874416948770827
+    ],
+    "ground_truth_m": [
+      2.0,
+      0.0,
+      0.0
+    ],
+    "in_plane_relative_error_percent": 0.10751430284219754,
+    "axial_component_m": -0.0010874416948770827,
+    "full_vector_difference_m": 0.002409618136969974
+  },
+  {
+    "vector": "3C",
+    "estimated": false,
+    "estimate_m": [
+      -0.15,
+      0.1,
+      0.05
+    ],
+    "ground_truth_m": [
+      -0.15,
+      0.1,
+      0.05
+    ],
+    "in_plane_relative_error_percent": null,
+    "axial_component_m": 0.05,
+    "full_vector_difference_m": 0.0
+  }
+]

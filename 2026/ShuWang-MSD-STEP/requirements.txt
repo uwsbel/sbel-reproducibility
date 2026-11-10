@@ -1,0 +1,19 @@
+# Tested with Python 3.9.13 (64 bit) on Windows.
+cycler==0.12.1
+fonttools==4.60.2
+kiwisolver==1.4.7
+llvmlite==0.43.0
+matplotlib==3.5.2
+mpmath==1.4.1
+numba==0.60.0
+numpy==1.26.4
+packaging==26.3
+pandas==2.2.3
+pillow==11.3.0
+pyparsing==3.3.3
+python-dateutil==2.9.0.post0
+pytz==2026.5
+scipy==1.13.1
+six==1.17.0
+sympy==1.10.1
+tzdata==2026.5

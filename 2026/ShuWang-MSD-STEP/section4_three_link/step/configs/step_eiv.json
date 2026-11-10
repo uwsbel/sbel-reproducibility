@@ -1,0 +1,62 @@
+{
+  "case": "three_link_checked",
+  "n_bodies": 3,
+  "joint_types": [
+    "spherical",
+    "spherical",
+    "spherical"
+  ],
+  "fixed_support": [
+    0,
+    0,
+    6
+  ],
+  "gravity": [
+    0,
+    0,
+    -9.81
+  ],
+  "calibration_s": 30,
+  "sg_windows": [
+    11,
+    11,
+    11
+  ],
+  "max_nfev": [
+    2000,
+    2000,
+    2000
+  ],
+  "solver_tolerance": 1e-06,
+  "initialization_seed": 20261006,
+  "random_starts": false,
+  "n_starts": 4,
+  "axis_updates": false,
+  "initial_state_sd": [
+    0.05,
+    0.1,
+    0.08726646259971647,
+    0.02,
+    0.002
+  ],
+  "acc_noise_sd": 0.01,
+  "gyro_noise_sd": 0.001,
+  "ba_rw_sd": 0.0001,
+  "bg_rw_sd": 1e-05,
+  "constraint_sd": {
+    "point_p": 0.01,
+    "point_v": 0.05
+  },
+  "exclude_s": 3,
+  "stage2_fix": {
+    "propagation": "midpoint",
+    "oc_heading": true
+  },
+  "stage1_gyro_range_rad_s": 34.90658503988659,
+  "stage1_exclusion_half_width": 10,
+  "stage1_eiv": true,
+  "stage1_eiv_mc": 50,
+  "stage1_eiv_seed": 20261014,
+  "stage1_eiv_gtol": 1e-08,
+  "stage1_eiv_gyro_sd": 0.001
+}

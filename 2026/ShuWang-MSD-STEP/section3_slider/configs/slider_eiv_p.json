@@ -1,0 +1,72 @@
+{
+  "case": "slider",
+  "gravity": [
+    0.0,
+    -9.81,
+    0.0
+  ],
+  "fixed_support": [
+    0.0,
+    0.0,
+    0.0
+  ],
+  "guide_point": [
+    0.0,
+    0.0,
+    0.0
+  ],
+  "slider_lever": [
+    -0.15,
+    0.1,
+    0.05
+  ],
+  "calibration_s": 10.0,
+  "sg_windows": [
+    7,
+    17,
+    17
+  ],
+  "axis_residual_multipliers": [
+    1.0,
+    1.0
+  ],
+  "max_nfev": [
+    600,
+    1200,
+    600
+  ],
+  "solver_tolerance": 1e-08,
+  "initial_state_sd": [
+    0.05,
+    0.1,
+    0.08726646259971647,
+    0.02,
+    0.002
+  ],
+  "acc_noise_sd": 0.01,
+  "gyro_noise_sd": 0.001,
+  "ba_rw_sd": 0.0001,
+  "bg_rw_sd": 1e-05,
+  "axis_updates": true,
+  "constraint_sd": {
+    "point_p": 0.01,
+    "point_v": 0.05,
+    "axis": 0.017453292519943295,
+    "guide_p": 0.01,
+    "guide_v": 0.05,
+    "fixed_attitude": 0.017453292519943295
+  },
+  "stage2_fix": {
+    "propagation": "midpoint",
+    "oc_heading": false
+  },
+  "initialization_seed": 20261006,
+  "stage1_gyro_range_rad_s": 34.90658503988659,
+  "stage1_exclusion_half_width": 16,
+  "stage1_eiv": true,
+  "stage1_eiv_mc": 50,
+  "stage1_eiv_seed": 20261014,
+  "stage1_eiv_gtol": 1e-08,
+  "stage1_eiv_gyro_sd": 0.001,
+  "stage1_eiv_project_axis": true
+}
