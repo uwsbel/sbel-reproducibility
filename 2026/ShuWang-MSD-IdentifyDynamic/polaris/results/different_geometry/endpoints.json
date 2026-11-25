@@ -1,0 +1,149 @@
+{
+ "teacher": "teacher0",
+ "setting": "different_geometry",
+ "parameters": [
+  "mu",
+  "M",
+  "COMx",
+  "COMz",
+  "Ixx",
+  "Iyy",
+  "Izz"
+ ],
+ "selected": "seed2",
+ "note": "One record per DE run. stop_event: i = validation cost at or below the near-noise threshold, ii = no improvement of more than 0.5 % in 8 generations, iii = generation cap. The endpoint is the checked generation with the lowest validation cost up to the stop. The test_r_* fields are the stored summaries of r over the 18 test motions and 8 output groups.",
+ "runs": [
+  {
+   "seed": 1,
+   "selected": false,
+   "stop_generation": 44,
+   "stop_event": "ii",
+   "endpoint_generation": 36,
+   "training_cost": 24.522252255047423,
+   "validation_cost": 29.423757409625168,
+   "test_cost": 28.988896468413415,
+   "parameters": [
+    0.6316671024736771,
+    1126.8128018397222,
+    -1.6331458402670376,
+    0.7793305892602501,
+    341.43632498545423,
+    1038.0930132411477,
+    1247.5035659588002
+   ],
+   "z": [
+    -0.4208322438158074,
+    0.07711551999899502,
+    0.024878416996890307,
+    0.11785798681091442,
+    0.9538347816409594,
+    0.8654160320363495,
+    0.15834521986266714
+   ],
+   "all_test_motions_valid": true,
+   "test_r_min": 0.9487090717983165,
+   "test_r_max": 78.97304698629307,
+   "test_r_median": 4.988407241808752,
+   "test_r_outside_band": 141
+  },
+  {
+   "seed": 2,
+   "selected": true,
+   "stop_generation": 32,
+   "stop_event": "ii",
+   "endpoint_generation": 24,
+   "training_cost": 28.705211255300135,
+   "validation_cost": 26.394747942229404,
+   "test_cost": 26.082223899994975,
+   "parameters": [
+    0.6333046592000873,
+    1130.4586917984925,
+    -1.625783893728846,
+    0.7996546174219662,
+    341.84629036565275,
+    1066.7165704541699,
+    1319.7143869171337
+   ],
+   "z": [
+    -0.4167383519997818,
+    0.09030734255447292,
+    0.05178167045247273,
+    0.3076785322555009,
+    0.9597828914672433,
+    0.9995711726468532,
+    0.39904795639044544
+   ],
+   "all_test_motions_valid": true,
+   "test_r_min": 0.9516931397794195,
+   "test_r_max": 56.6486118185536,
+   "test_r_median": 5.184934673201212,
+   "test_r_outside_band": 141
+  },
+  {
+   "seed": 3,
+   "selected": false,
+   "stop_generation": 64,
+   "stop_event": "ii",
+   "endpoint_generation": 56,
+   "training_cost": 23.87729234595559,
+   "validation_cost": 27.849127244502522,
+   "test_cost": 27.381697471077068,
+   "parameters": [
+    0.6326468513124264,
+    1124.2073319512958,
+    -1.6340823422486934,
+    0.7792053317466688,
+    344.512796065161,
+    1045.1868021617859,
+    1387.005008262623
+   ],
+   "z": [
+    -0.41838287171893407,
+    0.06768822053838353,
+    0.021456095190634628,
+    0.11668811785777988,
+    0.9984707161450377,
+    0.8986637602284453,
+    0.6233500275420771
+   ],
+   "all_test_motions_valid": true,
+   "test_r_min": 0.9484989381838356,
+   "test_r_max": 74.4441454936022,
+   "test_r_median": 4.978039333866242,
+   "test_r_outside_band": 141
+  },
+  {
+   "seed": 4,
+   "selected": false,
+   "stop_generation": 60,
+   "stop_event": "ii",
+   "endpoint_generation": 52,
+   "training_cost": 24.047193470892772,
+   "validation_cost": 27.853200474085654,
+   "test_cost": 27.253071734466992,
+   "parameters": [
+    0.6331681942940778,
+    1121.905086042575,
+    -1.6318478709663704,
+    0.7846359716629914,
+    342.3633424782125,
+    1042.0657866076833,
+    1363.953680195085
+   ],
+   "z": [
+    -0.4170795142648056,
+    0.05935806799665344,
+    0.029621672994778914,
+    0.16740872416806218,
+    0.9672847023516835,
+    0.8840359389065819,
+    0.5465122673169505
+   ],
+   "all_test_motions_valid": true,
+   "test_r_min": 0.9484641917504267,
+   "test_r_max": 74.11013068312882,
+   "test_r_median": 4.978768591929642,
+   "test_r_outside_band": 141
+  }
+ ]
+}

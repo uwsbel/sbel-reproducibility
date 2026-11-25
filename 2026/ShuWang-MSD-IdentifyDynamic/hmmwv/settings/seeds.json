@@ -1,0 +1,26 @@
+{
+ "de_seeds": {
+  "seed1": 26102201,
+  "seed2": 26102202,
+  "seed3": 26102203,
+  "seed4": 26102204
+ },
+ "de_chunk_rule": "chunk k of a run uses the integer seed + k; k = 0 for the first 16 generations",
+ "noise_seeds": {
+  "generator": "numpy.random.default_rng(seed), one seed per record",
+  "training_first": 2610231100,
+  "validation_first": 2610231200,
+  "test_first": 2610276100,
+  "rule": "record i of a set uses first + i, in the order of settings/motions.json; teacher k adds 10000 * k; both geometry settings use the same seeds"
+ },
+ "test_input_seeds": {
+  "first": 2610275100,
+  "rule": "test motion i uses first + i"
+ },
+ "teacher_draw_seeds": {
+  "teacher1": 26111301,
+  "teacher2": 26111302,
+  "teacher3": 26111303
+ },
+ "noise_only_cost_simulation_seed": 26111601
+}

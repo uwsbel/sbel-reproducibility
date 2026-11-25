@@ -1,0 +1,87 @@
+{
+ "description": "Evaluation counts of the eight DE runs of the main teacher. A candidate is one new parameter vector whose training cost was requested. Infeasible candidates are not simulated.",
+ "runs": [
+  {
+   "setting": "different_geometry",
+   "seed": 1,
+   "candidates_evaluated": 1568,
+   "infeasible_or_invalid": 100,
+   "stopped_early": 695,
+   "motion_simulations_run": 5854,
+   "motion_simulations_without_early_stop": 7340,
+   "share_of_motion_simulations_saved": 0.20245231607629433
+  },
+  {
+   "setting": "different_geometry",
+   "seed": 2,
+   "candidates_evaluated": 1312,
+   "infeasible_or_invalid": 72,
+   "stopped_early": 561,
+   "motion_simulations_run": 5044,
+   "motion_simulations_without_early_stop": 6200,
+   "share_of_motion_simulations_saved": 0.18645161290322576
+  },
+  {
+   "setting": "different_geometry",
+   "seed": 3,
+   "candidates_evaluated": 1184,
+   "infeasible_or_invalid": 88,
+   "stopped_early": 493,
+   "motion_simulations_run": 4458,
+   "motion_simulations_without_early_stop": 5480,
+   "share_of_motion_simulations_saved": 0.18649635036496348
+  },
+  {
+   "setting": "different_geometry",
+   "seed": 4,
+   "candidates_evaluated": 1184,
+   "infeasible_or_invalid": 92,
+   "stopped_early": 373,
+   "motion_simulations_run": 4753,
+   "motion_simulations_without_early_stop": 5460,
+   "share_of_motion_simulations_saved": 0.12948717948717947
+  },
+  {
+   "setting": "same_geometry",
+   "seed": 1,
+   "candidates_evaluated": 1312,
+   "infeasible_or_invalid": 136,
+   "stopped_early": 577,
+   "motion_simulations_run": 4644,
+   "motion_simulations_without_early_stop": 5880,
+   "share_of_motion_simulations_saved": 0.21020408163265303
+  },
+  {
+   "setting": "same_geometry",
+   "seed": 2,
+   "candidates_evaluated": 1312,
+   "infeasible_or_invalid": 77,
+   "stopped_early": 555,
+   "motion_simulations_run": 5068,
+   "motion_simulations_without_early_stop": 6175,
+   "share_of_motion_simulations_saved": 0.17927125506072872
+  },
+  {
+   "setting": "same_geometry",
+   "seed": 3,
+   "candidates_evaluated": 1056,
+   "infeasible_or_invalid": 78,
+   "stopped_early": 506,
+   "motion_simulations_run": 3792,
+   "motion_simulations_without_early_stop": 4890,
+   "share_of_motion_simulations_saved": 0.22453987730061353
+  },
+  {
+   "setting": "same_geometry",
+   "seed": 4,
+   "candidates_evaluated": 1184,
+   "infeasible_or_invalid": 62,
+   "stopped_early": 512,
+   "motion_simulations_run": 4602,
+   "motion_simulations_without_early_stop": 5610,
+   "share_of_motion_simulations_saved": 0.17967914438502675
+  }
+ ],
+ "total_candidates_evaluated": 10112,
+ "share_of_motion_simulations_saved": 0.1875199319655576
+}

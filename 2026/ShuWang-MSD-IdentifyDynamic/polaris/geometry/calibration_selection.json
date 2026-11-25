@@ -1,0 +1,255 @@
+{
+ "note": "Nine calibrations of the front suspension, one per rough road. The rule uses no true geometry. Step 1: validity limits. Step 2: screen against the median of the valid calibrations. Step 3: rank by the worst window dispersion. Step 4: the first calibration in this order that passes the three mechanical checks is selected. The rear suspension has a separate reconstruction and is not part of this choice.",
+ "validity_limits": {
+  "loop_closure_rms_m_at_most": 0.12,
+  "left_right_hardpoint_rms_m_at_most": 0.18,
+  "arm_relative_rate_rms_rad_per_s_at_least": 0.008
+ },
+ "screen": {
+  "worst_calibration_cost_per_sample": {
+   "median": 119.1226083602514,
+   "mad": 22.195218953024423,
+   "upper_limit": 185.7082652193247
+  },
+  "left_right_hardpoint_rms_m": {
+   "median": 0.019587341673067853,
+   "mad": 0.004509095958946044,
+   "upper_limit": 0.03311462954990599
+  },
+  "worst_window_dispersion_m": {
+   "median": 0.0178329490042778,
+   "mad": 0.0034652343257427784,
+   "upper_limit": 0.028228651981506137
+  },
+  "smallest_information_per_sample_at_least": 1676.1978515126475
+ },
+ "mechanical_check_limits": {
+  "joint_residual_m_at_most": 0.001,
+  "settled_toe_and_camber_deg_at_most": 5.0
+ },
+ "order_after_screen": [
+  "calibration_9",
+  "calibration_7",
+  "calibration_1",
+  "calibration_5"
+ ],
+ "selected": "calibration_9",
+ "calibrations": [
+  {
+   "name": "calibration_1",
+   "road": {
+    "height_max_m": 0.12,
+    "periods_x": 44,
+    "periods_y": 22
+   },
+   "valid": true,
+   "passes_screen": true,
+   "reasons": "",
+   "loop_closure_rms_m": 0.02265432493667754,
+   "left_right_hardpoint_rms_m": 0.0061540436521892875,
+   "arm_relative_rate_rms_rad_per_s": 3.1084586725643333,
+   "worst_calibration_cost_per_sample": 81.4863593871407,
+   "smallest_information_per_sample": 1839.774286423171,
+   "worst_window_dispersion_m": 0.01719291367221938,
+   "driving_check": true,
+   "joint_check": true,
+   "alignment_check": false,
+   "largest_joint_residual_m": 0.0006115101539152434,
+   "largest_settled_toe_deg": 81.3533504996661,
+   "largest_settled_camber_deg": 9.121617584553334,
+   "selected": false
+  },
+  {
+   "name": "calibration_2",
+   "road": {
+    "height_max_m": 0.15,
+    "periods_x": 36,
+    "periods_y": 18
+   },
+   "valid": true,
+   "passes_screen": false,
+   "reasons": "smallest information below the 25th percentile",
+   "loop_closure_rms_m": 0.027878680046799727,
+   "left_right_hardpoint_rms_m": 0.019582725294235787,
+   "arm_relative_rate_rms_rad_per_s": 2.7288274227962632,
+   "worst_calibration_cost_per_sample": 65.00955018872017,
+   "smallest_information_per_sample": 1113.3900610290818,
+   "worst_window_dispersion_m": 0.020784954959191672,
+   "driving_check": true,
+   "joint_check": true,
+   "alignment_check": false,
+   "largest_joint_residual_m": 0.0008500609865179506,
+   "largest_settled_toe_deg": 78.95796667147457,
+   "largest_settled_camber_deg": 8.846697138482284,
+   "selected": false
+  },
+  {
+   "name": "calibration_3",
+   "road": {
+    "height_max_m": 0.15,
+    "periods_x": 44,
+    "periods_y": 22
+   },
+   "valid": true,
+   "passes_screen": false,
+   "reasons": "worst window dispersion exceeds the median plus three median absolute deviations",
+   "loop_closure_rms_m": 0.019441428658235126,
+   "left_right_hardpoint_rms_m": 0.012900768367505864,
+   "arm_relative_rate_rms_rad_per_s": 3.2561500887597497,
+   "worst_calibration_cost_per_sample": 80.82259342809922,
+   "smallest_information_per_sample": 1768.7933163874563,
+   "worst_window_dispersion_m": 0.03618577363292098,
+   "driving_check": true,
+   "joint_check": true,
+   "alignment_check": false,
+   "largest_joint_residual_m": 0.00062460750622175,
+   "largest_settled_toe_deg": 1.5730977940531805,
+   "largest_settled_camber_deg": 5.078826059903715,
+   "selected": false
+  },
+  {
+   "name": "calibration_4",
+   "road": {
+    "height_max_m": 0.18,
+    "periods_x": 38,
+    "periods_y": 19
+   },
+   "valid": true,
+   "passes_screen": false,
+   "reasons": "left-right hardpoint difference exceeds the median plus three median absolute deviations; smallest information below the 25th percentile",
+   "loop_closure_rms_m": 0.02161785949033649,
+   "left_right_hardpoint_rms_m": 0.03383708959142733,
+   "arm_relative_rate_rms_rad_per_s": 3.919592821255322,
+   "worst_calibration_cost_per_sample": 112.6616815902996,
+   "smallest_information_per_sample": 1398.4114568882208,
+   "worst_window_dispersion_m": 0.01583056628460387,
+   "driving_check": true,
+   "joint_check": true,
+   "alignment_check": true,
+   "largest_joint_residual_m": 0.0005026374432805644,
+   "largest_settled_toe_deg": 2.9863456300016407,
+   "largest_settled_camber_deg": 2.3264551439635808,
+   "selected": false
+  },
+  {
+   "name": "calibration_5",
+   "road": {
+    "height_max_m": 0.2,
+    "periods_x": 34,
+    "periods_y": 17
+   },
+   "valid": true,
+   "passes_screen": true,
+   "reasons": "",
+   "loop_closure_rms_m": 0.03722677663788256,
+   "left_right_hardpoint_rms_m": 0.01959195805189992,
+   "arm_relative_rate_rms_rad_per_s": 3.9691975921737903,
+   "worst_calibration_cost_per_sample": 125.58353513020323,
+   "smallest_information_per_sample": 2219.27270551541,
+   "worst_window_dispersion_m": 0.018472984336336224,
+   "driving_check": true,
+   "joint_check": true,
+   "alignment_check": false,
+   "largest_joint_residual_m": 0.0009452577001204359,
+   "largest_settled_toe_deg": 1.99597740455153,
+   "largest_settled_camber_deg": 13.70122027548015,
+   "selected": false
+  },
+  {
+   "name": "calibration_6",
+   "road": {
+    "height_max_m": 0.2,
+    "periods_x": 36,
+    "periods_y": 19
+   },
+   "valid": false,
+   "passes_screen": false,
+   "reasons": "loop-closure RMS above 0.12 m; left-right hardpoint difference above 0.18 m",
+   "loop_closure_rms_m": 0.5844342808707537,
+   "left_right_hardpoint_rms_m": 0.5922508264175154,
+   "arm_relative_rate_rms_rad_per_s": 3.7118884744735476,
+   "worst_calibration_cost_per_sample": 110.80997078608664,
+   "smallest_information_per_sample": 1589.089130758541,
+   "worst_window_dispersion_m": 0.02033479879238876,
+   "driving_check": true,
+   "joint_check": true,
+   "alignment_check": false,
+   "largest_joint_residual_m": 0.0007282774409678398,
+   "largest_settled_toe_deg": 2.831033853733163,
+   "largest_settled_camber_deg": 6.148689063641566,
+   "selected": false
+  },
+  {
+   "name": "calibration_7",
+   "road": {
+    "height_max_m": 0.2,
+    "periods_x": 40,
+    "periods_y": 20
+   },
+   "valid": true,
+   "passes_screen": true,
+   "reasons": "",
+   "loop_closure_rms_m": 0.01882799762995821,
+   "left_right_hardpoint_rms_m": 0.017255723060737752,
+   "arm_relative_rate_rms_rad_per_s": 4.405314351997337,
+   "worst_calibration_cost_per_sample": 136.451666596151,
+   "smallest_information_per_sample": 2472.739740682979,
+   "worst_window_dispersion_m": 0.013854486307706115,
+   "driving_check": true,
+   "joint_check": true,
+   "alignment_check": true,
+   "largest_joint_residual_m": 0.000479761923544091,
+   "largest_settled_toe_deg": 2.71492307246786,
+   "largest_settled_camber_deg": 0.7188625127740184,
+   "selected": false
+  },
+  {
+   "name": "calibration_8",
+   "road": {
+    "height_max_m": 0.22,
+    "periods_x": 38,
+    "periods_y": 19
+   },
+   "valid": true,
+   "passes_screen": false,
+   "reasons": "worst window dispersion exceeds the median plus three median absolute deviations",
+   "loop_closure_rms_m": 0.026250434705309297,
+   "left_right_hardpoint_rms_m": 0.021649828286444715,
+   "arm_relative_rate_rms_rad_per_s": 4.417190279508101,
+   "worst_calibration_cost_per_sample": 146.18398803040066,
+   "smallest_information_per_sample": 2300.3180873351275,
+   "worst_window_dispersion_m": 0.028299046258864372,
+   "driving_check": true,
+   "joint_check": true,
+   "alignment_check": true,
+   "largest_joint_residual_m": 0.0008045841973678951,
+   "largest_settled_toe_deg": 2.3167022886375945,
+   "largest_settled_camber_deg": 2.0444524929120713,
+   "selected": false
+  },
+  {
+   "name": "calibration_9",
+   "road": {
+    "height_max_m": 0.25,
+    "periods_x": 40,
+    "periods_y": 20
+   },
+   "valid": true,
+   "passes_screen": true,
+   "reasons": "",
+   "loop_closure_rms_m": 0.022737463836408078,
+   "left_right_hardpoint_rms_m": 0.031372957828740236,
+   "arm_relative_rate_rms_rad_per_s": 4.21630564109619,
+   "worst_calibration_cost_per_sample": 128.12289721562342,
+   "smallest_information_per_sample": 3467.456490497102,
+   "worst_window_dispersion_m": 0.009873778020761833,
+   "driving_check": true,
+   "joint_check": true,
+   "alignment_check": true,
+   "largest_joint_residual_m": 0.0006308563783814836,
+   "largest_settled_toe_deg": 2.672845011452315,
+   "largest_settled_camber_deg": 2.385320655319991,
+   "selected": true
+  }
+ ]
+}

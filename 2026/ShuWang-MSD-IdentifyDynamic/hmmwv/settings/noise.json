@@ -1,0 +1,86 @@
+{
+ "output_interval_s": 0.002,
+ "groups": [
+  {
+   "name": "Position",
+   "key": "position",
+   "quantity": "Chassis position",
+   "components": 3,
+   "standard_deviation": 0.003,
+   "unit": "m",
+   "standard_deviation_si": 0.003
+  },
+  {
+   "name": "Attitude",
+   "key": "attitude",
+   "quantity": "Chassis attitude, as a rotation vector",
+   "components": 3,
+   "standard_deviation": 0.002,
+   "unit": "rad",
+   "standard_deviation_si": 0.002
+  },
+  {
+   "name": "Velocity",
+   "key": "velocity",
+   "quantity": "Chassis velocity",
+   "components": 3,
+   "standard_deviation": 0.02,
+   "unit": "m/s",
+   "standard_deviation_si": 0.02
+  },
+  {
+   "name": "Speed",
+   "key": "speed",
+   "quantity": "Forward speed: chassis velocity along the chassis x-axis",
+   "components": 1,
+   "standard_deviation": 0.02,
+   "unit": "m/s",
+   "standard_deviation_si": 0.02
+  },
+  {
+   "name": "Wheel angular speed",
+   "key": "wheel_angular_speed",
+   "quantity": "Spin rate of each wheel",
+   "components": 4,
+   "standard_deviation": 0.05,
+   "unit": "rad/s",
+   "standard_deviation_si": 0.05
+  },
+  {
+   "name": "Steering proxy",
+   "key": "steering_proxy",
+   "quantity": "Mean yaw angle of the two front uprights relative to the chassis",
+   "components": 1,
+   "standard_deviation": 0.5,
+   "unit": "deg",
+   "standard_deviation_si": 0.008726646259971648
+  },
+  {
+   "name": "Angular velocity",
+   "key": "angular_velocity",
+   "quantity": "Chassis angular velocity",
+   "components": 3,
+   "standard_deviation": 0.005,
+   "unit": "rad/s",
+   "standard_deviation_si": 0.005
+  },
+  {
+   "name": "Upright relative position",
+   "key": "upright_relative_position",
+   "quantity": "Positions of the four uprights relative to the chassis",
+   "components": 12,
+   "standard_deviation": 0.003,
+   "unit": "m",
+   "standard_deviation_si": 0.003
+  }
+ ],
+ "model": "Independent Gaussian noise on every component and sample. The attitude noise is a rotation with Gaussian rotation-vector components, applied on the left of the noise-free attitude.",
+ "scoring": {
+  "skipped_samples": 100,
+  "sample_stride": 4,
+  "training_record_samples": 1000,
+  "training_scored_samples": 225,
+  "validation_and_test_record_samples": 1200,
+  "validation_and_test_scored_samples": 275
+ }
+}

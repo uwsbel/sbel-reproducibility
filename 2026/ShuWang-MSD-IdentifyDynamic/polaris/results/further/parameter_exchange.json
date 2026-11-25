@@ -1,0 +1,128 @@
+{
+ "note": "Forward simulations of the 18 test motions, different-geometry setting. Each case is a teacher with the listed parameters and the true geometry; the reference model has the same parameters and the calibrated geometry. No parameter is fitted. reference_cost is the test cost of the reference model against the noisy records of the case.",
+ "parameters": [
+  "mu",
+  "M",
+  "COMx",
+  "COMz",
+  "Ixx",
+  "Iyy",
+  "Izz"
+ ],
+ "cases": [
+  {
+   "name": "teacher0",
+   "description": "teacher 0",
+   "parameters": [
+    0.637600643503205,
+    1117.9152134831063,
+    -1.6639715617402804,
+    0.7457959444860945,
+    285.5686770438346,
+    960.5103850054824,
+    1095.1090245542712
+   ],
+   "noise_only_cost": 0.9402670787280838,
+   "reference_cost": 54.525788068384195,
+   "reference_cost_position_group": 63.09954049880586,
+   "mean_speed_m_per_s": 5.19238039273705,
+   "largest_lateral_acceleration_g": 0.10387224861777124,
+   "mean_number_of_spinning_wheels": 1.9976143623259093
+  },
+  {
+   "name": "teacher1",
+   "description": "teacher 1",
+   "parameters": [
+    0.8572093141622065,
+    1144.6241786693026,
+    -1.6692445588897245,
+    0.7792289877520467,
+    273.4080783652121,
+    801.1237308271591,
+    1036.2997108432403
+   ],
+   "noise_only_cost": 0.93044981628831,
+   "reference_cost": 77.44300178082196,
+   "reference_cost_position_group": 220.31461908114593,
+   "mean_speed_m_per_s": 5.578511002811365,
+   "largest_lateral_acceleration_g": 0.21950889470310853,
+   "mean_number_of_spinning_wheels": 1.0774898172243657
+  },
+  {
+   "name": "teacher0_with_friction_of_teacher1",
+   "description": "teacher 0 with the friction of teacher 1",
+   "parameters": [
+    0.8572093141622065,
+    1117.9152134831063,
+    -1.6639715617402804,
+    0.7457959444860945,
+    285.5686770438346,
+    960.5103850054824,
+    1095.1090245542712
+   ],
+   "noise_only_cost": 0.9402659707366626,
+   "reference_cost": 77.28968446256064,
+   "reference_cost_position_group": 218.94883328562744,
+   "mean_speed_m_per_s": 5.678504292562864,
+   "largest_lateral_acceleration_g": 0.2248955540295203,
+   "mean_number_of_spinning_wheels": 1.0709151028133048
+  },
+  {
+   "name": "teacher1_with_friction_of_teacher0",
+   "description": "teacher 1 with the friction of teacher 0",
+   "parameters": [
+    0.637600643503205,
+    1144.6241786693026,
+    -1.6692445588897245,
+    0.7792289877520467,
+    273.4080783652121,
+    801.1237308271591,
+    1036.2997108432403
+   ],
+   "noise_only_cost": 0.930460065181397,
+   "reference_cost": 56.66761344982782,
+   "reference_cost_position_group": 72.60890753689601,
+   "mean_speed_m_per_s": 5.136196521309743,
+   "largest_lateral_acceleration_g": 0.09954936863800667,
+   "mean_number_of_spinning_wheels": 1.9380014698557726
+  },
+  {
+   "name": "teacher0_with_pitch_inertia_toward_teacher1",
+   "description": "teacher 0 with the pitch inertia moved toward teacher 1 (the full value is not feasible)",
+   "parameters": [
+    0.637600643503205,
+    1117.9152134831063,
+    -1.6639715617402804,
+    0.7457959444860945,
+    285.5686770438346,
+    810.0,
+    1095.1090245542712
+   ],
+   "noise_only_cost": 0.9402666625610464,
+   "reference_cost": 57.301960922253976,
+   "reference_cost_position_group": 78.91711494918735,
+   "mean_speed_m_per_s": 5.1955674298965135,
+   "largest_lateral_acceleration_g": 0.10482605850411883,
+   "mean_number_of_spinning_wheels": 1.9680993056125782
+  },
+  {
+   "name": "teacher1_with_pitch_inertia_of_teacher0",
+   "description": "teacher 1 with the pitch inertia of teacher 0",
+   "parameters": [
+    0.8572093141622065,
+    1144.6241786693026,
+    -1.6692445588897245,
+    0.7792289877520467,
+    273.4080783652121,
+    960.5103850054824,
+    1036.2997108432403
+   ],
+   "noise_only_cost": 0.93044998174954,
+   "reference_cost": 76.529506977819,
+   "reference_cost_position_group": 212.71188713570072,
+   "mean_speed_m_per_s": 5.587777168224465,
+   "largest_lateral_acceleration_g": 0.22018956705643056,
+   "mean_number_of_spinning_wheels": 1.09007687211286
+  }
+ ]
+}

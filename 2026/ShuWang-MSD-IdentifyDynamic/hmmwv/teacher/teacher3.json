@@ -1,0 +1,53 @@
+{
+ "teacher": 3,
+ "role": "further teacher",
+ "parameters": [
+  {
+   "name": "mu",
+   "unit": "-",
+   "value": 0.6950971544475966,
+   "z": -0.26225711388100875
+  },
+  {
+   "name": "M",
+   "unit": "kg",
+   "value": 2186.2998744673855,
+   "z": 0.19128476979350417
+  },
+  {
+   "name": "COMx",
+   "unit": "m",
+   "value": 0.16513722259025482,
+   "z": 0.3280379047748918
+  },
+  {
+   "name": "COMz",
+   "unit": "m",
+   "value": 0.29015503027528494,
+   "z": 0.6564855874027768
+  },
+  {
+   "name": "Ixx",
+   "unit": "kg m^2",
+   "value": 1087.73104307682,
+   "z": 0.03416178866157349
+  },
+  {
+   "name": "Iyy",
+   "unit": "kg m^2",
+   "value": 2603.2316328875627,
+   "z": -0.47695386764707354
+  },
+  {
+   "name": "Izz",
+   "unit": "kg m^2",
+   "value": 3300.8651932129083,
+   "z": -0.30175878862482947
+  }
+ ],
+ "draw": {
+  "rule": "each z is uniform in [-0.72, 0.72], except friction, whose z is uniform in [-0.72, 0.5]; the seven values are drawn in the order of the parameter list; an infeasible draw is rejected and all seven values are drawn again",
+  "generator": "numpy.random.default_rng with the seed of settings/seeds.json",
+  "rejected_draws": 0
+ }
+}

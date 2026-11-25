@@ -1,0 +1,81 @@
+{
+ "description": "Geometry of the simulated manipulator. The teacher of the different-geometry setting uses it.",
+ "convention": "For each joint: unit vector of the joint axis and the lever from the frame origin to the joint, in the frame of the parent link and in the frame of the child link. The frame of a moving link has its origin at the IMU of the link. The frame of the base has its origin on the joint-1 axis.",
+ "joints": [
+  {
+   "joint": 1,
+   "parent": "base",
+   "child": "link 1",
+   "axis_parent": [
+    0.0,
+    0.0,
+    1.0
+   ],
+   "axis_child": [
+    0.0,
+    0.0,
+    1.0
+   ],
+   "lever_parent_m": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "lever_child_m": [
+    -0.04,
+    0.025,
+    -0.06500000000000003
+   ]
+  },
+  {
+   "joint": 2,
+   "parent": "link 1",
+   "child": "link 2",
+   "axis_parent": [
+    0.0,
+    1.0,
+    0.0
+   ],
+   "axis_child": [
+    0.0,
+    1.0,
+    0.0
+   ],
+   "lever_parent_m": [
+    -0.04,
+    0.025,
+    -0.06500000000000003
+   ],
+   "lever_child_m": [
+    -0.16,
+    0.015,
+    -0.065
+   ]
+  },
+  {
+   "joint": 3,
+   "parent": "link 2",
+   "child": "link 3",
+   "axis_parent": [
+    0.0,
+    1.0,
+    0.0
+   ],
+   "axis_child": [
+    0.0,
+    1.0000000000000002,
+    0.0
+   ],
+   "lever_parent_m": [
+    0.27180000000000004,
+    -0.13504999999999998,
+    -0.065
+   ],
+   "lever_child_m": [
+    -0.25800000000000006,
+    0.02,
+    -0.024999999999999974
+   ]
+  }
+ ]
+}

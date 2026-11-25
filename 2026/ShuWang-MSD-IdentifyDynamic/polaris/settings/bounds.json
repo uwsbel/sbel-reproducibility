@@ -1,0 +1,70 @@
+{
+ "parameters": [
+  {
+   "name": "mu",
+   "unit": "-",
+   "lower": 0.4,
+   "upper": 1.2,
+   "center": 0.8,
+   "half_range": 0.4,
+   "reference_value": 0.8
+  },
+  {
+   "name": "M",
+   "unit": "kg",
+   "lower": 829.125,
+   "upper": 1381.875,
+   "center": 1105.5,
+   "half_range": 276.375,
+   "reference_value": 1105.5
+  },
+  {
+   "name": "COMx",
+   "unit": "m",
+   "lower": -1.913598913592704,
+   "upper": -1.3663084864072959,
+   "center": -1.6399537,
+   "half_range": 0.27364521359270405,
+   "reference_value": -1.6399537
+  },
+  {
+   "name": "COMz",
+   "unit": "m",
+   "lower": 0.6596418740501432,
+   "upper": 0.8737812667498569,
+   "center": 0.7667115704,
+   "half_range": 0.10706969634985687,
+   "reference_value": 0.7667115704
+  },
+  {
+   "name": "Ixx",
+   "unit": "kg m^2",
+   "lower": 206.770919925,
+   "upper": 344.618199875,
+   "center": 275.6945599,
+   "half_range": 68.923639975,
+   "reference_value": 278.5006400326274
+  },
+  {
+   "name": "Iyy",
+   "unit": "kg m^2",
+   "lower": 640.08483945,
+   "upper": 1066.80806575,
+   "center": 853.4464526,
+   "half_range": 213.36161315,
+   "reference_value": 880.3367887312286
+  },
+  {
+   "name": "Izz",
+   "unit": "kg m^2",
+   "lower": 900.0,
+   "upper": 1500.0,
+   "center": 1200.0,
+   "half_range": 300.0,
+   "reference_value": 1146.8374054724459
+  }
+ ],
+ "normalization": "value = center + half_range * z, with z in [-1, 1]",
+ "reference_value": "parameter values of the reference point, the first development point of the prior map",
+ "feasibility": "the three principal inertias must satisfy the triangle inequalities"
+}

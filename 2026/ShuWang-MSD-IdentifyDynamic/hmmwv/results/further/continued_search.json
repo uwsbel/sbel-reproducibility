@@ -1,0 +1,192 @@
+{
+ "description": "Same-geometry runs of the main teacher that stopped by event (i), continued with event (i) switched off. Events (ii) and (iii) are unchanged. The endpoint is the checked generation with the lowest validation cost.",
+ "parameters": [
+  "mu",
+  "M",
+  "COMx",
+  "COMz",
+  "Ixx",
+  "Iyy",
+  "Izz"
+ ],
+ "runs": [
+  {
+   "seed": 1,
+   "with_event_i": {
+    "stop_generation": 40,
+    "stop_event": "i",
+    "endpoint_generation": 40,
+    "training_cost": 1.1244684626896482,
+    "validation_cost": 1.1174626180265679,
+    "test_cost": 1.7620413616737456,
+    "signed_half_range_error": {
+     "mu": 0.0015274560928485448,
+     "M": -0.001399385089180157,
+     "COMx": -0.004895098172026049,
+     "COMz": -0.08744915617716821,
+     "Ixx": 0.15724670947380828,
+     "Iyy": -0.25663130311846816,
+     "Izz": 0.004783649912229837
+    },
+    "relative_error_percent": {
+     "mu": 0.06483322742335611,
+     "M": 0.039258395225558365,
+     "COMx": 5.217597399099873,
+     "COMz": 6.388354873123742,
+     "Ixx": 3.3559334759929085,
+     "Iyy": 5.878891151142315,
+     "Izz": 0.1166448034168069
+    },
+    "mean_relative_error_percent": 3.008787617917794
+   },
+   "without_event_i": {
+    "stop_generation": 56,
+    "stop_event": "ii",
+    "endpoint_generation": 48,
+    "training_cost": 0.9587578741494452,
+    "validation_cost": 0.9682474910358394,
+    "test_cost": 0.9666911472006807,
+    "signed_half_range_error": {
+     "mu": -0.0011381624795600565,
+     "M": -0.00012603330338253923,
+     "COMx": 0.0012433358633387,
+     "COMz": 0.0417689410077556,
+     "Ixx": -0.010750116079550837,
+     "Iyy": -0.11510326424026412,
+     "Izz": 0.08167855158071649
+    },
+    "relative_error_percent": {
+     "mu": 0.048309569896988695,
+     "M": 0.0035357424300363105,
+     "COMx": 1.3252494104890598,
+     "COMz": 3.0513138090379943,
+     "Ixx": 0.22942721372610594,
+     "Iyy": 2.6367771717127986,
+     "Izz": 1.991654650175086
+    },
+    "mean_relative_error_percent": 1.3266096524954385
+   },
+   "validation_checks": [
+    {
+     "generation": 24,
+     "validation_cost": 2.4147375771070894
+    },
+    {
+     "generation": 28,
+     "validation_cost": 1.774465806072688
+    },
+    {
+     "generation": 32,
+     "validation_cost": 1.2798130086647983
+    },
+    {
+     "generation": 36,
+     "validation_cost": 1.1679416382775059
+    },
+    {
+     "generation": 40,
+     "validation_cost": 1.1174626180265679
+    },
+    {
+     "generation": 44,
+     "validation_cost": 1.0319282474131601
+    },
+    {
+     "generation": 48,
+     "validation_cost": 0.9682474910358394
+    },
+    {
+     "generation": 52,
+     "validation_cost": 0.9835979442740848
+    },
+    {
+     "generation": 56,
+     "validation_cost": 0.9889093837955003
+    }
+   ]
+  },
+  {
+   "seed": 4,
+   "with_event_i": {
+    "stop_generation": 36,
+    "stop_event": "i",
+    "endpoint_generation": 36,
+    "training_cost": 0.9805270578910228,
+    "validation_cost": 0.9820024453489802,
+    "test_cost": 0.9752653621539132,
+    "signed_half_range_error": {
+     "mu": 0.0009258740272732879,
+     "M": 0.0008689534395250948,
+     "COMx": -0.0024456048227702288,
+     "COMz": -0.05887914619285113,
+     "Ixx": -0.0460565883225539,
+     "Iyy": 0.07818785268312324,
+     "Izz": -0.0524687829094172
+    },
+    "relative_error_percent": {
+     "mu": 0.039298937400971644,
+     "M": 0.024377648315139867,
+     "COMx": 2.606726344209496,
+     "COMz": 4.301252258448562,
+     "Ixx": 0.9829321520233618,
+     "Iyy": 1.791121619537743,
+     "Izz": 1.2794019170050905
+    },
+    "mean_relative_error_percent": 1.5750158395629092
+   },
+   "without_event_i": {
+    "stop_generation": 44,
+    "stop_event": "ii",
+    "endpoint_generation": 36,
+    "training_cost": 0.9805270578910228,
+    "validation_cost": 0.9820024453489802,
+    "test_cost": 0.9752653621539132,
+    "signed_half_range_error": {
+     "mu": 0.0009258740272732879,
+     "M": 0.0008689534395250948,
+     "COMx": -0.0024456048227702288,
+     "COMz": -0.05887914619285113,
+     "Ixx": -0.0460565883225539,
+     "Iyy": 0.07818785268312324,
+     "Izz": -0.0524687829094172
+    },
+    "relative_error_percent": {
+     "mu": 0.039298937400971644,
+     "M": 0.024377648315139867,
+     "COMx": 2.606726344209496,
+     "COMz": 4.301252258448562,
+     "Ixx": 0.9829321520233618,
+     "Iyy": 1.791121619537743,
+     "Izz": 1.2794019170050905
+    },
+    "mean_relative_error_percent": 1.5750158395629092
+   },
+   "validation_checks": [
+    {
+     "generation": 24,
+     "validation_cost": 1.8306033533938815
+    },
+    {
+     "generation": 28,
+     "validation_cost": 1.4005920959985059
+    },
+    {
+     "generation": 32,
+     "validation_cost": 1.1390036033015525
+    },
+    {
+     "generation": 36,
+     "validation_cost": 0.9820024453489802
+    },
+    {
+     "generation": 40,
+     "validation_cost": 0.9820024453489802
+    },
+    {
+     "generation": 44,
+     "validation_cost": 1.03215763060074
+    }
+   ]
+  }
+ ]
+}

@@ -1,0 +1,59 @@
+{
+ "de_seeds": {
+  "seed1": 26102801,
+  "seed2": 26102802,
+  "seed3": 26102803,
+  "seed4": 26102804
+ },
+ "de_seed_rule": "A DE run is made in parts that end at the validation checks: 24 generations, then four at a time. Part k (k = 0, 1, ...) starts from the stored population and calls SciPy with seed + k. The Latin-hypercube points of the initial population use the seed itself. Both geometry settings use the same seeds and the same initial populations.",
+ "measurement_noise_seeds": {
+  "training": {
+   "CP03": 2710002,
+   "GR03": 2710005,
+   "J1R02": 2710018,
+   "TZR03": 2710021
+  },
+  "validation": {
+   "HG1": 2719001,
+   "HG2": 2719002,
+   "HG3": 2719003,
+   "HF1": 2719011,
+   "HF2": 2719012,
+   "HF3": 2719013,
+   "HI1": 2719021,
+   "HI2": 2719022,
+   "HI3": 2719023,
+   "HC1": 2719031,
+   "HC2": 2719032,
+   "HC3": 2719033,
+   "CS1": 2719041,
+   "CS2": 2719042,
+   "CS3": 2719043,
+   "CH1": 2719051,
+   "CH2": 2719052,
+   "CH3": 2719053
+  },
+  "test": {
+   "HG4": 2719101,
+   "HG5": 2719102,
+   "HG6": 2719103,
+   "HF4": 2719111,
+   "HF5": 2719112,
+   "HF6": 2719113,
+   "HI4": 2719121,
+   "HI5": 2719122,
+   "HI6": 2719123,
+   "HC4": 2719131,
+   "HC5": 2719132,
+   "HC6": 2719133,
+   "CS4": 2719141,
+   "CS5": 2719142,
+   "CS6": 2719143,
+   "CH4": 2719151,
+   "CH5": 2719152,
+   "CH6": 2719153
+  }
+ },
+ "measurement_noise_rule": "numpy.random.default_rng(seed); normal draws with the shape of each array, in the order q, qd, imu_acc, imu_gyr, tau; noisy record = noise-free record + draw. Both geometry settings use the same seeds.",
+ "noise_only_cost_statistics_seed": 26111603
+}

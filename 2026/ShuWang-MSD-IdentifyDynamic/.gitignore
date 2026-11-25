@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+.venv/
+# outputs of the check scripts
+figures_out/
+check_report.json
+# outputs of the simulation code
+hmmwv/output/
+polaris/work/
+puma/code/output/
+*/code/terrain/build/

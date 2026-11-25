@@ -1,0 +1,49 @@
+{
+ "description": "Cost of pure noise on the three motion sets: 2000 simulated noise draws per set (seed in settings/seeds.json) and the analytic mean and standard deviation.",
+ "loss_mean_under_unit_noise": 0.9328808394245566,
+ "loss_variance_under_unit_noise": 1.5460231201505032,
+ "sets": {
+  "validation": {
+   "motions": 18,
+   "scored_samples": 18827,
+   "scored_values": 508329,
+   "mean": 0.9329240470270493,
+   "sd": 0.002192538940234753,
+   "smallest": 0.9256273967040537,
+   "largest": 0.9399176590021349,
+   "analytic_mean": 0.9328808394245566,
+   "analytic_sd": 0.0022443545014768436,
+   "cost_of_the_noise_in_the_records": 0.9347120717549716
+  },
+  "test": {
+   "motions": 18,
+   "scored_samples": 18221,
+   "scored_values": 491967,
+   "mean": 0.9328922642899418,
+   "sd": 0.002225014503777737,
+   "smallest": 0.9235854483969654,
+   "largest": 0.939592970712805,
+   "analytic_mean": 0.9328808394245566,
+   "analytic_sd": 0.0022389389581852124,
+   "cost_of_the_noise_in_the_records": 0.934133101844395
+  },
+  "training": {
+   "motions": 4,
+   "scored_samples": 3909,
+   "scored_values": 105543,
+   "mean": 0.9329295373752463,
+   "sd": 0.004495959270054204,
+   "smallest": 0.9183336886085856,
+   "largest": 0.9497407740748373,
+   "analytic_mean": 0.9328808394245566,
+   "analytic_sd": 0.004427441340957313,
+   "cost_of_the_noise_in_the_records": 0.9244122505180206
+  }
+ },
+ "near_noise_threshold": 1.1196,
+ "near_noise_threshold_above_the_mean_in_sd": {
+  "validation": 85.14145384025124,
+  "test": 83.91304209166132,
+  "training": 41.51960714326113
+ }
+}

@@ -1,0 +1,63 @@
+{
+ "de": {
+  "implementation": "scipy.optimize.differential_evolution",
+  "strategy": "best1bin",
+  "population": 34,
+  "mutation": [
+   0.5,
+   1.0
+  ],
+  "recombination": 0.7,
+  "polish": false,
+  "updating": "immediate",
+  "workers": 1,
+  "tol": 0.0,
+  "atol": 0.0,
+  "search_box_z": [
+   -1.0,
+   1.0
+  ],
+  "initial_population": "the five development points and 29 Latin-hypercube points (scipy.stats.qmc.LatinHypercube with the seed of the run); the sequence is continued until 29 feasible points are drawn",
+  "infeasible_cost": 1000000000.0,
+  "first_check_generation": 24,
+  "generations_between_checks": 4,
+  "noise_only_cost_rounded": 0.933,
+  "near_noise_threshold": 1.1196,
+  "improvement_fraction": 0.005,
+  "generations_without_improvement": 8,
+  "max_generations": 120,
+  "stop_events": {
+   "i": "validation cost V at or below the near-noise threshold",
+   "ii": "two consecutive checks without a decrease of V of more than 0.5 % below its reference value",
+   "iii": "120 generations"
+  },
+  "endpoint": "checked candidate with the lowest V"
+ },
+ "lm": {
+  "start": "DE endpoint of the same run",
+  "jacobian": "central differences in z; a one-sided difference where one of the two points is infeasible",
+  "jacobian_step_z": 0.002,
+  "damping_start": 0.01,
+  "damping_trials": "lambda/10, lambda, 10 lambda",
+  "damping_factor_without_descent": 100.0,
+  "max_tries_per_iteration": 4,
+  "validation_check_every_iterations": 5,
+  "improvement_fraction": 0.005,
+  "iterations_without_improvement": 10,
+  "rise_fraction": 0.005,
+  "relative_cost_decrease_tolerance": 0.0001,
+  "step_tolerance_z": 0.001,
+  "max_iterations": 60,
+  "infeasible_cost": 1000000000.0,
+  "stop_events": {
+   "validation": "10 iterations without a decrease of V of more than 0.5 % below its reference value",
+   "validation_rise": "V rises more than 0.5 % above its lowest value",
+   "cost": "an iteration lowers the training cost by less than a relative 1e-4",
+   "step": "an iteration moves z by less than 1e-3",
+   "no_descent_step": "no trial lowers the training cost",
+   "budget": "60 iterations"
+  },
+  "endpoint": "checked iterate with the lowest V, including the DE endpoint (iteration 0)"
+ },
+ "selected_endpoint": "endpoint with the lowest V over the four runs of a setting; an exact tie goes to the earlier iteration and then to the lower seed number"
+}

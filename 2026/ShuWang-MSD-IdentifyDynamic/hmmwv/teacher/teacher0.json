@@ -1,0 +1,53 @@
+{
+ "teacher": 0,
+ "role": "main teacher",
+ "parameters": [
+  {
+   "name": "mu",
+   "unit": "-",
+   "value": 0.9423909026612982,
+   "z": 0.35597725665324553
+  },
+  {
+   "name": "M",
+   "unit": "kg",
+   "value": 1859.376166231622,
+   "z": -0.4354500963678816
+  },
+  {
+   "name": "COMx",
+   "unit": "m",
+   "value": 0.03121330162283494,
+   "z": -0.07450232293760495
+  },
+  {
+   "name": "COMz",
+   "unit": "m",
+   "value": 0.16088132709614733,
+   "z": -0.44345984278485906
+  },
+  {
+   "name": "Ixx",
+   "unit": "kg m^2",
+   "value": 1263.3870897240788,
+   "z": 0.685632495360601
+  },
+  {
+   "name": "Iyy",
+   "unit": "kg m^2",
+   "value": 3225.586500388539,
+   "z": 0.3653011515377811
+  },
+  {
+   "name": "Izz",
+   "unit": "kg m^2",
+   "value": 3660.383149606769,
+   "z": 0.10103988528011787
+  }
+ ],
+ "draw": {
+  "rule": "each z is uniform in [-0.72, 0.72]; an infeasible draw is rejected and all seven values are drawn again",
+  "generator": "operating-system entropy, no seed",
+  "rejected_draws": 0
+ }
+}

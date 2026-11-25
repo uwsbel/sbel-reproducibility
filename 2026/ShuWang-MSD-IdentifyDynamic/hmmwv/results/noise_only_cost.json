@@ -1,0 +1,93 @@
+{
+ "description": "Cost of the noise alone. simulated: mean and standard deviation of the cost of a noise-free record set against the same set with new noise, over the noise realizations, for sets with the size of the validation, test and training sets. teachers: cost of the stored noisy records of each teacher against its noise-free records.",
+ "simulated": {
+  "validation": {
+   "motions": 18,
+   "record_samples": 1200,
+   "scored_samples_per_motion": 275,
+   "realizations": 2000,
+   "mean": 0.9329086158358323,
+   "standard_deviation": 0.004351137218415671,
+   "analytic_mean": 0.9328808394245568,
+   "analytic_standard_deviation": 0.004230104740175241
+  },
+  "test": {
+   "motions": 18,
+   "record_samples": 1200,
+   "scored_samples_per_motion": 275,
+   "realizations": 2000,
+   "mean": 0.9329304692541839,
+   "standard_deviation": 0.004190888793390378,
+   "analytic_mean": 0.9328808394245568,
+   "analytic_standard_deviation": 0.004230104740175241
+  },
+  "training": {
+   "motions": 5,
+   "record_samples": 1000,
+   "scored_samples_per_motion": 225,
+   "realizations": 2000,
+   "mean": 0.932841617972839,
+   "standard_deviation": 0.009105209072751648,
+   "analytic_mean": 0.9328808394245568,
+   "analytic_standard_deviation": 0.008873142560364585
+  }
+ },
+ "teachers": [
+  {
+   "teacher": 0,
+   "setting": "different_geometry",
+   "training": 0.9185051251746643,
+   "validation": 0.9305933040622132,
+   "test": 0.9316815501633369
+  },
+  {
+   "teacher": 0,
+   "setting": "same_geometry",
+   "training": 0.9185040140490337,
+   "validation": 0.9305931594393348,
+   "test": 0.9316824475296036
+  },
+  {
+   "teacher": 1,
+   "setting": "different_geometry",
+   "training": 0.9191431088762579,
+   "validation": 0.928890574533838,
+   "test": 0.9393909197525585
+  },
+  {
+   "teacher": 1,
+   "setting": "same_geometry",
+   "training": 0.9191445552731163,
+   "validation": 0.9288913552618889,
+   "test": 0.9393904413565352
+  },
+  {
+   "teacher": 2,
+   "setting": "different_geometry",
+   "training": 0.9181031923939728,
+   "validation": 0.9331873353761642,
+   "test": 0.9315250927506129
+  },
+  {
+   "teacher": 2,
+   "setting": "same_geometry",
+   "training": 0.9181009980787558,
+   "validation": 0.9331876049963945,
+   "test": 0.9315252844613674
+  },
+  {
+   "teacher": 3,
+   "setting": "different_geometry",
+   "training": 0.9416811220270851,
+   "validation": 0.934154231368048,
+   "test": 0.9397010257550321
+  },
+  {
+   "teacher": 3,
+   "setting": "same_geometry",
+   "training": 0.9416805642287086,
+   "validation": 0.9341545375499215,
+   "test": 0.939700950422315
+  }
+ ]
+}

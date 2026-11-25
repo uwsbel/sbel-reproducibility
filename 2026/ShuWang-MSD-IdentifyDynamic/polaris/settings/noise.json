@@ -1,0 +1,90 @@
+{
+ "output_interval_s": 0.002,
+ "internal_step_s": 0.001,
+ "groups": [
+  {
+   "name": "p",
+   "label": "Position",
+   "quantity": "Chassis position",
+   "components": 3,
+   "noise_sd": 0.003,
+   "unit": "m",
+   "r_rule": "vector norm"
+  },
+  {
+   "name": "q",
+   "label": "Attitude",
+   "quantity": "Chassis attitude, as a rotation vector",
+   "components": 3,
+   "noise_sd": 0.002,
+   "unit": "rad",
+   "r_rule": "vector norm"
+  },
+  {
+   "name": "v",
+   "label": "Velocity",
+   "quantity": "Chassis velocity",
+   "components": 3,
+   "noise_sd": 0.02,
+   "unit": "m/s",
+   "r_rule": "vector norm"
+  },
+  {
+   "name": "speed",
+   "label": "Speed",
+   "quantity": "Forward speed: chassis velocity along the chassis x-axis",
+   "components": 1,
+   "noise_sd": 0.02,
+   "unit": "m/s",
+   "r_rule": "mean over components"
+  },
+  {
+   "name": "wheel_omega",
+   "label": "Wheel angular speed",
+   "quantity": "Spin rate of each wheel",
+   "components": 4,
+   "noise_sd": 0.05,
+   "unit": "rad/s",
+   "r_rule": "mean over components"
+  },
+  {
+   "name": "delta",
+   "label": "Steering proxy",
+   "quantity": "Mean yaw angle of the two front uprights relative to the chassis",
+   "components": 1,
+   "noise_sd": 0.008726646259971648,
+   "unit": "rad",
+   "r_rule": "mean over components",
+   "noise_sd_deg": 0.5
+  },
+  {
+   "name": "gyro",
+   "label": "Angular velocity",
+   "quantity": "Chassis angular velocity",
+   "components": 3,
+   "noise_sd": 0.005,
+   "unit": "rad/s",
+   "r_rule": "mean over components"
+  },
+  {
+   "name": "upright_rel",
+   "label": "Upright relative position",
+   "quantity": "Positions of the four uprights relative to the chassis",
+   "components": 12,
+   "noise_sd": 0.003,
+   "unit": "m",
+   "r_rule": "mean over components"
+  }
+ ],
+ "attitude_noise": "rotation with Gaussian rotation-vector components, composed with the noise-free attitude",
+ "scoring": {
+  "skip_samples": 100,
+  "stride": 4,
+  "loss_scale": 3,
+  "training_record_samples": 1000,
+  "training_scored_samples": 225,
+  "validation_and_test_record_samples": 1200,
+  "validation_and_test_scored_samples": 275
+ },
+ "band": "r of a model without error has the standard deviation (6 N)^-0.5 for the vector groups p, q, v and (2 N d)^-0.5 for a group with d components; the band is 1 +/- 3 standard deviations, N = 275"
+}

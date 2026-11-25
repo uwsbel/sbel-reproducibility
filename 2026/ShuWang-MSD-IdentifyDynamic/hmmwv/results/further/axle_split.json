@@ -1,0 +1,178 @@
+{
+ "description": "Test cost of the model with the teacher parameters and a mixed geometry, on the different-geometry test data of the main teacher. No parameter is fitted. noise_only: noisy against noise-free test records. front_axle_calibrated: calibrated geometry in the front axle, true geometry in the rear axle. rear_axle_calibrated: the opposite. both_axles_calibrated: the reference model.",
+ "group_costs": {
+  "noise_only": {
+   "position": 0.9357738489783117,
+   "attitude": 0.9487227571249615,
+   "velocity": 0.9477786983889764,
+   "speed": 0.9064294282550881,
+   "wheel_angular_speed": 0.9441205225297635,
+   "steering_proxy": 0.9115205308870922,
+   "angular_velocity": 0.9310737819485596,
+   "upright_relative_position": 0.9280328331939413
+  },
+  "front_axle_calibrated": {
+   "position": 10.82823368050853,
+   "attitude": 2.9588255474294285,
+   "velocity": 2.030157298029547,
+   "speed": 2.092088139212604,
+   "wheel_angular_speed": 11.985857776170528,
+   "steering_proxy": 0.9331167423907455,
+   "angular_velocity": 1.5970419709997643,
+   "upright_relative_position": 6.038565256314655
+  },
+  "rear_axle_calibrated": {
+   "position": 9.443301126017355,
+   "attitude": 6.348586018348911,
+   "velocity": 2.680854993702257,
+   "speed": 2.300057202398572,
+   "wheel_angular_speed": 15.3929440991606,
+   "steering_proxy": 0.9122682186452025,
+   "angular_velocity": 3.683995379455488,
+   "upright_relative_position": 8.255202922692872
+  },
+  "both_axles_calibrated": {
+   "position": 6.207463862717426,
+   "attitude": 4.04718373034552,
+   "velocity": 1.9842184931916573,
+   "speed": 1.8862847671531335,
+   "wheel_angular_speed": 23.75963719606153,
+   "steering_proxy": 0.934605740691868,
+   "angular_velocity": 4.004208053899236,
+   "upright_relative_position": 13.496251506382443
+  }
+ },
+ "motion_costs": [
+  {
+   "motion": "test_lane_change_brake_1",
+   "true_geometry_in_both_axles": 0.9262786777474744,
+   "front_axle_calibrated": 3.901879573301773,
+   "rear_axle_calibrated": 5.26740175843514,
+   "both_axles_calibrated": 4.879452023439526
+  },
+  {
+   "motion": "test_lane_change_brake_2",
+   "true_geometry_in_both_axles": 0.9217789063124857,
+   "front_axle_calibrated": 3.9572281045785203,
+   "rear_axle_calibrated": 5.418726040268789,
+   "both_axles_calibrated": 4.881002998446627
+  },
+  {
+   "motion": "test_lane_change_brake_3",
+   "true_geometry_in_both_axles": 0.9475581765287394,
+   "front_axle_calibrated": 3.9136924796941344,
+   "rear_axle_calibrated": 5.3631879300647896,
+   "both_axles_calibrated": 4.949715945934976
+  },
+  {
+   "motion": "test_longitudinal_chirp_1",
+   "true_geometry_in_both_axles": 0.926416117293946,
+   "front_axle_calibrated": 2.7359423599854074,
+   "rear_axle_calibrated": 3.550911743563266,
+   "both_axles_calibrated": 3.624712786067978
+  },
+  {
+   "motion": "test_longitudinal_chirp_2",
+   "true_geometry_in_both_axles": 0.9270205321852358,
+   "front_axle_calibrated": 2.7684223057523227,
+   "rear_axle_calibrated": 3.2641937205764595,
+   "both_axles_calibrated": 3.5406630681717095
+  },
+  {
+   "motion": "test_longitudinal_chirp_3",
+   "true_geometry_in_both_axles": 0.932662986144221,
+   "front_axle_calibrated": 2.842213888626609,
+   "rear_axle_calibrated": 3.2770091098102627,
+   "both_axles_calibrated": 3.5860109782100045
+  },
+  {
+   "motion": "test_multisine_slalom_1",
+   "true_geometry_in_both_axles": 0.9370943882323612,
+   "front_axle_calibrated": 4.667691055929463,
+   "rear_axle_calibrated": 5.579491028794674,
+   "both_axles_calibrated": 5.276963146496828
+  },
+  {
+   "motion": "test_multisine_slalom_2",
+   "true_geometry_in_both_axles": 0.9047094825974362,
+   "front_axle_calibrated": 5.001570121424612,
+   "rear_axle_calibrated": 5.607932892544913,
+   "both_axles_calibrated": 5.553449918874239
+  },
+  {
+   "motion": "test_multisine_slalom_3",
+   "true_geometry_in_both_axles": 0.9095482436821363,
+   "front_axle_calibrated": 5.269987342180239,
+   "rear_axle_calibrated": 5.809668882226074,
+   "both_axles_calibrated": 5.827516579887686
+  },
+  {
+   "motion": "test_sine_dwell_coast_1",
+   "true_geometry_in_both_axles": 0.9455504869546186,
+   "front_axle_calibrated": 8.750116951319647,
+   "rear_axle_calibrated": 7.964208815486433,
+   "both_axles_calibrated": 10.078543787664486
+  },
+  {
+   "motion": "test_sine_dwell_coast_2",
+   "true_geometry_in_both_axles": 0.9479382396444063,
+   "front_axle_calibrated": 8.861906988728776,
+   "rear_axle_calibrated": 8.121235931118367,
+   "both_axles_calibrated": 10.849825889276813
+  },
+  {
+   "motion": "test_sine_dwell_coast_3",
+   "true_geometry_in_both_axles": 0.9441630464196571,
+   "front_axle_calibrated": 8.701556132530468,
+   "rear_axle_calibrated": 7.921813536070314,
+   "both_axles_calibrated": 10.035033607169384
+  },
+  {
+   "motion": "test_offset_brake_slalom_1",
+   "true_geometry_in_both_axles": 0.9373797046410044,
+   "front_axle_calibrated": 2.968559657976197,
+   "rear_axle_calibrated": 5.823394992099438,
+   "both_axles_calibrated": 6.250059032539742
+  },
+  {
+   "motion": "test_offset_brake_slalom_2",
+   "true_geometry_in_both_axles": 0.933363548283312,
+   "front_axle_calibrated": 3.2793092249758713,
+   "rear_axle_calibrated": 7.328416704227018,
+   "both_axles_calibrated": 18.48001457869178
+  },
+  {
+   "motion": "test_offset_brake_slalom_3",
+   "true_geometry_in_both_axles": 0.9181039731301377,
+   "front_axle_calibrated": 4.093974742948859,
+   "rear_axle_calibrated": 9.083481901760297,
+   "both_axles_calibrated": 8.72458492730032
+  },
+  {
+   "motion": "test_late_sweep_release_1",
+   "true_geometry_in_both_axles": 0.9138201101899692,
+   "front_axle_calibrated": 5.702820458844963,
+   "rear_axle_calibrated": 6.715998471567317,
+   "both_axles_calibrated": 6.560243970958845
+  },
+  {
+   "motion": "test_late_sweep_release_2",
+   "true_geometry_in_both_axles": 0.9640023707660761,
+   "front_axle_calibrated": 4.0142742324705685,
+   "rear_axle_calibrated": 7.45258958219848,
+   "both_axles_calibrated": 7.0026434998243605
+  },
+  {
+   "motion": "test_late_sweep_release_3",
+   "true_geometry_in_both_axles": 0.932878912186845,
+   "front_axle_calibrated": 5.112598803607133,
+   "rear_axle_calibrated": 6.739059370135784,
+   "both_axles_calibrated": 6.619233299541021
+  }
+ ],
+ "checks": {
+  "true_geometry_in_both_axles_equals_noise_free_test_records": true,
+  "both_axles_calibrated_equals_reference_predictions": true
+ },
+ "all_trajectories_pass_mechanical_checks": true
+}

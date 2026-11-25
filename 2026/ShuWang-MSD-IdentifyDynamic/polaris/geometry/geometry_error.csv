@@ -1,0 +1,47 @@
+axle,side,point,group,source,dx_mm,dy_mm,dz_mm
+front,L,UCA_F,Chassis-side arm points,Calibrated,-1.447,-15.784,9.276
+front,L,UCA_B,Chassis-side arm points,Calibrated,-1.149,-14.896,7.541
+front,L,LCA_F,Chassis-side arm points,Calibrated,-1.565,-9.89,13.058
+front,L,LCA_B,Chassis-side arm points,Calibrated,-1.277,-8.817,10.626
+front,L,TIEROD_C,"Tie-rod inner, spring and damper upper points",Public,0.0,0.0,0.0
+front,L,SPRING_C,"Tie-rod inner, spring and damper upper points",Public,0.0,0.0,0.0
+front,L,SHOCK_C,"Tie-rod inner, spring and damper upper points",Public,0.0,0.0,0.0
+front,L,UCA_U,Outer arm points,Calibrated,18.432,-30.313,-19.166
+front,L,LCA_U,Outer arm points,Calibrated,7.242,-21.308,-6.598
+front,L,TIEROD_U,Tie-rod outer point,"Public, moved",8.149,-21.237,-2.994
+front,L,SPINDLE,Wheel center,"Public, moved",13.659,-27.064,-4.138
+front,L,SPRING_A,Spring and damper lower points,"Public, moved",-0.777,-8.279,-1.439
+front,L,SHOCK_A,Spring and damper lower points,"Public, moved",-0.777,-8.279,-1.439
+rear,L,TA_C,Chassis-side arm points,Calibrated,-26.349,1.771,1.553
+rear,L,UL_C,Chassis-side arm points,Calibrated,-0.013,6.747,-4.131
+rear,L,LL_C,Chassis-side arm points,Calibrated,-0.005,6.72,-3.658
+rear,L,SPRING_C,"Tie-rod inner, spring and damper upper points",Public,0.0,0.0,0.0
+rear,L,SHOCK_C,"Tie-rod inner, spring and damper upper points",Public,0.0,0.0,0.0
+rear,L,UL_A,Outer arm points,Calibrated,34.316,52.405,-1.033
+rear,L,LL_A,Outer arm points,Calibrated,10.134,14.042,5.454
+rear,L,SPINDLE,Wheel center,"Public, moved",0.229,1.751,7.668
+rear,L,SPRING_A,Spring and damper lower points,"Public, moved",0.315,1.108,4.884
+rear,L,SHOCK_A,Spring and damper lower points,"Public, moved",0.315,1.108,4.884
+front,R,UCA_F,Chassis-side arm points,Calibrated,-1.447,15.784,9.276
+front,R,UCA_B,Chassis-side arm points,Calibrated,-1.149,14.896,7.541
+front,R,LCA_F,Chassis-side arm points,Calibrated,-1.565,9.89,13.058
+front,R,LCA_B,Chassis-side arm points,Calibrated,-1.277,8.817,10.626
+front,R,TIEROD_C,"Tie-rod inner, spring and damper upper points",Public,0.0,0.0,0.0
+front,R,SPRING_C,"Tie-rod inner, spring and damper upper points",Public,0.0,0.0,0.0
+front,R,SHOCK_C,"Tie-rod inner, spring and damper upper points",Public,0.0,0.0,0.0
+front,R,UCA_U,Outer arm points,Calibrated,18.246,29.868,-18.16
+front,R,LCA_U,Outer arm points,Calibrated,7.116,20.843,-5.582
+front,R,TIEROD_U,Tie-rod outer point,"Public, moved",8.029,20.782,-2.021
+front,R,SPINDLE,Wheel center,"Public, moved",13.502,26.61,-3.124
+front,R,SPRING_A,Spring and damper lower points,"Public, moved",-0.862,8.452,-0.693
+front,R,SHOCK_A,Spring and damper lower points,"Public, moved",-0.862,8.452,-0.693
+rear,R,TA_C,Chassis-side arm points,Calibrated,-26.349,-1.771,1.553
+rear,R,UL_C,Chassis-side arm points,Calibrated,-0.013,-6.747,-4.131
+rear,R,LL_C,Chassis-side arm points,Calibrated,-0.005,-6.72,-3.658
+rear,R,SPRING_C,"Tie-rod inner, spring and damper upper points",Public,0.0,0.0,0.0
+rear,R,SHOCK_C,"Tie-rod inner, spring and damper upper points",Public,0.0,0.0,0.0
+rear,R,UL_A,Outer arm points,Calibrated,34.393,-52.608,-0.145
+rear,R,LL_A,Outer arm points,Calibrated,10.074,-14.258,6.351
+rear,R,SPINDLE,Wheel center,"Public, moved",0.246,-1.946,8.505
+rear,R,SPRING_A,Spring and damper lower points,"Public, moved",0.344,-1.227,5.399
+rear,R,SHOCK_A,Spring and damper lower points,"Public, moved",0.344,-1.227,5.399

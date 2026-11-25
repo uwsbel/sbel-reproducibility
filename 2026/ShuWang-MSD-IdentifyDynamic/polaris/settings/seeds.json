@@ -1,0 +1,61 @@
+{
+ "de_seeds": {
+  "seed1": 26102201,
+  "seed2": 26102202,
+  "seed3": 26102203,
+  "seed4": 26102204
+ },
+ "de_seed_rule": "The first call of a run covers 16 generations and uses the seed. Each later call covers 8 generations; call k (k = 1, 2, ...) uses seed + k. The Latin-hypercube points of the initial population use the seed.",
+ "noise_seeds": {
+  "training_first": 2610232100,
+  "validation_first": 2610232200,
+  "test_first": 2610274100,
+  "rule": "Motion i of a set (i = 0, 1, ..., in the order of settings/motions.json) uses first + i. Teacher k (k = 1, 2, 3) adds 10000 * k. Both geometry settings use the same seeds. The generator is numpy.random.default_rng(seed); the groups are drawn in the order of settings/noise.json."
+ },
+ "teacher_draw_seeds": {
+  "teacher1": 26111311,
+  "teacher2": 26111312,
+  "teacher3": 26111313
+ },
+ "teacher_draw_rule": {
+  "generator": "numpy.random.default_rng(seed)",
+  "order": [
+   "mu",
+   "M",
+   "COMx",
+   "COMz",
+   "Ixx",
+   "Iyy",
+   "Izz"
+  ],
+  "z_low": [
+   -0.72,
+   -0.72,
+   -0.72,
+   -0.72,
+   -0.72,
+   -0.72,
+   -0.72
+  ],
+  "z_high": [
+   0.5,
+   0.72,
+   0.72,
+   0.72,
+   0.72,
+   0.72,
+   0.72
+  ],
+  "rule": "Seven uniform values of z in the parameter order. An infeasible vector is rejected and all seven values are drawn again with the same generator.",
+  "rejected_vectors": {
+   "teacher1": 0,
+   "teacher2": 1,
+   "teacher3": 1
+  }
+ },
+ "teacher0": "The main teacher was drawn once with operating-system entropy. It has no seed; its values are in teacher/teacher0.json.",
+ "noise_only_cost_simulation": {
+  "seed": 26111602,
+  "realizations": 2000
+ }
+}

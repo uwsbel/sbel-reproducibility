@@ -1,0 +1,866 @@
+{
+ "teacher": 0,
+ "setting": "same_geometry",
+ "noise_only": {
+  "description": "noisy test records against the noise-free test records",
+  "test_cost": 0.9316824475296037,
+  "group_costs": {
+   "position": 0.9357738489783115,
+   "attitude": 0.9487299360550965,
+   "velocity": 0.9477786983889764,
+   "speed": 0.906429428255088,
+   "wheel_angular_speed": 0.9441205225297638,
+   "steering_proxy": 0.9115205308870922,
+   "angular_velocity": 0.9310737819485596,
+   "upright_relative_position": 0.9280328331939413
+  }
+ },
+ "reference_model": {
+  "description": "teacher parameters with the calibrated geometry",
+  "equals_noise_free_record": true,
+  "test_cost": 0.9316824475296037,
+  "group_costs": {
+   "position": 0.9357738489783115,
+   "attitude": 0.9487299360550965,
+   "velocity": 0.9477786983889764,
+   "speed": 0.906429428255088,
+   "wheel_angular_speed": 0.9441205225297638,
+   "steering_proxy": 0.9115205308870922,
+   "angular_velocity": 0.9310737819485596,
+   "upright_relative_position": 0.9280328331939413
+  },
+  "motions": [
+   {
+    "motion": "test_lane_change_brake_1",
+    "cost": 0.926277199773041,
+    "group_costs": {
+     "position": 0.8731484428931179,
+     "attitude": 0.9609017304970587,
+     "velocity": 0.9676852196823653,
+     "speed": 0.8742283932458789,
+     "wheel_angular_speed": 0.8864524916804364,
+     "steering_proxy": 0.9637659631495176,
+     "angular_velocity": 0.9281888039600099,
+     "upright_relative_position": 0.9558465530759436
+    },
+    "r": {
+     "position": 0.9655991332624893,
+     "attitude": 1.0169405565114877,
+     "velocity": 1.0229291930577515,
+     "speed": 0.9659858835458048,
+     "wheel_angular_speed": 0.9737492003419949,
+     "steering_proxy": 1.0152618204464385,
+     "angular_velocity": 0.9988369330073245,
+     "upright_relative_position": 1.013404744666705
+    },
+    "cost_noise_free": 0.0,
+    "group_costs_noise_free": {
+     "position": 0.0,
+     "attitude": 0.0,
+     "velocity": 0.0,
+     "speed": 0.0,
+     "wheel_angular_speed": 0.0,
+     "steering_proxy": 0.0,
+     "angular_velocity": 0.0,
+     "upright_relative_position": 0.0
+    },
+    "r_noise_free": {
+     "position": 0.0,
+     "attitude": 1.471282186075314e-16,
+     "velocity": 0.0,
+     "speed": 0.0,
+     "wheel_angular_speed": 0.0,
+     "steering_proxy": 0.0,
+     "angular_velocity": 0.0,
+     "upright_relative_position": 0.0
+    }
+   },
+   {
+    "motion": "test_lane_change_brake_2",
+    "cost": 0.9217800278018422,
+    "group_costs": {
+     "position": 0.9439122600203207,
+     "attitude": 0.9228167352797603,
+     "velocity": 0.9242276209855343,
+     "speed": 0.9337201791340846,
+     "wheel_angular_speed": 0.9607605727192704,
+     "steering_proxy": 0.9212697535357516,
+     "angular_velocity": 0.8769044168521231,
+     "upright_relative_position": 0.8906286838878925
+    },
+    "r": {
+     "position": 1.008442750644835,
+     "attitude": 0.99487011549342,
+     "velocity": 0.99372836033303,
+     "speed": 1.0013551948686277,
+     "wheel_angular_speed": 1.0159039736278046,
+     "steering_proxy": 0.9951981836331087,
+     "angular_velocity": 0.9678704558555122,
+     "upright_relative_position": 0.9759548251318132
+    },
+    "cost_noise_free": 0.0,
+    "group_costs_noise_free": {
+     "position": 0.0,
+     "attitude": 0.0,
+     "velocity": 0.0,
+     "speed": 0.0,
+     "wheel_angular_speed": 0.0,
+     "steering_proxy": 0.0,
+     "angular_velocity": 0.0,
+     "upright_relative_position": 0.0
+    },
+    "r_noise_free": {
+     "position": 0.0,
+     "attitude": 3.025658914734415e-17,
+     "velocity": 0.0,
+     "speed": 0.0,
+     "wheel_angular_speed": 0.0,
+     "steering_proxy": 0.0,
+     "angular_velocity": 0.0,
+     "upright_relative_position": 0.0
+    }
+   },
+   {
+    "motion": "test_lane_change_brake_3",
+    "cost": 0.9475592754620091,
+    "group_costs": {
+     "position": 0.9591195531727631,
+     "attitude": 0.9615080680392384,
+     "velocity": 0.9128921539564052,
+     "speed": 0.9516640263614723,
+     "wheel_angular_speed": 0.9425450901360491,
+     "steering_proxy": 1.0661748250002256,
+     "angular_velocity": 0.8937488258043226,
+     "upright_relative_position": 0.8928216612255969
+    },
+    "r": {
+     "position": 1.0138181653930995,
+     "attitude": 1.015680002710653,
+     "velocity": 0.9888961642951404,
+     "speed": 1.0087562286406317,
+     "wheel_angular_speed": 1.0036850204280539,
+     "steering_proxy": 1.074236246994937,
+     "angular_velocity": 0.9752961211692217,
+     "upright_relative_position": 0.9761215464687427
+    },
+    "cost_noise_free": 0.0,
+    "group_costs_noise_free": {
+     "position": 0.0,
+     "attitude": 0.0,
+     "velocity": 0.0,
+     "speed": 0.0,
+     "wheel_angular_speed": 0.0,
+     "steering_proxy": 0.0,
+     "angular_velocity": 0.0,
+     "upright_relative_position": 0.0
+    },
+    "r_noise_free": {
+     "position": 0.0,
+     "attitude": 2.789225090318287e-16,
+     "velocity": 0.0,
+     "speed": 0.0,
+     "wheel_angular_speed": 0.0,
+     "steering_proxy": 0.0,
+     "angular_velocity": 0.0,
+     "upright_relative_position": 0.0
+    }
+   },
+   {
+    "motion": "test_longitudinal_chirp_1",
+    "cost": 0.9264160705044255,
+    "group_costs": {
+     "position": 0.9347940555285029,
+     "attitude": 0.9359317406068308,
+     "velocity": 0.9200052091182818,
+     "speed": 0.8264406779298019,
+     "wheel_angular_speed": 0.8766960888419534,
+     "steering_proxy": 1.0013354877172276,
+     "angular_velocity": 0.9851139339651687,
+     "upright_relative_position": 0.931011370327637
+    },
+    "r": {
+     "position": 1.0033163627963355,
+     "attitude": 1.0003458661078573,
+     "velocity": 0.9940030168263353,
+     "speed": 0.9412546456346995,
+     "wheel_angular_speed": 0.9677887105879132,
+     "steering_proxy": 1.0381027804916894,
+     "angular_velocity": 1.0298522277034288,
+     "upright_relative_position": 0.9991027632781835
+    },
+    "cost_noise_free": 0.0,
+    "group_costs_noise_free": {
+     "position": 0.0,
+     "attitude": 0.0,
+     "velocity": 0.0,
+     "speed": 0.0,
+     "wheel_angular_speed": 0.0,
+     "steering_proxy": 0.0,
+     "angular_velocity": 0.0,
+     "upright_relative_position": 0.0
+    },
+    "r_noise_free": {
+     "position": 0.0,
+     "attitude": 2.681917227292702e-16,
+     "velocity": 0.0,
+     "speed": 0.0,
+     "wheel_angular_speed": 0.0,
+     "steering_proxy": 0.0,
+     "angular_velocity": 0.0,
+     "upright_relative_position": 0.0
+    }
+   },
+   {
+    "motion": "test_longitudinal_chirp_2",
+    "cost": 0.9270201102639366,
+    "group_costs": {
+     "position": 0.8812259712739052,
+     "attitude": 0.9917570171006104,
+     "velocity": 0.9629670209193056,
+     "speed": 0.7426348861348298,
+     "wheel_angular_speed": 0.9457549270455696,
+     "steering_proxy": 0.9473248162146389,
+     "angular_velocity": 0.9673404138169126,
+     "upright_relative_position": 0.9771558296057201
+    },
+    "r": {
+     "position": 0.9700431279343488,
+     "attitude": 1.0312441753116577,
+     "velocity": 1.0207606051432405,
+     "speed": 0.8842901943951281,
+     "wheel_angular_speed": 1.008383984456432,
+     "steering_proxy": 1.0096246362529882,
+     "angular_velocity": 1.0188266940809318,
+     "upright_relative_position": 1.0262016957936564
+    },
+    "cost_noise_free": 0.0,
+    "group_costs_noise_free": {
+     "position": 0.0,
+     "attitude": 0.0,
+     "velocity": 0.0,
+     "speed": 0.0,
+     "wheel_angular_speed": 0.0,
+     "steering_proxy": 0.0,
+     "angular_velocity": 0.0,
+     "upright_relative_position": 0.0
+    },
+    "r_noise_free": {
+     "position": 0.0,
+     "attitude": 1.8685343894168088e-17,
+     "velocity": 0.0,
+     "speed": 0.0,
+     "wheel_angular_speed": 0.0,
+     "steering_proxy": 0.0,
+     "angular_velocity": 0.0,
+     "upright_relative_position": 0.0
+    }
+   },
+   {
+    "motion": "test_longitudinal_chirp_3",
+    "cost": 0.9326623345289433,
+    "group_costs": {
+     "position": 0.9357360510099616,
+     "attitude": 0.9199831870358536,
+     "velocity": 1.0142521839353116,
+     "speed": 0.8894564046347725,
+     "wheel_angular_speed": 0.876106628147877,
+     "steering_proxy": 0.9767589010973825,
+     "angular_velocity": 0.8727358145395228,
+     "upright_relative_position": 0.9762695058308644
+    },
+    "r": {
+     "position": 1.0051363945901866,
+     "attitude": 0.9949670593001316,
+     "velocity": 1.0454856994338233,
+     "speed": 0.974587662496622,
+     "wheel_angular_speed": 0.9673137584975058,
+     "steering_proxy": 1.0283374435218668,
+     "angular_velocity": 0.9680758003005965,
+     "upright_relative_position": 1.0255115692625476
+    },
+    "cost_noise_free": 0.0,
+    "group_costs_noise_free": {
+     "position": 0.0,
+     "attitude": 0.0,
+     "velocity": 0.0,
+     "speed": 0.0,
+     "wheel_angular_speed": 0.0,
+     "steering_proxy": 0.0,
+     "angular_velocity": 0.0,
+     "upright_relative_position": 0.0
+    },
+    "r_noise_free": {
+     "position": 0.0,
+     "attitude": 1.7545204151587243e-16,
+     "velocity": 0.0,
+     "speed": 0.0,
+     "wheel_angular_speed": 0.0,
+     "steering_proxy": 0.0,
+     "angular_velocity": 0.0,
+     "upright_relative_position": 0.0
+    }
+   },
+   {
+    "motion": "test_multisine_slalom_1",
+    "cost": 0.937098337572631,
+    "group_costs": {
+     "position": 0.9499881928280443,
+     "attitude": 0.9465466791914651,
+     "velocity": 0.9169499542405389,
+     "speed": 1.0421557750558992,
+     "wheel_angular_speed": 0.9302724973557374,
+     "steering_proxy": 0.8649529030882863,
+     "angular_velocity": 0.9294400132117554,
+     "upright_relative_position": 0.9164806856093215
+    },
+    "r": {
+     "position": 1.0111850290709592,
+     "attitude": 1.0076061034125114,
+     "velocity": 0.9915817222687253,
+     "speed": 1.0674255154678707,
+     "wheel_angular_speed": 1.000343718627626,
+     "steering_proxy": 0.9636504503858933,
+     "angular_velocity": 0.9993827971533251,
+     "upright_relative_position": 0.9913475113180477
+    },
+    "cost_noise_free": 0.0,
+    "group_costs_noise_free": {
+     "position": 0.0,
+     "attitude": 0.0,
+     "velocity": 0.0,
+     "speed": 0.0,
+     "wheel_angular_speed": 0.0,
+     "steering_proxy": 0.0,
+     "angular_velocity": 0.0,
+     "upright_relative_position": 0.0
+    },
+    "r_noise_free": {
+     "position": 0.0,
+     "attitude": 9.47416427251331e-16,
+     "velocity": 0.0,
+     "speed": 0.0,
+     "wheel_angular_speed": 0.0,
+     "steering_proxy": 0.0,
+     "angular_velocity": 0.0,
+     "upright_relative_position": 0.0
+    }
+   },
+   {
+    "motion": "test_multisine_slalom_2",
+    "cost": 0.9047139150597627,
+    "group_costs": {
+     "position": 0.9079918993022853,
+     "attitude": 0.9339587221899407,
+     "velocity": 0.9145220522001923,
+     "speed": 0.9062616180411576,
+     "wheel_angular_speed": 0.9214805060393272,
+     "steering_proxy": 0.8077035860974495,
+     "angular_velocity": 0.9292017981116864,
+     "upright_relative_position": 0.9165911384960623
+    },
+    "r": {
+     "position": 0.9865837423420762,
+     "attitude": 0.9977630613662078,
+     "velocity": 0.9899792595923386,
+     "speed": 0.9818220907576448,
+     "wheel_angular_speed": 0.994007158329624,
+     "steering_proxy": 0.9298681315548166,
+     "angular_velocity": 0.9974324395474033,
+     "upright_relative_position": 0.9902994057320699
+    },
+    "cost_noise_free": 0.0,
+    "group_costs_noise_free": {
+     "position": 0.0,
+     "attitude": 0.0,
+     "velocity": 0.0,
+     "speed": 0.0,
+     "wheel_angular_speed": 0.0,
+     "steering_proxy": 0.0,
+     "angular_velocity": 0.0,
+     "upright_relative_position": 0.0
+    },
+    "r_noise_free": {
+     "position": 0.0,
+     "attitude": 9.244710490146786e-16,
+     "velocity": 0.0,
+     "speed": 0.0,
+     "wheel_angular_speed": 0.0,
+     "steering_proxy": 0.0,
+     "angular_velocity": 0.0,
+     "upright_relative_position": 0.0
+    }
+   },
+   {
+    "motion": "test_multisine_slalom_3",
+    "cost": 0.9095483444270884,
+    "group_costs": {
+     "position": 0.9141071782222301,
+     "attitude": 0.9317549348166487,
+     "velocity": 0.8687192867052806,
+     "speed": 0.9187773077814169,
+     "wheel_angular_speed": 0.9280155503132034,
+     "steering_proxy": 0.8462678053008602,
+     "angular_velocity": 0.9762955814418748,
+     "upright_relative_position": 0.8924491108351927
+    },
+    "r": {
+     "position": 0.990362819600701,
+     "attitude": 1.0014122585299445,
+     "velocity": 0.9622320970135098,
+     "speed": 0.9892859352351369,
+     "wheel_angular_speed": 0.9962767857936807,
+     "steering_proxy": 0.9508411200527067,
+     "angular_velocity": 1.0222581030092637,
+     "upright_relative_position": 0.9768597577547449
+    },
+    "cost_noise_free": 0.0,
+    "group_costs_noise_free": {
+     "position": 0.0,
+     "attitude": 0.0,
+     "velocity": 0.0,
+     "speed": 0.0,
+     "wheel_angular_speed": 0.0,
+     "steering_proxy": 0.0,
+     "angular_velocity": 0.0,
+     "upright_relative_position": 0.0
+    },
+    "r_noise_free": {
+     "position": 0.0,
+     "attitude": 8.57475302494431e-16,
+     "velocity": 0.0,
+     "speed": 0.0,
+     "wheel_angular_speed": 0.0,
+     "steering_proxy": 0.0,
+     "angular_velocity": 0.0,
+     "upright_relative_position": 0.0
+    }
+   },
+   {
+    "motion": "test_sine_dwell_coast_1",
+    "cost": 0.9455413233556722,
+    "group_costs": {
+     "position": 0.9639495607294766,
+     "attitude": 0.9351541355368651,
+     "velocity": 0.9961392249577644,
+     "speed": 0.8253080713752373,
+     "wheel_angular_speed": 0.9452561570378426,
+     "steering_proxy": 1.0349079508466648,
+     "angular_velocity": 0.9463519758487486,
+     "upright_relative_position": 0.9172635105127781
+    },
+    "r": {
+     "position": 1.021622028430866,
+     "attitude": 1.0001035905154352,
+     "velocity": 1.0351911059222554,
+     "speed": 0.9369252042814734,
+     "wheel_angular_speed": 1.006910854378169,
+     "steering_proxy": 1.0538950525816386,
+     "angular_velocity": 1.009475045490228,
+     "upright_relative_position": 0.9907086368329711
+    },
+    "cost_noise_free": 0.0,
+    "group_costs_noise_free": {
+     "position": 0.0,
+     "attitude": 0.0,
+     "velocity": 0.0,
+     "speed": 0.0,
+     "wheel_angular_speed": 0.0,
+     "steering_proxy": 0.0,
+     "angular_velocity": 0.0,
+     "upright_relative_position": 0.0
+    },
+    "r_noise_free": {
+     "position": 0.0,
+     "attitude": 5.078080199067642e-16,
+     "velocity": 0.0,
+     "speed": 0.0,
+     "wheel_angular_speed": 0.0,
+     "steering_proxy": 0.0,
+     "angular_velocity": 0.0,
+     "upright_relative_position": 0.0
+    }
+   },
+   {
+    "motion": "test_sine_dwell_coast_2",
+    "cost": 0.9479377874990362,
+    "group_costs": {
+     "position": 0.9316204372386867,
+     "attitude": 0.916838086125102,
+     "velocity": 0.988642378916648,
+     "speed": 1.0482873229509415,
+     "wheel_angular_speed": 0.8984633399148227,
+     "steering_proxy": 0.9283421101660378,
+     "angular_velocity": 0.9344301805402208,
+     "upright_relative_position": 0.9368784441398303
+    },
+    "r": {
+     "position": 0.9991556164704127,
+     "attitude": 0.9916019303451745,
+     "velocity": 1.0321545670288246,
+     "speed": 1.0649102404022632,
+     "wheel_angular_speed": 0.9782625583189584,
+     "steering_proxy": 0.998215049058306,
+     "angular_velocity": 1.0004535707566569,
+     "upright_relative_position": 1.0029076141289393
+    },
+    "cost_noise_free": 0.0,
+    "group_costs_noise_free": {
+     "position": 0.0,
+     "attitude": 0.0,
+     "velocity": 0.0,
+     "speed": 0.0,
+     "wheel_angular_speed": 0.0,
+     "steering_proxy": 0.0,
+     "angular_velocity": 0.0,
+     "upright_relative_position": 0.0
+    },
+    "r_noise_free": {
+     "position": 0.0,
+     "attitude": 2.6478713521599165e-17,
+     "velocity": 0.0,
+     "speed": 0.0,
+     "wheel_angular_speed": 0.0,
+     "steering_proxy": 0.0,
+     "angular_velocity": 0.0,
+     "upright_relative_position": 0.0
+    }
+   },
+   {
+    "motion": "test_sine_dwell_coast_3",
+    "cost": 0.9441560674977288,
+    "group_costs": {
+     "position": 0.941318046009623,
+     "attitude": 0.9588487919654353,
+     "velocity": 0.9337989993788681,
+     "speed": 0.9604056108797783,
+     "wheel_angular_speed": 0.9826872459385932,
+     "steering_proxy": 0.9028349638241622,
+     "angular_velocity": 0.9364083979594767,
+     "upright_relative_position": 0.9369464840258936
+    },
+    "r": {
+     "position": 1.005214532567327,
+     "attitude": 1.0155387232364184,
+     "velocity": 0.999079599742834,
+     "speed": 1.0135480606409006,
+     "wheel_angular_speed": 1.0270004893128217,
+     "steering_proxy": 0.9838447908658007,
+     "angular_velocity": 0.9980023636402504,
+     "upright_relative_position": 1.0033802509577194
+    },
+    "cost_noise_free": 0.0,
+    "group_costs_noise_free": {
+     "position": 0.0,
+     "attitude": 0.0,
+     "velocity": 0.0,
+     "speed": 0.0,
+     "wheel_angular_speed": 0.0,
+     "steering_proxy": 0.0,
+     "angular_velocity": 0.0,
+     "upright_relative_position": 0.0
+    },
+    "r_noise_free": {
+     "position": 0.0,
+     "attitude": 6.54597052454725e-16,
+     "velocity": 0.0,
+     "speed": 0.0,
+     "wheel_angular_speed": 0.0,
+     "steering_proxy": 0.0,
+     "angular_velocity": 0.0,
+     "upright_relative_position": 0.0
+    }
+   },
+   {
+    "motion": "test_offset_brake_slalom_1",
+    "cost": 0.9373765622295025,
+    "group_costs": {
+     "position": 0.9300430141230628,
+     "attitude": 1.0139068801796793,
+     "velocity": 0.8986079888776036,
+     "speed": 0.8673172372642021,
+     "wheel_angular_speed": 1.0070123606589563,
+     "steering_proxy": 0.8642191434060861,
+     "angular_velocity": 0.9951234973828199,
+     "upright_relative_position": 0.9227823759436099
+    },
+    "r": {
+     "position": 0.9984744832990264,
+     "attitude": 1.0459592873569594,
+     "velocity": 0.9815503441345786,
+     "speed": 0.9621031963113996,
+     "wheel_angular_speed": 1.0410349881419245,
+     "steering_proxy": 0.9575856427651026,
+     "angular_velocity": 1.033308996844041,
+     "upright_relative_position": 0.9938452285651284
+    },
+    "cost_noise_free": 0.0,
+    "group_costs_noise_free": {
+     "position": 0.0,
+     "attitude": 0.0,
+     "velocity": 0.0,
+     "speed": 0.0,
+     "wheel_angular_speed": 0.0,
+     "steering_proxy": 0.0,
+     "angular_velocity": 0.0,
+     "upright_relative_position": 0.0
+    },
+    "r_noise_free": {
+     "position": 0.0,
+     "attitude": 6.841756511303715e-16,
+     "velocity": 0.0,
+     "speed": 0.0,
+     "wheel_angular_speed": 0.0,
+     "steering_proxy": 0.0,
+     "angular_velocity": 0.0,
+     "upright_relative_position": 0.0
+    }
+   },
+   {
+    "motion": "test_offset_brake_slalom_2",
+    "cost": 0.9333783366576385,
+    "group_costs": {
+     "position": 0.9703018516755434,
+     "attitude": 0.99717767439756,
+     "velocity": 0.9913463985197742,
+     "speed": 0.837642620467484,
+     "wheel_angular_speed": 0.9908547414796344,
+     "steering_proxy": 0.8549048410202795,
+     "angular_velocity": 0.873617274451122,
+     "upright_relative_position": 0.9511812912497104
+    },
+    "r": {
+     "position": 1.02121646966521,
+     "attitude": 1.0351174191808594,
+     "velocity": 1.03470859988056,
+     "speed": 0.9442638752269041,
+     "wheel_angular_speed": 1.0324113875225345,
+     "steering_proxy": 0.9552478432292951,
+     "angular_velocity": 0.966871697731073,
+     "upright_relative_position": 1.0106524613146473
+    },
+    "cost_noise_free": 0.0,
+    "group_costs_noise_free": {
+     "position": 0.0,
+     "attitude": 0.0,
+     "velocity": 0.0,
+     "speed": 0.0,
+     "wheel_angular_speed": 0.0,
+     "steering_proxy": 0.0,
+     "angular_velocity": 0.0,
+     "upright_relative_position": 0.0
+    },
+    "r_noise_free": {
+     "position": 0.0,
+     "attitude": 2.5404870457095457e-16,
+     "velocity": 0.0,
+     "speed": 0.0,
+     "wheel_angular_speed": 0.0,
+     "steering_proxy": 0.0,
+     "angular_velocity": 0.0,
+     "upright_relative_position": 0.0
+    }
+   },
+   {
+    "motion": "test_offset_brake_slalom_3",
+    "cost": 0.9181081784123082,
+    "group_costs": {
+     "position": 0.9590755110458801,
+     "attitude": 0.919519711078102,
+     "velocity": 0.957129784351612,
+     "speed": 0.8659324472180532,
+     "wheel_angular_speed": 0.9556494336650481,
+     "steering_proxy": 0.8671113360538593,
+     "angular_velocity": 0.9064016348630997,
+     "upright_relative_position": 0.9140455690228109
+    },
+    "r": {
+     "position": 1.0151690108492972,
+     "attitude": 0.9962820204275892,
+     "velocity": 1.0149466127196416,
+     "speed": 0.9607633569388065,
+     "wheel_angular_speed": 1.0144862931934957,
+     "steering_proxy": 0.9614405673911692,
+     "angular_velocity": 0.9874133799101968,
+     "upright_relative_position": 0.9887032121380239
+    },
+    "cost_noise_free": 0.0,
+    "group_costs_noise_free": {
+     "position": 0.0,
+     "attitude": 0.0,
+     "velocity": 0.0,
+     "speed": 0.0,
+     "wheel_angular_speed": 0.0,
+     "steering_proxy": 0.0,
+     "angular_velocity": 0.0,
+     "upright_relative_position": 0.0
+    },
+    "r_noise_free": {
+     "position": 0.0,
+     "attitude": 1.3044988510594601e-15,
+     "velocity": 0.0,
+     "speed": 0.0,
+     "wheel_angular_speed": 0.0,
+     "steering_proxy": 0.0,
+     "angular_velocity": 0.0,
+     "upright_relative_position": 0.0
+    }
+   },
+   {
+    "motion": "test_late_sweep_release_1",
+    "cost": 0.9138217956514074,
+    "group_costs": {
+     "position": 0.9296825661357971,
+     "attitude": 0.9450357272448876,
+     "velocity": 0.9529567018110288,
+     "speed": 0.8729393666301022,
+     "wheel_angular_speed": 1.0214493827570192,
+     "steering_proxy": 0.8010746137173944,
+     "angular_velocity": 0.8635005581056007,
+     "upright_relative_position": 0.9239354488094289
+    },
+    "r": {
+     "position": 0.996740359789906,
+     "attitude": 1.0066874089480737,
+     "velocity": 1.0130686794820833,
+     "speed": 0.9673034412353056,
+     "wheel_angular_speed": 1.047766162117067,
+     "steering_proxy": 0.9215114231382363,
+     "angular_velocity": 0.9576336666494227,
+     "upright_relative_position": 0.9955646777787556
+    },
+    "cost_noise_free": 0.0,
+    "group_costs_noise_free": {
+     "position": 0.0,
+     "attitude": 0.0,
+     "velocity": 0.0,
+     "speed": 0.0,
+     "wheel_angular_speed": 0.0,
+     "steering_proxy": 0.0,
+     "angular_velocity": 0.0,
+     "upright_relative_position": 0.0
+    },
+    "r_noise_free": {
+     "position": 0.0,
+     "attitude": 2.2445768693233537e-16,
+     "velocity": 0.0,
+     "speed": 0.0,
+     "wheel_angular_speed": 0.0,
+     "steering_proxy": 0.0,
+     "angular_velocity": 0.0,
+     "upright_relative_position": 0.0
+    }
+   },
+   {
+    "motion": "test_late_sweep_release_2",
+    "cost": 0.9640058612418478,
+    "group_costs": {
+     "position": 0.9269769680708746,
+     "attitude": 0.9396655414251808,
+     "velocity": 0.9821836875863322,
+     "speed": 1.0007263242069269,
+     "wheel_angular_speed": 0.9704069559036278,
+     "steering_proxy": 0.9601958028642545,
+     "angular_velocity": 0.9838348920867411,
+     "upright_relative_position": 0.9480567177908451
+    },
+    "r": {
+     "position": 0.9969316878972645,
+     "attitude": 1.0019728792942417,
+     "velocity": 1.0284191812840249,
+     "speed": 1.0422458364101723,
+     "wheel_angular_speed": 1.0213438688891219,
+     "steering_proxy": 1.0145771730186142,
+     "angular_velocity": 1.0285676484455286,
+     "upright_relative_position": 1.009145768174024
+    },
+    "cost_noise_free": 0.0,
+    "group_costs_noise_free": {
+     "position": 0.0,
+     "attitude": 0.0,
+     "velocity": 0.0,
+     "speed": 0.0,
+     "wheel_angular_speed": 0.0,
+     "steering_proxy": 0.0,
+     "angular_velocity": 0.0,
+     "upright_relative_position": 0.0
+    },
+    "r_noise_free": {
+     "position": 0.0,
+     "attitude": 1.1042461623846995e-15,
+     "velocity": 0.0,
+     "speed": 0.0,
+     "wheel_angular_speed": 0.0,
+     "steering_proxy": 0.0,
+     "angular_velocity": 0.0,
+     "upright_relative_position": 0.0
+    }
+   },
+   {
+    "motion": "test_late_sweep_release_3",
+    "cost": 0.9328825275940449,
+    "group_costs": {
+     "position": 0.9909377223295353,
+     "attitude": 0.9458334862815199,
+     "velocity": 0.9569907048587282,
+     "speed": 0.951831439279543,
+     "wheel_angular_speed": 0.9543054359007788,
+     "steering_proxy": 0.7982247528675821,
+     "angular_velocity": 0.9606900621328678,
+     "upright_relative_position": 0.904246617101805
+    },
+    "r": {
+     "position": 1.0334567649577415,
+     "attitude": 1.0059154480882508,
+     "velocity": 1.0125162720056344,
+     "speed": 1.0130645050879832,
+     "wheel_angular_speed": 1.0126077846921715,
+     "steering_proxy": 0.9208183107499975,
+     "angular_velocity": 1.0176960190622046,
+     "upright_relative_position": 0.9848956990790568
+    },
+    "cost_noise_free": 0.0,
+    "group_costs_noise_free": {
+     "position": 0.0,
+     "attitude": 0.0,
+     "velocity": 0.0,
+     "speed": 0.0,
+     "wheel_angular_speed": 0.0,
+     "steering_proxy": 0.0,
+     "angular_velocity": 0.0,
+     "upright_relative_position": 0.0
+    },
+    "r_noise_free": {
+     "position": 0.0,
+     "attitude": 4.0492985937664667e-17,
+     "velocity": 0.0,
+     "speed": 0.0,
+     "wheel_angular_speed": 0.0,
+     "steering_proxy": 0.0,
+     "angular_velocity": 0.0,
+     "upright_relative_position": 0.0
+    }
+   }
+  ]
+ },
+ "selected_endpoint": {
+  "test_cost": 0.9752653621539132,
+  "group_costs": {
+   "position": 0.9599578647020454,
+   "attitude": 0.9524057468769538,
+   "velocity": 0.9506559031267654,
+   "speed": 0.9119671833356988,
+   "wheel_angular_speed": 1.2315708099041258,
+   "steering_proxy": 0.9113992030468574,
+   "angular_velocity": 0.9560522097406476,
+   "upright_relative_position": 0.9281139764982116
+  },
+  "seed": 4
+ },
+ "share_removed": null,
+ "without_upright_group": {
+  "noise_only": 0.9322038210061269,
+  "reference_model": 0.9322038210061269,
+  "selected_endpoint": 0.9820012743904422
+ },
+ "share_removed_without_upright_group": null
+}

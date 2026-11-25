@@ -1,0 +1,56 @@
+{
+ "description": "Settings of the forward model. The vehicle settles for control_steps x control_interval_s = 2.0 s: freely for free_control_steps, then the velocities of all moving bodies are multiplied by velocity_factor_after_each_step after every integration step. The tire model limits the road friction to [0.1, 1.0], so the settle uses an effective friction of 0.1. A rollout is valid if all outputs are finite and the limits under validity hold.",
+ "integration_step_s": 0.001,
+ "control_interval_s": 0.002,
+ "initial_chassis_height_m": 0.6,
+ "contact": {
+  "method": "SMC",
+  "settings": "Chrono defaults of the SMC system"
+ },
+ "terrain_material": {
+  "friction": "the parameter mu",
+  "young_modulus_pa": 200000.0,
+  "poisson_ratio": 0.3,
+  "restitution": 0.05,
+  "adhesion_n": 0.0
+ },
+ "flat_patch_size_m": [
+  300.0,
+  300.0
+ ],
+ "rough_roads": {
+  "asymmetric roll road": {
+   "height_map": "settings/terrain/asymmetric_roll_road.png",
+   "length_m": 18.0,
+   "width_m": 12.0,
+   "minimum_height_m": -0.08,
+   "maximum_height_m": 0.08
+  },
+  "asymmetric roll road, confirmation variant": {
+   "height_map": "settings/terrain/asymmetric_roll_road_confirmation.png",
+   "length_m": 18.0,
+   "width_m": 12.0,
+   "minimum_height_m": -0.072,
+   "maximum_height_m": 0.072
+  }
+ },
+ "settle": {
+  "control_steps": 1000,
+  "free_control_steps": 200,
+  "velocity_factor_after_each_step": 0.99,
+  "throttle": 0.0,
+  "steering": 0.0,
+  "braking": 0.0,
+  "drive_mode": "neutral",
+  "road_friction": 0.001,
+  "effective_road_friction": 0.1,
+  "chassis_held_in": "x, y and yaw"
+ },
+ "validity": {
+  "maximum_speed_m_per_s": 35.0,
+  "maximum_roll_pitch_deg": 45.0,
+  "minimum_planar_travel_m": 0.05,
+  "maximum_joint_residual_m": 0.001,
+  "maximum_initial_toe_camber_deg": 5.0
+ }
+}

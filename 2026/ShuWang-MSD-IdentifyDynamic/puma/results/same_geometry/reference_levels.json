@@ -1,0 +1,85 @@
+{
+ "noise_only_cost": 0.934133101844395,
+ "reference_cost": 0.934133101844395,
+ "selected_endpoint_cost": 0.9343402313682971,
+ "share_of_excess_removed": null,
+ "definitions": {
+  "noise_only_cost": "test cost of the noise-free teacher output against the noisy test records",
+  "reference_cost": "test cost of the reference model (teacher parameters, calibrated geometry) against the noisy test records; its output is the noise-free test record of the same-geometry setting",
+  "share_of_excess_removed": "(reference_cost - selected_endpoint_cost) / (reference_cost - noise_only_cost); not defined in the same-geometry setting, where the reference model is the teacher"
+ },
+ "per_motion": {
+  "HG4": {
+   "noise_only_cost": 0.9253693213038879,
+   "reference_cost": 0.9253693213038879
+  },
+  "HG5": {
+   "noise_only_cost": 0.9354887209275209,
+   "reference_cost": 0.9354887209275209
+  },
+  "HG6": {
+   "noise_only_cost": 0.9326793199743445,
+   "reference_cost": 0.9326793199743445
+  },
+  "HF4": {
+   "noise_only_cost": 0.9315926251848591,
+   "reference_cost": 0.9315926251848591
+  },
+  "HF5": {
+   "noise_only_cost": 0.9286184679322643,
+   "reference_cost": 0.9286184679322643
+  },
+  "HF6": {
+   "noise_only_cost": 0.9344558344553924,
+   "reference_cost": 0.9344558344553924
+  },
+  "HI4": {
+   "noise_only_cost": 0.9305474721708379,
+   "reference_cost": 0.9305474721708379
+  },
+  "HI5": {
+   "noise_only_cost": 0.9340027894171096,
+   "reference_cost": 0.9340027894171096
+  },
+  "HI6": {
+   "noise_only_cost": 0.9429082323783998,
+   "reference_cost": 0.9429082323783998
+  },
+  "HC4": {
+   "noise_only_cost": 0.9358235161358133,
+   "reference_cost": 0.9358235161358133
+  },
+  "HC5": {
+   "noise_only_cost": 0.932014879227058,
+   "reference_cost": 0.932014879227058
+  },
+  "HC6": {
+   "noise_only_cost": 0.9386339320118445,
+   "reference_cost": 0.9386339320118445
+  },
+  "CS4": {
+   "noise_only_cost": 0.947850253567206,
+   "reference_cost": 0.947850253567206
+  },
+  "CS5": {
+   "noise_only_cost": 0.938095323461468,
+   "reference_cost": 0.938095323461468
+  },
+  "CS6": {
+   "noise_only_cost": 0.929620753825736,
+   "reference_cost": 0.929620753825736
+  },
+  "CH4": {
+   "noise_only_cost": 0.9285252495177085,
+   "reference_cost": 0.9285252495177085
+  },
+  "CH5": {
+   "noise_only_cost": 0.9356618660399996,
+   "reference_cost": 0.9356618660399996
+  },
+  "CH6": {
+   "noise_only_cost": 0.9325072756676619,
+   "reference_cost": 0.9325072756676619
+  }
+ }
+}

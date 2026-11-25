@@ -1,0 +1,36 @@
+{
+ "method": "differential evolution (scipy.optimize.differential_evolution)",
+ "strategy": "best1bin",
+ "population": 32,
+ "initial_population": "the three development points and 29 Latin-hypercube points drawn with the seed of the run",
+ "mutation": [
+  0.5,
+  1.0
+ ],
+ "recombination": 0.7,
+ "polishing": false,
+ "population_updating": "immediate",
+ "workers": 1,
+ "tolerance": 1e-08,
+ "penalty_of_infeasible_or_invalid_candidates": 1000000000.0,
+ "runs_per_geometry_setting": 4,
+ "generation_chunks": {
+  "first": 16,
+  "next": 8,
+  "seed_of_chunk": "seed + chunk index, the first chunk has index 0"
+ },
+ "validation_checks": {
+  "first_generation": 24,
+  "every_generations": 4,
+  "candidate": "population member with the lowest training cost"
+ },
+ "stop_rule": {
+  "event_i_validation_cost_at_most": 1.1196,
+  "event_ii_relative_decrease": 0.005,
+  "event_ii_generations_without_decrease": 8,
+  "event_iii_generations": 120
+ },
+ "endpoint": "checked candidate with the lowest validation cost up to the stop",
+ "selected_model": "endpoint with the lowest validation cost over the seeds; an exact tie goes to the earlier generation and then to the lower seed number",
+ "early_rejection": "the evaluation of a trial stops when its partial cost over the training motions already exceeds the cost of the population member it would replace; the search path is unchanged"
+}

@@ -1,0 +1,162 @@
+{
+ "description": "The true geometry is the stock geometry of the HMMWV model of Project Chrono. Its data files are not copied here. They are named below with the sha256 of the files used in this study. The hardpoint locations are the values of these files (left side, axle reference frame, m).",
+ "license_of_the_named_files": "BSD 3-Clause, Project Chrono Development Team",
+ "files": [
+  {
+   "name": "vehicle/hmmwv/suspension/HMMWV_DoubleWishboneFront.json",
+   "sha256": "bfe772b17d603c03822fb597e13c08f1ea41e884b274bd2af77c9b6af9d8e885"
+  },
+  {
+   "name": "vehicle/hmmwv/suspension/HMMWV_DoubleWishboneRear.json",
+   "sha256": "d7fc89d7fb5a2826beaa23c323a0019bece1344a8679a56339a390919b528072"
+  }
+ ],
+ "axle_location_m": {
+  "front": [
+   1.688,
+   0.0,
+   0.0
+  ],
+  "rear": [
+   -1.688,
+   0.0,
+   0.0
+  ]
+ },
+ "hardpoints_m": {
+  "front": {
+   "upper_arm_chassis_front": [
+    -0.048,
+    0.446,
+    0.245
+   ],
+   "upper_arm_chassis_back": [
+    -0.268,
+    0.478,
+    0.196
+   ],
+   "upper_arm_upright": [
+    -0.053,
+    0.716,
+    0.215
+   ],
+   "lower_arm_chassis_front": [
+    0.223,
+    0.307,
+    0.0
+   ],
+   "lower_arm_chassis_back": [
+    -0.223,
+    0.307,
+    0.0
+   ],
+   "lower_arm_upright": [
+    -0.036,
+    0.787,
+    -0.118
+   ],
+   "tie_rod_chassis": [
+    -0.25,
+    0.448,
+    0.054
+   ],
+   "tie_rod_upright": [
+    -0.176,
+    0.821,
+    -0.016
+   ],
+   "wheel_center": [
+    -0.04,
+    0.91,
+    -0.026
+   ],
+   "spring_chassis": [
+    0.104,
+    0.51,
+    0.197
+   ],
+   "spring_arm": [
+    0.097,
+    0.543,
+    -0.047
+   ],
+   "damper_chassis": [
+    0.104,
+    0.498,
+    0.323
+   ],
+   "damper_arm": [
+    0.097,
+    0.543,
+    -0.047
+   ]
+  },
+  "rear": {
+   "upper_arm_chassis_front": [
+    0.349,
+    0.462,
+    0.228
+   ],
+   "upper_arm_chassis_back": [
+    0.077,
+    0.462,
+    0.224
+   ],
+   "upper_arm_upright": [
+    0.036,
+    0.716,
+    0.216
+   ],
+   "lower_arm_chassis_front": [
+    0.223,
+    0.307,
+    0.0
+   ],
+   "lower_arm_chassis_back": [
+    -0.223,
+    0.307,
+    0.0
+   ],
+   "lower_arm_upright": [
+    0.036,
+    0.787,
+    -0.118
+   ],
+   "tie_rod_chassis": [
+    0.223,
+    0.416,
+    0.059
+   ],
+   "tie_rod_upright": [
+    0.17,
+    0.821,
+    -0.009
+   ],
+   "wheel_center": [
+    0.036,
+    0.91,
+    -0.026
+   ],
+   "spring_chassis": [
+    -0.104,
+    0.502,
+    0.256
+   ],
+   "spring_arm": [
+    -0.097,
+    0.543,
+    -0.047
+   ],
+   "damper_chassis": [
+    -0.104,
+    0.498,
+    0.323
+   ],
+   "damper_arm": [
+    -0.097,
+    0.544,
+    -0.038
+   ]
+  }
+ }
+}

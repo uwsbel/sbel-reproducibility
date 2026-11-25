@@ -1,0 +1,38 @@
+{
+ "method": "differential evolution (SciPy differential_evolution)",
+ "strategy": "best1bin",
+ "population": 32,
+ "mutation": [
+  0.5,
+  1.0
+ ],
+ "recombination": 0.7,
+ "updating": "immediate",
+ "polishing": false,
+ "tolerance": 1e-08,
+ "bounds_z": [
+  -1.0,
+  1.0
+ ],
+ "initial_population": "three development points of the prior map and 29 Latin-hypercube points of the seed",
+ "penalty_cost": 1000000000.0,
+ "penalty_rule": "an infeasible candidate or a simulation that does not pass the mechanical checks gets the penalty cost",
+ "generations_per_call": {
+  "first_call": 16,
+  "later_calls": 8
+ },
+ "validation_checks": {
+  "first_generation": 24,
+  "every_generations": 4,
+  "candidate": "population member with the lowest training cost"
+ },
+ "stop_rule": {
+  "event_i_validation_cost_at_most": 1.1196,
+  "event_ii_relative_improvement": 0.005,
+  "event_ii_generations": 8,
+  "event_iii_generation_cap": 120
+ },
+ "endpoint": "checked generation with the lowest validation cost up to the stop; ties go to the earlier generation",
+ "selected_model": "run with the lowest endpoint validation cost; ties go to the earlier generation and then to the lower seed",
+ "runs_per_geometry_setting": 4
+}

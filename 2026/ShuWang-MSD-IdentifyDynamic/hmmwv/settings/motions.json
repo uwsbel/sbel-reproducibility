@@ -1,0 +1,600 @@
+{
+ "input_columns": [
+  "throttle",
+  "steering",
+  "braking"
+ ],
+ "input_interval_s": 0.002,
+ "note": "Each input file holds one array named control with one row per control interval. The inputs are held between the intervals.",
+ "training": [
+  "H-D03",
+  "H-D04",
+  "P-D01",
+  "P-R02",
+  "P-S01"
+ ],
+ "library": [
+  {
+   "id": "H-D01",
+   "file": "settings/inputs/H-D01.npz",
+   "samples": 1000,
+   "duration_s": 2.0,
+   "terrain": "flat",
+   "category": "Combined",
+   "name": "Aggressive combined motion",
+   "training": false
+  },
+  {
+   "id": "H-D02",
+   "file": "settings/inputs/H-D02.npz",
+   "samples": 1000,
+   "duration_s": 2.0,
+   "terrain": "flat",
+   "category": "Combined",
+   "name": "Moderate combined motion",
+   "training": false
+  },
+  {
+   "id": "H-D03",
+   "file": "settings/inputs/H-D03.npz",
+   "samples": 1000,
+   "duration_s": 2.0,
+   "terrain": "flat",
+   "category": "Load transition",
+   "name": "Longitudinal load transfer",
+   "training": true
+  },
+  {
+   "id": "H-D04",
+   "file": "settings/inputs/H-D04.npz",
+   "samples": 1000,
+   "duration_s": 2.0,
+   "terrain": "flat",
+   "category": "Yaw",
+   "name": "Yaw-roll motion",
+   "training": true
+  },
+  {
+   "id": "P-D01",
+   "file": "settings/inputs/P-D01.npz",
+   "samples": 1000,
+   "duration_s": 2.0,
+   "terrain": "flat",
+   "category": "Combined",
+   "name": "Rich combined motion",
+   "training": true
+  },
+  {
+   "id": "P-R01",
+   "file": "settings/inputs/P-R01.npz",
+   "samples": 1000,
+   "duration_s": 2.0,
+   "terrain": "flat",
+   "category": "Yaw",
+   "name": "Yaw-inertia pulses",
+   "training": false
+  },
+  {
+   "id": "P-R02",
+   "file": "settings/inputs/P-R02.npz",
+   "samples": 1000,
+   "duration_s": 2.0,
+   "terrain": "asymmetric roll road",
+   "category": "Uneven road",
+   "name": "Asymmetric roll road",
+   "training": true
+  },
+  {
+   "id": "P-S01",
+   "file": "settings/inputs/P-S01.npz",
+   "samples": 1000,
+   "duration_s": 2.0,
+   "terrain": "flat",
+   "category": "Multisine",
+   "name": "Multisine slalom",
+   "training": true
+  },
+  {
+   "id": "P-W01",
+   "file": "settings/inputs/P-W01.npz",
+   "samples": 1000,
+   "duration_s": 2.0,
+   "terrain": "flat",
+   "category": "Load transition",
+   "name": "Early-chirp unloading",
+   "training": false
+  },
+  {
+   "id": "P-W02",
+   "file": "settings/inputs/P-W02.npz",
+   "samples": 1000,
+   "duration_s": 2.0,
+   "terrain": "flat",
+   "category": "Load transition",
+   "name": "Brake-release sweep",
+   "training": false
+  },
+  {
+   "id": "P-W03",
+   "file": "settings/inputs/P-W03.npz",
+   "samples": 1000,
+   "duration_s": 2.0,
+   "terrain": "flat",
+   "category": "Load transition",
+   "name": "Counterphase unloading",
+   "training": false
+  },
+  {
+   "id": "P-W04",
+   "file": "settings/inputs/P-W04.npz",
+   "samples": 1000,
+   "duration_s": 2.0,
+   "terrain": "flat",
+   "category": "Load transition",
+   "name": "Dual load-transition pulses",
+   "training": false
+  }
+ ],
+ "confirmation": [
+  {
+   "id": "confirmation_H-D01",
+   "file": "settings/inputs/confirmation_H-D01.npz",
+   "samples": 1000,
+   "duration_s": 2.0,
+   "terrain": "flat",
+   "variant_of": "H-D01"
+  },
+  {
+   "id": "confirmation_H-D02",
+   "file": "settings/inputs/confirmation_H-D02.npz",
+   "samples": 1000,
+   "duration_s": 2.0,
+   "terrain": "flat",
+   "variant_of": "H-D02"
+  },
+  {
+   "id": "confirmation_H-D03",
+   "file": "settings/inputs/confirmation_H-D03.npz",
+   "samples": 1000,
+   "duration_s": 2.0,
+   "terrain": "flat",
+   "variant_of": "H-D03"
+  },
+  {
+   "id": "confirmation_H-D04",
+   "file": "settings/inputs/confirmation_H-D04.npz",
+   "samples": 1000,
+   "duration_s": 2.0,
+   "terrain": "flat",
+   "variant_of": "H-D04"
+  },
+  {
+   "id": "confirmation_P-D01",
+   "file": "settings/inputs/confirmation_P-D01.npz",
+   "samples": 1000,
+   "duration_s": 2.0,
+   "terrain": "flat",
+   "variant_of": "P-D01"
+  },
+  {
+   "id": "confirmation_P-R01",
+   "file": "settings/inputs/confirmation_P-R01.npz",
+   "samples": 1000,
+   "duration_s": 2.0,
+   "terrain": "flat",
+   "variant_of": "P-R01"
+  },
+  {
+   "id": "confirmation_P-R02",
+   "file": "settings/inputs/confirmation_P-R02.npz",
+   "samples": 1000,
+   "duration_s": 2.0,
+   "terrain": "asymmetric roll road",
+   "variant_of": "P-R02"
+  },
+  {
+   "id": "confirmation_P-S01",
+   "file": "settings/inputs/confirmation_P-S01.npz",
+   "samples": 1000,
+   "duration_s": 2.0,
+   "terrain": "flat",
+   "variant_of": "P-S01"
+  },
+  {
+   "id": "confirmation_P-W01",
+   "file": "settings/inputs/confirmation_P-W01.npz",
+   "samples": 1000,
+   "duration_s": 2.0,
+   "terrain": "flat",
+   "variant_of": "P-W01"
+  },
+  {
+   "id": "confirmation_P-W02",
+   "file": "settings/inputs/confirmation_P-W02.npz",
+   "samples": 1000,
+   "duration_s": 2.0,
+   "terrain": "flat",
+   "variant_of": "P-W02"
+  },
+  {
+   "id": "confirmation_P-W03",
+   "file": "settings/inputs/confirmation_P-W03.npz",
+   "samples": 1000,
+   "duration_s": 2.0,
+   "terrain": "flat",
+   "variant_of": "P-W03"
+  },
+  {
+   "id": "confirmation_P-W04",
+   "file": "settings/inputs/confirmation_P-W04.npz",
+   "samples": 1000,
+   "duration_s": 2.0,
+   "terrain": "flat",
+   "variant_of": "P-W04"
+  }
+ ],
+ "validation": [
+  {
+   "id": "validation_lane_change_brake_1",
+   "file": "settings/inputs/validation_lane_change_brake_1.npz",
+   "samples": 1200,
+   "duration_s": 2.4,
+   "terrain": "flat",
+   "family": "lane_change_brake",
+   "family_name": "lane change and brake",
+   "variant": 1
+  },
+  {
+   "id": "validation_lane_change_brake_2",
+   "file": "settings/inputs/validation_lane_change_brake_2.npz",
+   "samples": 1200,
+   "duration_s": 2.4,
+   "terrain": "flat",
+   "family": "lane_change_brake",
+   "family_name": "lane change and brake",
+   "variant": 2
+  },
+  {
+   "id": "validation_lane_change_brake_3",
+   "file": "settings/inputs/validation_lane_change_brake_3.npz",
+   "samples": 1200,
+   "duration_s": 2.4,
+   "terrain": "flat",
+   "family": "lane_change_brake",
+   "family_name": "lane change and brake",
+   "variant": 3
+  },
+  {
+   "id": "validation_longitudinal_chirp_1",
+   "file": "settings/inputs/validation_longitudinal_chirp_1.npz",
+   "samples": 1200,
+   "duration_s": 2.4,
+   "terrain": "flat",
+   "family": "longitudinal_chirp",
+   "family_name": "longitudinal chirp",
+   "variant": 1
+  },
+  {
+   "id": "validation_longitudinal_chirp_2",
+   "file": "settings/inputs/validation_longitudinal_chirp_2.npz",
+   "samples": 1200,
+   "duration_s": 2.4,
+   "terrain": "flat",
+   "family": "longitudinal_chirp",
+   "family_name": "longitudinal chirp",
+   "variant": 2
+  },
+  {
+   "id": "validation_longitudinal_chirp_3",
+   "file": "settings/inputs/validation_longitudinal_chirp_3.npz",
+   "samples": 1200,
+   "duration_s": 2.4,
+   "terrain": "flat",
+   "family": "longitudinal_chirp",
+   "family_name": "longitudinal chirp",
+   "variant": 3
+  },
+  {
+   "id": "validation_multisine_slalom_1",
+   "file": "settings/inputs/validation_multisine_slalom_1.npz",
+   "samples": 1200,
+   "duration_s": 2.4,
+   "terrain": "flat",
+   "family": "multisine_slalom",
+   "family_name": "multisine slalom",
+   "variant": 1
+  },
+  {
+   "id": "validation_multisine_slalom_2",
+   "file": "settings/inputs/validation_multisine_slalom_2.npz",
+   "samples": 1200,
+   "duration_s": 2.4,
+   "terrain": "flat",
+   "family": "multisine_slalom",
+   "family_name": "multisine slalom",
+   "variant": 2
+  },
+  {
+   "id": "validation_multisine_slalom_3",
+   "file": "settings/inputs/validation_multisine_slalom_3.npz",
+   "samples": 1200,
+   "duration_s": 2.4,
+   "terrain": "flat",
+   "family": "multisine_slalom",
+   "family_name": "multisine slalom",
+   "variant": 3
+  },
+  {
+   "id": "validation_sine_dwell_coast_1",
+   "file": "settings/inputs/validation_sine_dwell_coast_1.npz",
+   "samples": 1200,
+   "duration_s": 2.4,
+   "terrain": "flat",
+   "family": "sine_dwell_coast",
+   "family_name": "sine dwell and coast",
+   "variant": 1
+  },
+  {
+   "id": "validation_sine_dwell_coast_2",
+   "file": "settings/inputs/validation_sine_dwell_coast_2.npz",
+   "samples": 1200,
+   "duration_s": 2.4,
+   "terrain": "flat",
+   "family": "sine_dwell_coast",
+   "family_name": "sine dwell and coast",
+   "variant": 2
+  },
+  {
+   "id": "validation_sine_dwell_coast_3",
+   "file": "settings/inputs/validation_sine_dwell_coast_3.npz",
+   "samples": 1200,
+   "duration_s": 2.4,
+   "terrain": "flat",
+   "family": "sine_dwell_coast",
+   "family_name": "sine dwell and coast",
+   "variant": 3
+  },
+  {
+   "id": "validation_offset_brake_slalom_1",
+   "file": "settings/inputs/validation_offset_brake_slalom_1.npz",
+   "samples": 1200,
+   "duration_s": 2.4,
+   "terrain": "flat",
+   "family": "offset_brake_slalom",
+   "family_name": "offset-brake slalom",
+   "variant": 1
+  },
+  {
+   "id": "validation_offset_brake_slalom_2",
+   "file": "settings/inputs/validation_offset_brake_slalom_2.npz",
+   "samples": 1200,
+   "duration_s": 2.4,
+   "terrain": "flat",
+   "family": "offset_brake_slalom",
+   "family_name": "offset-brake slalom",
+   "variant": 2
+  },
+  {
+   "id": "validation_offset_brake_slalom_3",
+   "file": "settings/inputs/validation_offset_brake_slalom_3.npz",
+   "samples": 1200,
+   "duration_s": 2.4,
+   "terrain": "flat",
+   "family": "offset_brake_slalom",
+   "family_name": "offset-brake slalom",
+   "variant": 3
+  },
+  {
+   "id": "validation_late_sweep_release_1",
+   "file": "settings/inputs/validation_late_sweep_release_1.npz",
+   "samples": 1200,
+   "duration_s": 2.4,
+   "terrain": "flat",
+   "family": "late_sweep_release",
+   "family_name": "late sweep and release",
+   "variant": 1
+  },
+  {
+   "id": "validation_late_sweep_release_2",
+   "file": "settings/inputs/validation_late_sweep_release_2.npz",
+   "samples": 1200,
+   "duration_s": 2.4,
+   "terrain": "flat",
+   "family": "late_sweep_release",
+   "family_name": "late sweep and release",
+   "variant": 2
+  },
+  {
+   "id": "validation_late_sweep_release_3",
+   "file": "settings/inputs/validation_late_sweep_release_3.npz",
+   "samples": 1200,
+   "duration_s": 2.4,
+   "terrain": "flat",
+   "family": "late_sweep_release",
+   "family_name": "late sweep and release",
+   "variant": 3
+  }
+ ],
+ "test": [
+  {
+   "id": "test_lane_change_brake_1",
+   "file": "settings/inputs/test_lane_change_brake_1.npz",
+   "samples": 1200,
+   "duration_s": 2.4,
+   "terrain": "flat",
+   "family": "lane_change_brake",
+   "family_name": "lane change and brake",
+   "variant": 1
+  },
+  {
+   "id": "test_lane_change_brake_2",
+   "file": "settings/inputs/test_lane_change_brake_2.npz",
+   "samples": 1200,
+   "duration_s": 2.4,
+   "terrain": "flat",
+   "family": "lane_change_brake",
+   "family_name": "lane change and brake",
+   "variant": 2
+  },
+  {
+   "id": "test_lane_change_brake_3",
+   "file": "settings/inputs/test_lane_change_brake_3.npz",
+   "samples": 1200,
+   "duration_s": 2.4,
+   "terrain": "flat",
+   "family": "lane_change_brake",
+   "family_name": "lane change and brake",
+   "variant": 3
+  },
+  {
+   "id": "test_longitudinal_chirp_1",
+   "file": "settings/inputs/test_longitudinal_chirp_1.npz",
+   "samples": 1200,
+   "duration_s": 2.4,
+   "terrain": "flat",
+   "family": "longitudinal_chirp",
+   "family_name": "longitudinal chirp",
+   "variant": 1
+  },
+  {
+   "id": "test_longitudinal_chirp_2",
+   "file": "settings/inputs/test_longitudinal_chirp_2.npz",
+   "samples": 1200,
+   "duration_s": 2.4,
+   "terrain": "flat",
+   "family": "longitudinal_chirp",
+   "family_name": "longitudinal chirp",
+   "variant": 2
+  },
+  {
+   "id": "test_longitudinal_chirp_3",
+   "file": "settings/inputs/test_longitudinal_chirp_3.npz",
+   "samples": 1200,
+   "duration_s": 2.4,
+   "terrain": "flat",
+   "family": "longitudinal_chirp",
+   "family_name": "longitudinal chirp",
+   "variant": 3
+  },
+  {
+   "id": "test_multisine_slalom_1",
+   "file": "settings/inputs/test_multisine_slalom_1.npz",
+   "samples": 1200,
+   "duration_s": 2.4,
+   "terrain": "flat",
+   "family": "multisine_slalom",
+   "family_name": "multisine slalom",
+   "variant": 1
+  },
+  {
+   "id": "test_multisine_slalom_2",
+   "file": "settings/inputs/test_multisine_slalom_2.npz",
+   "samples": 1200,
+   "duration_s": 2.4,
+   "terrain": "flat",
+   "family": "multisine_slalom",
+   "family_name": "multisine slalom",
+   "variant": 2
+  },
+  {
+   "id": "test_multisine_slalom_3",
+   "file": "settings/inputs/test_multisine_slalom_3.npz",
+   "samples": 1200,
+   "duration_s": 2.4,
+   "terrain": "flat",
+   "family": "multisine_slalom",
+   "family_name": "multisine slalom",
+   "variant": 3
+  },
+  {
+   "id": "test_sine_dwell_coast_1",
+   "file": "settings/inputs/test_sine_dwell_coast_1.npz",
+   "samples": 1200,
+   "duration_s": 2.4,
+   "terrain": "flat",
+   "family": "sine_dwell_coast",
+   "family_name": "sine dwell and coast",
+   "variant": 1
+  },
+  {
+   "id": "test_sine_dwell_coast_2",
+   "file": "settings/inputs/test_sine_dwell_coast_2.npz",
+   "samples": 1200,
+   "duration_s": 2.4,
+   "terrain": "flat",
+   "family": "sine_dwell_coast",
+   "family_name": "sine dwell and coast",
+   "variant": 2
+  },
+  {
+   "id": "test_sine_dwell_coast_3",
+   "file": "settings/inputs/test_sine_dwell_coast_3.npz",
+   "samples": 1200,
+   "duration_s": 2.4,
+   "terrain": "flat",
+   "family": "sine_dwell_coast",
+   "family_name": "sine dwell and coast",
+   "variant": 3
+  },
+  {
+   "id": "test_offset_brake_slalom_1",
+   "file": "settings/inputs/test_offset_brake_slalom_1.npz",
+   "samples": 1200,
+   "duration_s": 2.4,
+   "terrain": "flat",
+   "family": "offset_brake_slalom",
+   "family_name": "offset-brake slalom",
+   "variant": 1
+  },
+  {
+   "id": "test_offset_brake_slalom_2",
+   "file": "settings/inputs/test_offset_brake_slalom_2.npz",
+   "samples": 1200,
+   "duration_s": 2.4,
+   "terrain": "flat",
+   "family": "offset_brake_slalom",
+   "family_name": "offset-brake slalom",
+   "variant": 2
+  },
+  {
+   "id": "test_offset_brake_slalom_3",
+   "file": "settings/inputs/test_offset_brake_slalom_3.npz",
+   "samples": 1200,
+   "duration_s": 2.4,
+   "terrain": "flat",
+   "family": "offset_brake_slalom",
+   "family_name": "offset-brake slalom",
+   "variant": 3
+  },
+  {
+   "id": "test_late_sweep_release_1",
+   "file": "settings/inputs/test_late_sweep_release_1.npz",
+   "samples": 1200,
+   "duration_s": 2.4,
+   "terrain": "flat",
+   "family": "late_sweep_release",
+   "family_name": "late sweep and release",
+   "variant": 1
+  },
+  {
+   "id": "test_late_sweep_release_2",
+   "file": "settings/inputs/test_late_sweep_release_2.npz",
+   "samples": 1200,
+   "duration_s": 2.4,
+   "terrain": "flat",
+   "family": "late_sweep_release",
+   "family_name": "late sweep and release",
+   "variant": 2
+  },
+  {
+   "id": "test_late_sweep_release_3",
+   "file": "settings/inputs/test_late_sweep_release_3.npz",
+   "samples": 1200,
+   "duration_s": 2.4,
+   "terrain": "flat",
+   "family": "late_sweep_release",
+   "family_name": "late sweep and release",
+   "variant": 3
+  }
+ ]
+}

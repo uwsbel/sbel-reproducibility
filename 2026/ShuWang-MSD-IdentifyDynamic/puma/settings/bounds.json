@@ -1,0 +1,140 @@
+{
+ "parameters": [
+  {
+   "name": "m2",
+   "unit": "kg",
+   "lower": 8.0,
+   "upper": 28.0
+  },
+  {
+   "name": "m3",
+   "unit": "kg",
+   "lower": 2.5,
+   "upper": 10.0
+  },
+  {
+   "name": "m2c2x",
+   "unit": "kg m",
+   "lower": -0.56,
+   "upper": 4.2
+  },
+  {
+   "name": "m2c2z",
+   "unit": "kg m",
+   "lower": -2.24,
+   "upper": 0.84
+  },
+  {
+   "name": "m3c3x",
+   "unit": "kg m",
+   "lower": -1.4,
+   "upper": 0.4
+  },
+  {
+   "name": "m3c3z",
+   "unit": "kg m",
+   "lower": -0.7,
+   "upper": 0.3
+  },
+  {
+   "name": "I1z",
+   "unit": "kg m^2",
+   "lower": 0.015,
+   "upper": 0.12
+  },
+  {
+   "name": "I2y",
+   "unit": "kg m^2",
+   "lower": 0.2,
+   "upper": 0.9
+  },
+  {
+   "name": "I2z",
+   "unit": "kg m^2",
+   "lower": 0.2,
+   "upper": 0.9
+  },
+  {
+   "name": "I3y",
+   "unit": "kg m^2",
+   "lower": 0.05,
+   "upper": 0.35
+  },
+  {
+   "name": "I3z",
+   "unit": "kg m^2",
+   "lower": 0.04,
+   "upper": 0.3
+  },
+  {
+   "name": "b1",
+   "unit": "N m s/rad",
+   "lower": 0.05,
+   "upper": 1.0
+  },
+  {
+   "name": "b2",
+   "unit": "N m s/rad",
+   "lower": 0.1,
+   "upper": 2.0
+  },
+  {
+   "name": "b3",
+   "unit": "N m s/rad",
+   "lower": 0.05,
+   "upper": 1.2
+  },
+  {
+   "name": "fc1",
+   "unit": "N m",
+   "lower": 0.2,
+   "upper": 1.4
+  },
+  {
+   "name": "fc2",
+   "unit": "N m",
+   "lower": 0.4,
+   "upper": 2.2
+  },
+  {
+   "name": "fc3",
+   "unit": "N m",
+   "lower": 0.2,
+   "upper": 1.5
+  }
+ ],
+ "coordinate": "z = (value - centre) / half_range, centre = (lower + upper) / 2, half_range = (upper - lower) / 2",
+ "fixed": {
+  "m1_kg": 5.0,
+  "c1_m": [
+   0.0,
+   0.0,
+   0.0
+  ],
+  "I1x_kg_m2": 0.06,
+  "I1y_kg_m2": 0.06,
+  "I2x_kg_m2": 0.05,
+  "I3x_kg_m2": 0.04,
+  "c2y_m": 0.0,
+  "c3y_m": 0.0
+ },
+ "centre_of_mass_intervals_m": {
+  "c2x": [
+   -0.02,
+   0.15
+  ],
+  "c2z": [
+   -0.08,
+   0.03
+  ],
+  "c3x": [
+   -0.14,
+   0.04
+  ],
+  "c3z": [
+   -0.07,
+   0.03
+  ]
+ },
+ "feasibility": "A candidate is feasible if it lies in the box, the principal inertias of each link are positive and satisfy the triangle inequalities, and c2 = (m2c2x, m2c2z) / m2 and c3 = (m3c3x, m3c3z) / m3 lie in the centre-of-mass intervals."
+}

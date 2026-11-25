@@ -1,0 +1,38 @@
+{
+ "note": "The tire model limits the tire-terrain friction coefficient to [0.1, 1.0]. The selected different-geometry endpoint of teacher 3 has a friction estimate above 1.0. With friction set to 1.0 and the other six parameters unchanged, all 18 test predictions are bit for bit the same, and so are the training cost and the test cost.",
+ "teacher": "teacher3",
+ "setting": "different_geometry",
+ "seed": 2,
+ "parameters": [
+  "mu",
+  "M",
+  "COMx",
+  "COMz",
+  "Ixx",
+  "Iyy",
+  "Izz"
+ ],
+ "endpoint_parameters": [
+  1.0897042604779363,
+  1252.3550453951957,
+  -1.7350911305841108,
+  0.7155071434014078,
+  323.4069849377419,
+  958.9413859844406,
+  1228.8189093807373
+ ],
+ "parameters_with_friction_at_the_limit": [
+  1.0,
+  1252.3550453951957,
+  -1.7350911305841108,
+  0.7155071434014078,
+  323.4069849377419,
+  958.9413859844406,
+  1228.8189093807373
+ ],
+ "test_cost": 42.529263784202364,
+ "test_cost_with_friction_at_the_limit": 42.529263784202364,
+ "test_predictions_equal": 18,
+ "training_cost": 30.694996355858272,
+ "training_cost_with_friction_at_the_limit": 30.694996355858272
+}

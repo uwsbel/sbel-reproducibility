@@ -1,0 +1,150 @@
+{
+ "method": "Encoder-aided calibration: link attitudes from the encoder angles, joint axes from relative gyroscope signals, levers from the condition that the joint point has the same acceleration on both adjacent links.",
+ "windows": {
+  "fraction_of_the_record": 0.55,
+  "start_fractions": [
+   0.0,
+   0.225,
+   0.45
+  ]
+ },
+ "checks": {
+  "validity": "finite signals, within the joint limits, no torque saturation, settled start",
+  "quality": "fit residual, high-frequency ratio and lever dispersion at most the median plus three median absolute deviations over the six calibrations",
+  "information": "smallest information per sample at least the lower quartile over the six calibrations",
+  "limits": {
+   "largest_fit_residual_rms_m_s2_upper": 0.13702248960049057,
+   "high_frequency_ratio_upper": 0.00010092214768330036,
+   "largest_window_lever_dispersion_m_upper": 0.136166684396267,
+   "smallest_information_per_sample_lower": 0.06175355088178796
+  }
+ },
+ "rule": "Among the calibrations that pass the checks, the one with the least window-to-window dispersion of the levers is selected. The axis dispersion and the fit residual break ties.",
+ "calibrations": [
+  {
+   "calibration": 1,
+   "valid": true,
+   "samples": 700,
+   "largest_fit_residual_rms_m_s2": 0.13425742875406457,
+   "high_frequency_ratio": 6.590022485652163e-05,
+   "largest_window_lever_dispersion_m": 0.1045822117342172,
+   "median_window_lever_dispersion_m": 0.0026831398165854583,
+   "largest_window_axis_dispersion_deg": 0.08532203705378306,
+   "median_window_axis_dispersion_deg": 0.026557975083869596,
+   "information_per_sample_by_joint": [
+    8.829285892987876,
+    0.06298480954140516,
+    4.567825749660302
+   ],
+   "smallest_information_per_sample": 0.06298480954140516,
+   "passes": true,
+   "checks_not_passed": []
+  },
+  {
+   "calibration": 2,
+   "valid": true,
+   "samples": 700,
+   "largest_fit_residual_rms_m_s2": 0.0958504814038094,
+   "high_frequency_ratio": 6.787453204866562e-05,
+   "largest_window_lever_dispersion_m": 0.06967954729799786,
+   "median_window_lever_dispersion_m": 0.002135215602877859,
+   "largest_window_axis_dispersion_deg": 0.17892609622140004,
+   "median_window_axis_dispersion_deg": 0.044471473818449354,
+   "information_per_sample_by_joint": [
+    8.468510488568116,
+    0.06040095517898315,
+    2.4698844704356233
+   ],
+   "smallest_information_per_sample": 0.06040095517898315,
+   "passes": false,
+   "checks_not_passed": [
+    "information"
+   ]
+  },
+  {
+   "calibration": 3,
+   "valid": true,
+   "samples": 700,
+   "largest_fit_residual_rms_m_s2": 0.08635858237249051,
+   "high_frequency_ratio": 8.880937137668926e-05,
+   "largest_window_lever_dispersion_m": 0.11577217632096123,
+   "median_window_lever_dispersion_m": 0.002756015679680373,
+   "largest_window_axis_dispersion_deg": 0.15476838117847516,
+   "median_window_axis_dispersion_deg": 0.07847209674447303,
+   "information_per_sample_by_joint": [
+    3.7573318375187474,
+    0.06654407291637067,
+    1.813624293195607
+   ],
+   "smallest_information_per_sample": 0.06654407291637067,
+   "passes": true,
+   "checks_not_passed": []
+  },
+  {
+   "calibration": 4,
+   "valid": true,
+   "samples": 700,
+   "largest_fit_residual_rms_m_s2": 0.11769218896369453,
+   "high_frequency_ratio": 8.742624970467167e-05,
+   "largest_window_lever_dispersion_m": 0.08691302137926438,
+   "median_window_lever_dispersion_m": 0.00990610831697841,
+   "largest_window_axis_dispersion_deg": 0.15254151666312757,
+   "median_window_axis_dispersion_deg": 0.03812303447692919,
+   "information_per_sample_by_joint": [
+    3.8234752613559926,
+    0.061343131328582226,
+    1.926462035140843
+   ],
+   "smallest_information_per_sample": 0.061343131328582226,
+   "passes": false,
+   "checks_not_passed": [
+    "information"
+   ]
+  },
+  {
+   "calibration": 5,
+   "valid": true,
+   "samples": 700,
+   "largest_fit_residual_rms_m_s2": 0.1011221890448955,
+   "high_frequency_ratio": 7.752590712593231e-05,
+   "largest_window_lever_dispersion_m": 0.04420362153417764,
+   "median_window_lever_dispersion_m": 0.0019908533417140164,
+   "largest_window_axis_dispersion_deg": 0.10215490181017342,
+   "median_window_axis_dispersion_deg": 0.036309575099058036,
+   "information_per_sample_by_joint": [
+    7.704627055699716,
+    0.06930042160902102,
+    5.09071919078145
+   ],
+   "smallest_information_per_sample": 0.06930042160902102,
+   "passes": true,
+   "checks_not_passed": []
+  },
+  {
+   "calibration": 6,
+   "valid": true,
+   "samples": 700,
+   "largest_fit_residual_rms_m_s2": 0.10739766747643026,
+   "high_frequency_ratio": 7.32662343946083e-05,
+   "largest_window_lever_dispersion_m": 0.0660019450291266,
+   "median_window_lever_dispersion_m": 0.0024787247673014037,
+   "largest_window_axis_dispersion_deg": 0.059012722255818106,
+   "median_window_axis_dispersion_deg": 0.028282706579715416,
+   "information_per_sample_by_joint": [
+    4.6255530211906954,
+    0.06386783332666744,
+    3.723566947949617
+   ],
+   "smallest_information_per_sample": 0.06386783332666744,
+   "passes": true,
+   "checks_not_passed": []
+  }
+ ],
+ "passing": [
+  1,
+  3,
+  5,
+  6
+ ],
+ "selected": 5
+}

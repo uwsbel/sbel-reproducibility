@@ -1,0 +1,278 @@
+{
+ "note": "Calibrated suspension geometry of the model. Coordinates are in metres, in the suspension frame of the axle, left side; the right side is the mirror image. 'front' is a complete double-wishbone suspension description. Its arm and upright points come from the selected calibration; its other entries (masses, inertias, spring and damper data, chassis-side tie-rod and spring points) are the public Chrono Polaris component data. 'rear' gives the five calibrated points of the three-link rear suspension; all other rear entries are those of the public Chrono file Polaris_Rear_TrailingArm.json.",
+ "suspension_location_in_vehicle_frame_m": {
+  "front": [
+   0.0,
+   0.0,
+   0.397
+  ],
+  "rear": [
+   0.0,
+   0.0,
+   0.07
+  ]
+ },
+ "front": {
+  "Name": "Polaris DoubleWishbone",
+  "Type": "Suspension",
+  "Template": "DoubleWishbone",
+  "Spindle": {
+   "Mass": 0.1,
+   "COM": [
+    0.01304554716415699,
+    0.5915018665161584,
+    -0.005875142517003218
+   ],
+   "Inertia": [
+    0.004117,
+    0.007352,
+    0.004117
+   ],
+   "Radius": 0.05,
+   "Width": 0.06
+  },
+  "Upright": {
+   "Mass": 30.19178388,
+   "COM": [
+    0.012301215973144597,
+    0.5475253220276888,
+    -0.007103762039775474
+   ],
+   "Moments of Inertia": [
+    0.3252566910694148,
+    0.38314107519904284,
+    0.08427223373154227
+   ],
+   "Products of Inertia": [
+    0.0012437260352480804,
+    -0.009292457691938788,
+    0.008514331535078426
+   ],
+   "Radius": 0.025
+  },
+  "Upper Control Arm": {
+   "Mass": 3.6933,
+   "COM": [
+    0.006776287777010115,
+    0.2865195646934625,
+    0.25621374371128425
+   ],
+   "Moments of Inertia": [
+    0.01500016486381314,
+    0.015000047724950187,
+    0.0327597874112367
+   ],
+   "Products of Inertia": [
+    -8.870240847055001e-08,
+    -5.411050058043876e-05,
+    2.911331258091503e-05
+   ],
+   "Radius": 0.02,
+   "Location Chassis Front": [
+    0.15955314232213613,
+    0.12021596996693992,
+    0.2802764227707973
+   ],
+   "Location Chassis Back": [
+    -0.08814909266472704,
+    0.1161044735657969,
+    0.23454133361754315
+   ],
+   "Location Upright": [
+    0.010354030541105175,
+    0.5439542231230471,
+    0.06759291367152187
+   ]
+  },
+  "Lower Control Arm": {
+   "Mass": 4.6716,
+   "COM": [
+    -0.07355809411905412,
+    0.27276818720475654,
+    0.004342633003417917
+   ],
+   "Moments of Inertia": [
+    0.10000002142462203,
+    0.10000235864531891,
+    0.29379761993005904
+   ],
+   "Products of Inertia": [
+    2.2479565064135093e-07,
+    -6.443633109061166e-05,
+    -0.0006760915981309326
+   ],
+   "Radius": 0.03,
+   "Location Chassis Front": [
+    0.04543512992724552,
+    0.10211041870258077,
+    0.10105819219025397
+   ],
+   "Location Chassis Back": [
+    -0.2472768291746974,
+    0.09918322592696989,
+    0.06362638030307871
+   ],
+   "Location Upright": [
+    0.023110207890424395,
+    0.5545340208577744,
+    -0.09007434738483089
+   ]
+  },
+  "Tierod": {
+   "Location Chassis": [
+    -0.137,
+    0.113,
+    0.055
+   ],
+   "Location Upright": [
+    -0.08866636981619246,
+    0.5125938337916247,
+    -0.0923055093779996
+   ]
+  },
+  "Spring": {
+   "Location Chassis": [
+    -0.053,
+    0.166,
+    0.574
+   ],
+   "Location Arm": [
+    -0.003071157715020964,
+    0.4251693569372058,
+    0.18444038178847347
+   ],
+   "Free Length": 0.475653,
+   "Spring Curve Data": [
+    [
+     -0.099233471,
+     -14801.48006
+    ],
+    [
+     -0.091600127,
+     -9620.962037
+    ],
+    [
+     -0.076333439,
+     -8140.814031
+    ],
+    [
+     -0.061066751,
+     -6660.666026
+    ],
+    [
+     -0.045800064,
+     -5772.577222
+    ],
+    [
+     -0.030533376,
+     -4810.481018
+    ],
+    [
+     -0.015266688,
+     -4440.444017
+    ],
+    [
+     0,
+     -3848.384815
+    ],
+    [
+     0.015266688,
+     -3330.333013
+    ],
+    [
+     0.030533376,
+     -2886.288611
+    ],
+    [
+     0.045800064,
+     -2442.244209
+    ],
+    [
+     0.053433408,
+     3700.370014
+    ]
+   ]
+  },
+  "Shock": {
+   "Location Chassis": [
+    -0.053,
+    0.166,
+    0.574
+   ],
+   "Location Arm": [
+    -0.003071157715020964,
+    0.4251693569372058,
+    0.18444038178847347
+   ],
+   "Damping Curve Data": [
+    [
+     -4,
+     -12500
+    ],
+    [
+     -0.33,
+     -262
+    ],
+    [
+     -0.13,
+     -1625
+    ],
+    [
+     0,
+     0
+    ],
+    [
+     0.13,
+     2000
+    ],
+    [
+     0.33,
+     2875
+    ],
+    [
+     4,
+     15000
+    ]
+   ]
+  },
+  "Axle": {
+   "Inertia": 0.4
+  },
+  "Toe Angle (deg)": 0.9696751877944444,
+  "Camber Angle (deg)": -1.6000878256175763,
+  "Vehicle-Frame Inertia": false
+ },
+ "rear": {
+  "Trailing Arm": {
+   "Location Chassis": [
+    -1.8373688192364022,
+    0.41452136310748133,
+    0.33937328669411126
+   ]
+  },
+  "Upper Link": {
+   "Location Chassis": [
+    -2.7800425809048743,
+    0.12739728709461362,
+    0.4835487802991203
+   ],
+   "Location Arm": [
+    -2.7274276041472496,
+    0.6626267586304606,
+    0.3943939922962657
+   ]
+  },
+  "Lower Link": {
+   "Location Chassis": [
+    -2.7813054768497247,
+    0.06513977947502404,
+    0.3519416868100189
+   ],
+   "Location Arm": [
+    -2.770717129055299,
+    0.6268363846143155,
+    0.24859561497162236
+   ]
+  }
+ }
+}

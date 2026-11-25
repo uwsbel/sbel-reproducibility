@@ -1,0 +1,45 @@
+{
+ "teacher": "teacher0",
+ "setting": "different_geometry",
+ "note": "noise_only: noise-free teacher output against the noisy test records. reference: the model with the teacher parameters and the calibrated geometry. selected: the selected endpoint. share_removed = (reference - selected) / (reference - noise_only); it is not defined in the same-geometry setting, where the reference model is the teacher itself.",
+ "noise_only_cost": 0.9402670787280838,
+ "noise_only_group_costs": {
+  "p": 0.9356248743724852,
+  "q": 0.9567806005751474,
+  "v": 0.9314574685430839,
+  "speed": 0.9397905008770289,
+  "wheel_omega": 0.9382889373445423,
+  "delta": 0.9496961877391108,
+  "gyro": 0.9378585881874888,
+  "upright_rel": 0.9326394721857832
+ },
+ "reference_cost": 54.52578806838419,
+ "reference_group_costs": {
+  "p": 63.09954049880586,
+  "q": 15.053498440031742,
+  "v": 25.33432141141673,
+  "speed": 12.012235343981157,
+  "wheel_omega": 275.33518060040535,
+  "delta": 1.6438429425112129,
+  "gyro": 30.716955483131542,
+  "upright_rel": 13.010729826789941
+ },
+ "selected_cost": 26.082223899994975,
+ "selected_group_costs": {
+  "p": 36.27878496987936,
+  "q": 5.991273231012396,
+  "v": 16.043647098523984,
+  "speed": 12.228315282553924,
+  "wheel_omega": 96.7866366278089,
+  "delta": 1.6316500431529315,
+  "gyro": 27.379976283679657,
+  "upright_rel": 12.317507663348636
+ },
+ "share_removed": 0.53080689789094,
+ "cost_without_upright_group": {
+  "noise_only": 0.9413567368055552,
+  "reference": 60.456510674326225,
+  "selected": 28.048611933801595
+ },
+ "reference_prediction_equals_noise_free_teacher_output": false
+}

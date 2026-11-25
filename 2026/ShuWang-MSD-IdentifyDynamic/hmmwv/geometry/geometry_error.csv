@@ -1,0 +1,53 @@
+axle,side,point,group,source,dx_mm,dy_mm,dz_mm,outward_mm
+front,left,upper_arm_chassis_front,Chassis-side arm points,Calibrated,1.67,9.915,-1.552,9.915
+front,left,upper_arm_chassis_back,Chassis-side arm points,Calibrated,1.292,7.165,-1.573,7.165
+front,left,lower_arm_chassis_front,Chassis-side arm points,Calibrated,-0.237,22.12,-1.149,22.12
+front,left,lower_arm_chassis_back,Chassis-side arm points,Calibrated,-0.208,17.035,-1.325,17.035
+front,right,upper_arm_chassis_front,Chassis-side arm points,Calibrated,1.67,-9.915,-1.552,9.915
+front,right,upper_arm_chassis_back,Chassis-side arm points,Calibrated,1.292,-7.165,-1.573,7.165
+front,right,lower_arm_chassis_front,Chassis-side arm points,Calibrated,-0.237,-22.12,-1.149,22.12
+front,right,lower_arm_chassis_back,Chassis-side arm points,Calibrated,-0.208,-17.035,-1.325,17.035
+rear,left,upper_arm_chassis_front,Chassis-side arm points,Calibrated,0.417,-41.027,0.186,-41.027
+rear,left,upper_arm_chassis_back,Chassis-side arm points,Calibrated,0.425,-43.759,0.536,-43.759
+rear,left,lower_arm_chassis_front,Chassis-side arm points,Calibrated,0.386,-24.607,-6.948,-24.607
+rear,left,lower_arm_chassis_back,Chassis-side arm points,Calibrated,0.432,-30.993,-7.622,-30.993
+rear,right,upper_arm_chassis_front,Chassis-side arm points,Calibrated,0.417,41.027,0.186,-41.027
+rear,right,upper_arm_chassis_back,Chassis-side arm points,Calibrated,0.425,43.759,0.536,-43.759
+rear,right,lower_arm_chassis_front,Chassis-side arm points,Calibrated,0.386,24.607,-6.948,-24.607
+rear,right,lower_arm_chassis_back,Chassis-side arm points,Calibrated,0.432,30.993,-7.622,-30.993
+front,left,upper_arm_upright,Outer arm points,Calibrated,-3.413,7.162,5.707,7.162
+front,left,lower_arm_upright,Outer arm points,Calibrated,8.166,12.423,5.556,12.423
+front,right,upper_arm_upright,Outer arm points,Calibrated,-3.42,-7.188,5.754,7.188
+front,right,lower_arm_upright,Outer arm points,Calibrated,8.166,-12.446,5.603,12.446
+rear,left,upper_arm_upright,Outer arm points,Calibrated,35.425,-41.662,5.343,-41.662
+rear,left,lower_arm_upright,Outer arm points,Calibrated,-5.285,-30.455,3.29,-30.455
+rear,right,upper_arm_upright,Outer arm points,Calibrated,35.424,41.651,5.365,-41.651
+rear,right,lower_arm_upright,Outer arm points,Calibrated,-5.285,30.444,3.312,-30.444
+front,left,tie_rod_upright,Tie-rod outer point,"Public, moved",7.282,14.863,3.809,14.863
+front,right,tie_rod_upright,Tie-rod outer point,"Public, moved",7.277,-14.884,3.851,14.884
+rear,left,tie_rod_upright,Tie-rod outer point,"Public, moved",-11.608,-21.618,6.556,-21.618
+rear,right,tie_rod_upright,Tie-rod outer point,"Public, moved",-11.608,21.608,6.577,-21.608
+front,left,wheel_center,Wheel center,"Public, moved",5.403,17.777,3.717,17.777
+front,right,wheel_center,Wheel center,"Public, moved",5.396,-17.801,3.763,17.801
+rear,left,wheel_center,Wheel center,"Public, moved",-13.089,-23.827,7.063,-23.827
+rear,right,wheel_center,Wheel center,"Public, moved",-13.089,23.816,7.085,-23.816
+front,left,spring_arm,Spring and damper lower points,"Public, moved",2.87,11.763,2.364,11.763
+front,left,damper_arm,Spring and damper lower points,"Public, moved",2.87,11.763,2.364,11.763
+front,right,spring_arm,Spring and damper lower points,"Public, moved",2.87,-11.773,2.388,11.773
+front,right,damper_arm,Spring and damper lower points,"Public, moved",2.87,-11.773,2.388,11.773
+rear,left,spring_arm,Spring and damper lower points,"Public, moved",6.912,-38.27,-0.533,-38.27
+rear,left,damper_arm,Spring and damper lower points,"Public, moved",6.858,-38.411,-0.485,-38.411
+rear,right,spring_arm,Spring and damper lower points,"Public, moved",6.912,38.265,-0.522,-38.265
+rear,right,damper_arm,Spring and damper lower points,"Public, moved",6.858,38.407,-0.474,-38.407
+front,left,tie_rod_chassis,"Tie-rod inner, spring and damper upper points",Public,0.0,0.0,0.0,0.0
+front,left,spring_chassis,"Tie-rod inner, spring and damper upper points",Public,0.0,0.0,0.0,0.0
+front,left,damper_chassis,"Tie-rod inner, spring and damper upper points",Public,0.0,0.0,0.0,0.0
+front,right,tie_rod_chassis,"Tie-rod inner, spring and damper upper points",Public,0.0,0.0,0.0,-0.0
+front,right,spring_chassis,"Tie-rod inner, spring and damper upper points",Public,0.0,0.0,0.0,-0.0
+front,right,damper_chassis,"Tie-rod inner, spring and damper upper points",Public,0.0,0.0,0.0,-0.0
+rear,left,tie_rod_chassis,"Tie-rod inner, spring and damper upper points",Public,0.0,0.0,0.0,0.0
+rear,left,spring_chassis,"Tie-rod inner, spring and damper upper points",Public,0.0,0.0,0.0,0.0
+rear,left,damper_chassis,"Tie-rod inner, spring and damper upper points",Public,0.0,0.0,0.0,0.0
+rear,right,tie_rod_chassis,"Tie-rod inner, spring and damper upper points",Public,0.0,0.0,0.0,-0.0
+rear,right,spring_chassis,"Tie-rod inner, spring and damper upper points",Public,0.0,0.0,0.0,-0.0
+rear,right,damper_chassis,"Tie-rod inner, spring and damper upper points",Public,0.0,0.0,0.0,-0.0

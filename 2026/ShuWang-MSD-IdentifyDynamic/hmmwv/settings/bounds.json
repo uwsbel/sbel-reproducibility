@@ -1,0 +1,70 @@
+{
+ "parameters": [
+  {
+   "name": "mu",
+   "unit": "-",
+   "lower": 0.4,
+   "upper": 1.2,
+   "center": 0.8,
+   "half_range": 0.4
+  },
+  {
+   "name": "M",
+   "unit": "kg",
+   "lower": 1564.8899999999999,
+   "upper": 2608.15,
+   "center": 2086.52,
+   "half_range": 521.63
+  },
+  {
+   "name": "COMx",
+   "unit": "m",
+   "lower": -0.2766969871519806,
+   "upper": 0.3886969871519806,
+   "center": 0.056,
+   "half_range": 0.3326969871519806
+  },
+  {
+   "name": "COMz",
+   "unit": "m",
+   "lower": 0.09547262124896025,
+   "upper": 0.33052737875103977,
+   "center": 0.213,
+   "half_range": 0.11752737875103975
+  },
+  {
+   "name": "Ixx",
+   "unit": "kg m^2",
+   "lower": 808.89,
+   "upper": 1348.15,
+   "center": 1078.52,
+   "half_range": 269.63
+  },
+  {
+   "name": "Iyy",
+   "unit": "kg m^2",
+   "lower": 2216.745,
+   "upper": 3694.575,
+   "center": 2955.66,
+   "half_range": 738.915
+  },
+  {
+   "name": "Izz",
+   "unit": "kg m^2",
+   "lower": 2677.6499999999996,
+   "upper": 4462.75,
+   "center": 3570.2,
+   "half_range": 892.55
+  }
+ ],
+ "normalization": "value = center + half_range * z, with z between -1 and 1",
+ "feasibility": "mu > 0, M > 0, and the three principal inertias are positive and satisfy the triangle inequalities",
+ "tire_model_friction_limits": [
+  0.1,
+  1.0
+ ],
+ "scale": {
+  "wheelbase_m": 3.3269698715198057,
+  "center_of_mass_height_above_ground_m": 0.783515858340265
+ }
+}

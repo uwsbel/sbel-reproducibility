@@ -1,0 +1,24 @@
+{
+ "description": "Cost of each output group on the 18 test motions: mean over the motions of the group cost. The test cost is the mean of the five values.",
+ "selected_endpoint": {
+  "joint_angle": 0.9361165667006723,
+  "joint_rate": 0.943459774634385,
+  "specific_force": 0.9359605262826677,
+  "angular_rate": 0.931308226346739,
+  "torque": 0.924856062877022
+ },
+ "reference_model": {
+  "joint_angle": 0.9354468255729184,
+  "joint_rate": 0.9431977354024933,
+  "specific_force": 0.9359647978126558,
+  "angular_rate": 0.9312870303480962,
+  "torque": 0.9247691200858116
+ },
+ "noise_only": {
+  "joint_angle": 0.9354468255729184,
+  "joint_rate": 0.9431977354024933,
+  "specific_force": 0.9359647978126558,
+  "angular_rate": 0.9312870303480962,
+  "torque": 0.9247691200858116
+ }
+}

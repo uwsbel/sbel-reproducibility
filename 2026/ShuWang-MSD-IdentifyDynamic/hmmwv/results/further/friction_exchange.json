@@ -1,0 +1,35 @@
+{
+ "description": "Forward simulations with one parameter exchanged: the friction coefficient of one teacher is replaced by the rounded friction of another teacher; the other six parameters are unchanged. The reference cost is the test cost of these parameters with the calibrated geometry against test data generated with the same parameters and the true geometry. No parameter is fitted.",
+ "exchanges": [
+  {
+   "teacher": 0,
+   "parameters": {
+    "mu": 0.69,
+    "M": 1859.376166231622,
+    "COMx": 0.03121330162283494,
+    "COMz": 0.16088132709614733,
+    "Ixx": 1263.3870897240788,
+    "Iyy": 3225.586500388539,
+    "Izz": 3660.383149606769
+   },
+   "noise_only_cost": 0.9316866960117447,
+   "reference_cost": 3.9637511819137377,
+   "reference_cost_with_own_friction": 7.039981668805352
+  },
+  {
+   "teacher": 2,
+   "parameters": {
+    "mu": 0.942,
+    "M": 2052.059066843554,
+    "COMx": -0.0757999576994779,
+    "COMz": 0.259001350508297,
+    "Ixx": 1231.5533425215626,
+    "Iyy": 3094.922352160879,
+    "Izz": 4103.645505899778
+   },
+   "noise_only_cost": 0.9315264305132046,
+   "reference_cost": 7.500054711584665,
+   "reference_cost_with_own_friction": 4.1806571942109505
+  }
+ ]
+}

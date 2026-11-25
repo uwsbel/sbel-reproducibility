@@ -1,0 +1,81 @@
+{
+ "description": "Selected calibration. Every model uses it; the teacher of the same-geometry setting uses it too.",
+ "convention": "For each joint: unit vector of the joint axis and the lever from the frame origin to the joint, in the frame of the parent link and in the frame of the child link. The frame of a moving link has its origin at the IMU of the link. The frame of the base has its origin on the joint-1 axis.",
+ "joints": [
+  {
+   "joint": 1,
+   "parent": "base",
+   "child": "link 1",
+   "axis_parent": [
+    -0.0005315611257293245,
+    0.00031540447873479316,
+    0.9999998089813741
+   ],
+   "axis_child": [
+    -0.0005200939717416687,
+    0.0002921190919814587,
+    0.9999998220843326
+   ],
+   "lever_parent_m": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "lever_child_m": [
+    -0.03899356022917804,
+    0.024048337222861187,
+    0.05999514560640011
+   ]
+  },
+  {
+   "joint": 2,
+   "parent": "link 1",
+   "child": "link 2",
+   "axis_parent": [
+    0.0004110181301624731,
+    0.9999998797499481,
+    -0.00026751483327277364
+   ],
+   "axis_child": [
+    0.00046841150734493723,
+    0.9999998870163735,
+    8.098086223797591e-05
+   ],
+   "lever_parent_m": [
+    -0.039026595744107724,
+    1.915366587021579e-05,
+    0.0116368319451787
+   ],
+   "lever_child_m": [
+    -0.16054256966037198,
+    -0.00826518373001548,
+    -0.06590006465685543
+   ]
+  },
+  {
+   "joint": 3,
+   "parent": "link 2",
+   "child": "link 3",
+   "axis_parent": [
+    0.0004581872200484848,
+    0.9999998446075231,
+    0.00031756794761143967
+   ],
+   "axis_child": [
+    0.0005302062853332739,
+    0.9999998519381097,
+    -0.00012249511775900364
+   ],
+   "lever_parent_m": [
+    0.27109726889965885,
+    -0.00010367625154611079,
+    -0.06466984063954165
+   ],
+   "lever_child_m": [
+    -0.2576647452703141,
+    0.15514663743437257,
+    -0.024478284421650363
+   ]
+  }
+ ]
+}

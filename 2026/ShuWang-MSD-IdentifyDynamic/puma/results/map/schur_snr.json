@@ -1,0 +1,516 @@
+{
+ "description": "Prior map of the selected training motions. Stored results; the response columns of the map are not part of this package.",
+ "parameters": [
+  "m2",
+  "m3",
+  "m2c2x",
+  "m2c2z",
+  "m3c3x",
+  "m3c3z",
+  "I1z",
+  "I2y",
+  "I2z",
+  "I3y",
+  "I3z",
+  "b1",
+  "b2",
+  "b3",
+  "fc1",
+  "fc2",
+  "fc3"
+ ],
+ "prior_points": [
+  "development_1",
+  "development_2",
+  "development_3",
+  "development_4",
+  "development_5",
+  "confirmation_1",
+  "confirmation_2"
+ ],
+ "schur_snr": [
+  [
+   82.8028780350481,
+   690.0303653435335,
+   123.30115250142038,
+   195.94840729147188,
+   628.7983419477162,
+   1466.896172410284,
+   58.48191473941132,
+   42.14753188572187,
+   42.80118465560912,
+   431.5752671934627,
+   119.48863849724688,
+   206.28803683384558,
+   211.72962216858832,
+   218.8632637266324,
+   234.45098971353897,
+   164.07753989596202,
+   185.92793023362287
+  ],
+  [
+   100.38576871565128,
+   711.7222241637742,
+   150.67840211775044,
+   236.32042559780953,
+   647.4955588800168,
+   1467.0154850587946,
+   55.47813247673514,
+   79.93825825469821,
+   85.68906711701581,
+   460.02454493569024,
+   120.43006022029968,
+   202.89643973716602,
+   217.68755073570435,
+   212.72884190072287,
+   227.5890674946876,
+   159.9154982524541,
+   180.0849835014327
+  ],
+  [
+   112.0973741532648,
+   673.6296009685036,
+   166.70769469918358,
+   266.1900648764876,
+   613.6552963796154,
+   1475.4787800006477,
+   58.982735609150836,
+   46.182955224563614,
+   47.090925233359016,
+   360.8019868589075,
+   115.56650238272087,
+   207.68665562346848,
+   211.26581034872052,
+   221.04184982961888,
+   237.19458463902293,
+   165.0177080022485,
+   188.46865118409482
+  ],
+  [
+   146.5009711269506,
+   671.2195827951207,
+   218.42868807277875,
+   346.34290605206536,
+   611.4262704832379,
+   1453.9766915019818,
+   57.018199145681606,
+   65.96897457324577,
+   68.55894147606244,
+   369.50274185406937,
+   115.42132015587306,
+   207.09836920777718,
+   210.99902210912853,
+   221.01215200309662,
+   238.64962778711802,
+   166.849109033054,
+   187.63693755924342
+  ],
+  [
+   55.33038252072177,
+   687.4897695324177,
+   82.27023114705052,
+   130.4139700372334,
+   626.0760259540148,
+   1470.5200403903793,
+   59.88789975167691,
+   33.07201255027018,
+   33.41758457977447,
+   391.1268456664575,
+   116.82236586958159,
+   206.9726937134527,
+   207.28008089984826,
+   220.46783554401296,
+   233.79094099169103,
+   161.6381059882281,
+   189.70337860721764
+  ],
+  [
+   12.837816918964016,
+   665.12195574935,
+   19.03248324803495,
+   30.08457202505095,
+   606.5260387880675,
+   1455.2668828066369,
+   66.43847783754403,
+   5.882698975103446,
+   5.878449062915059,
+   348.94747524048665,
+   114.31879738101937,
+   205.41500152851017,
+   204.01934434913525,
+   222.92594436324225,
+   241.80802812544863,
+   166.34809829878648,
+   191.72293953090283
+  ],
+  [
+   165.2947034782208,
+   691.9849320535495,
+   248.88206939402403,
+   387.6514525034301,
+   629.3060752968656,
+   1444.42745099257,
+   54.88144677208707,
+   98.15984634596151,
+   107.93679626082121,
+   397.89432718363196,
+   116.03348914304391,
+   206.35950348001617,
+   212.12525627927084,
+   216.26909935454287,
+   233.1144649041543,
+   164.6482748676789,
+   184.56921464289272
+  ]
+ ],
+ "numerical_rank": [
+  17,
+  17,
+  17,
+  17,
+  17,
+  16,
+  17
+ ],
+ "condition_number": [
+  388.45428916258606,
+  255.0305906321867,
+  350.56986194689205,
+  261.1665030527158,
+  504.1639723838602,
+  2615.081810136083,
+  222.18301933882324
+ ],
+ "largest_column_correlation": [
+  0.9105321830535132,
+  0.9363727433939919,
+  0.9028178445776412,
+  0.9008283581185895,
+  0.911320774231169,
+  0.8983498548772021,
+  0.9095456142738394
+ ],
+ "settings": {
+  "parameter_change_z": 0.1,
+  "difference_step_z": 0.02,
+  "second_step_z_first_development_point": 0.01,
+  "smallest_step_agreement": 0.7,
+  "snr_threshold": 1.0,
+  "numerical_rank_rule": "number of singular values above 1e-3 times the largest"
+ },
+ "library": {
+  "categories": {
+   "coupling": [
+    "CBD03",
+    "CP02",
+    "CP03"
+   ],
+   "friction": [
+    "FR01",
+    "FR03",
+    "J1R02",
+    "J2F03",
+    "J3R03"
+   ],
+   "gravity": [
+    "GFD02",
+    "GR03",
+    "GR04"
+   ],
+   "inertia": [
+    "BFD02",
+    "DFD01",
+    "IN02",
+    "IN04",
+    "J1I03",
+    "SEP02",
+    "SEP04",
+    "SEP06",
+    "TZR02",
+    "TZR03"
+   ]
+  },
+  "durations_s": {
+   "BFD02": 9.200000000000001,
+   "CBD03": 9.200000000000001,
+   "CP02": 8.28,
+   "CP03": 11.3,
+   "DFD01": 8.950000000000001,
+   "FR01": 7.112,
+   "FR03": 8.256,
+   "GFD02": 9.57,
+   "GR03": 10.5,
+   "GR04": 9.25,
+   "IN02": 6.1000000000000005,
+   "IN04": 6.1000000000000005,
+   "J1I03": 8.3,
+   "J1R02": 9.8,
+   "J2F03": 8.64,
+   "J3R03": 10.392,
+   "SEP02": 8.700000000000001,
+   "SEP04": 8.1,
+   "SEP06": 8.1,
+   "TZR02": 8.85,
+   "TZR03": 8.290000000000001
+  },
+  "smallest_step_agreement_by_motion": {
+   "BFD02": 0.9999999992029213,
+   "CBD03": 0.9999999699739422,
+   "CP02": 0.9999999993735899,
+   "CP03": 0.9999999983879893,
+   "DFD01": 0.9999999855458738,
+   "FR01": 0.9999999993758324,
+   "FR03": 0.9999999998461293,
+   "GFD02": 0.9999998761313895,
+   "GR03": 0.999999990519839,
+   "GR04": 0.9999999965516365,
+   "IN02": 0.9999999996569733,
+   "IN04": 0.9999999938329196,
+   "J1I03": 0.9999999845768596,
+   "J1R02": 0.9999999998851548,
+   "J2F03": 0.9999999997545603,
+   "J3R03": 0.9999999995746686,
+   "SEP02": 0.9999999934518395,
+   "SEP04": 0.9999998819659784,
+   "SEP06": 0.9999999993225805,
+   "TZR02": 0.9999999650013254,
+   "TZR03": 0.9999999971833224
+  },
+  "repeated_simulation_equal_by_motion": {
+   "BFD02": true,
+   "CP02": true,
+   "CBD03": true,
+   "DFD01": true,
+   "CP03": true,
+   "FR01": true,
+   "FR03": true,
+   "IN02": true,
+   "GFD02": true,
+   "GR04": true,
+   "IN04": true,
+   "GR03": true,
+   "J1I03": true,
+   "SEP02": true,
+   "J3R03": true,
+   "SEP04": true,
+   "J2F03": true,
+   "J1R02": true,
+   "SEP06": true,
+   "TZR03": true,
+   "TZR02": true
+  },
+  "covered_pairs": 85,
+  "parameters_covered_at_three_or_more_development_points": 17
+ },
+ "selected_set": {
+  "motions": [
+   "CP03",
+   "GR03",
+   "J1R02",
+   "TZR03"
+  ],
+  "duration_s": 39.89,
+  "covered_pairs": 85,
+  "parameters_covered_at_three_or_more_development_points": 17,
+  "median_schur_snr": 206.28803683384558,
+  "reaches_the_coverage_of_the_library": true,
+  "coverage_lost_without_motion": {
+   "CP03": false,
+   "GR03": false,
+   "J1R02": false,
+   "TZR03": false
+  }
+ },
+ "coverage": {
+  "m2": {
+   "development_points_covered": 5,
+   "confirmation_points_covered": 2
+  },
+  "m3": {
+   "development_points_covered": 5,
+   "confirmation_points_covered": 2
+  },
+  "m2c2x": {
+   "development_points_covered": 5,
+   "confirmation_points_covered": 2
+  },
+  "m2c2z": {
+   "development_points_covered": 5,
+   "confirmation_points_covered": 2
+  },
+  "m3c3x": {
+   "development_points_covered": 5,
+   "confirmation_points_covered": 2
+  },
+  "m3c3z": {
+   "development_points_covered": 5,
+   "confirmation_points_covered": 2
+  },
+  "I1z": {
+   "development_points_covered": 5,
+   "confirmation_points_covered": 2
+  },
+  "I2y": {
+   "development_points_covered": 5,
+   "confirmation_points_covered": 2
+  },
+  "I2z": {
+   "development_points_covered": 5,
+   "confirmation_points_covered": 2
+  },
+  "I3y": {
+   "development_points_covered": 5,
+   "confirmation_points_covered": 2
+  },
+  "I3z": {
+   "development_points_covered": 5,
+   "confirmation_points_covered": 2
+  },
+  "b1": {
+   "development_points_covered": 5,
+   "confirmation_points_covered": 2
+  },
+  "b2": {
+   "development_points_covered": 5,
+   "confirmation_points_covered": 2
+  },
+  "b3": {
+   "development_points_covered": 5,
+   "confirmation_points_covered": 2
+  },
+  "fc1": {
+   "development_points_covered": 5,
+   "confirmation_points_covered": 2
+  },
+  "fc2": {
+   "development_points_covered": 5,
+   "confirmation_points_covered": 2
+  },
+  "fc3": {
+   "development_points_covered": 5,
+   "confirmation_points_covered": 2
+  }
+ },
+ "first_ten_sets": [
+  {
+   "motions": [
+    "CP03",
+    "GR03",
+    "J1R02",
+    "TZR03"
+   ],
+   "covered_pairs": 85,
+   "parameters_covered_at_three_or_more_development_points": 17,
+   "median_schur_snr": 206.28803683384558,
+   "duration_s": 39.89
+  },
+  {
+   "motions": [
+    "CP03",
+    "DFD01",
+    "FR03",
+    "GR03"
+   ],
+   "covered_pairs": 85,
+   "parameters_covered_at_three_or_more_development_points": 17,
+   "median_schur_snr": 205.85083017702266,
+   "duration_s": 39.006
+  },
+  {
+   "motions": [
+    "CP03",
+    "GR03",
+    "J1R02",
+    "TZR02"
+   ],
+   "covered_pairs": 85,
+   "parameters_covered_at_three_or_more_development_points": 17,
+   "median_schur_snr": 204.1200532118056,
+   "duration_s": 40.45
+  },
+  {
+   "motions": [
+    "CP03",
+    "DFD01",
+    "GR03",
+    "J3R03"
+   ],
+   "covered_pairs": 85,
+   "parameters_covered_at_three_or_more_development_points": 17,
+   "median_schur_snr": 203.90538818720617,
+   "duration_s": 41.141999999999996
+  },
+  {
+   "motions": [
+    "CP03",
+    "FR01",
+    "GR03",
+    "TZR03"
+   ],
+   "covered_pairs": 85,
+   "parameters_covered_at_three_or_more_development_points": 17,
+   "median_schur_snr": 203.05440143219334,
+   "duration_s": 37.202
+  },
+  {
+   "motions": [
+    "CP03",
+    "GR03",
+    "J1I03",
+    "J1R02"
+   ],
+   "covered_pairs": 85,
+   "parameters_covered_at_three_or_more_development_points": 17,
+   "median_schur_snr": 202.87926056986632,
+   "duration_s": 39.900000000000006
+  },
+  {
+   "motions": [
+    "CP03",
+    "FR03",
+    "GR03",
+    "SEP04"
+   ],
+   "covered_pairs": 85,
+   "parameters_covered_at_three_or_more_development_points": 17,
+   "median_schur_snr": 202.74903849205384,
+   "duration_s": 38.156
+  },
+  {
+   "motions": [
+    "CP03",
+    "FR03",
+    "GR03",
+    "SEP02"
+   ],
+   "covered_pairs": 85,
+   "parameters_covered_at_three_or_more_development_points": 17,
+   "median_schur_snr": 202.06461999491017,
+   "duration_s": 38.756
+  },
+  {
+   "motions": [
+    "CP03",
+    "FR01",
+    "GR03",
+    "J1I03"
+   ],
+   "covered_pairs": 85,
+   "parameters_covered_at_three_or_more_development_points": 17,
+   "median_schur_snr": 201.15142479038502,
+   "duration_s": 37.212
+  },
+  {
+   "motions": [
+    "CP03",
+    "FR03",
+    "GR03",
+    "TZR02"
+   ],
+   "covered_pairs": 85,
+   "parameters_covered_at_three_or_more_development_points": 17,
+   "median_schur_snr": 200.9690011083636,
+   "duration_s": 38.906
+  }
+ ]
+}

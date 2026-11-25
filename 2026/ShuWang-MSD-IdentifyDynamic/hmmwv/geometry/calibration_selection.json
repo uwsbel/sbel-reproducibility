@@ -1,0 +1,180 @@
+{
+ "rule": "A valid calibration is removed if its worst calibration cost, its left-right hardpoint difference or its worst window dispersion exceeds the median of the valid calibrations by more than three median absolute deviations, or if the smallest information of its joint positions is below the 25th percentile. The remaining calibrations are ranked by their worst window dispersion. The first one in this order that passes the mechanical checks is selected. The true geometry is not used.",
+ "screen_thresholds": {
+  "worst_calibration_cost_per_sample": {
+   "median": 8.39407266765017,
+   "median_absolute_deviation": 0.6205923483431919,
+   "upper_limit": 10.255849712679744
+  },
+  "left_right_hardpoint_rms_m": {
+   "median": 0.062244449368876346,
+   "median_absolute_deviation": 0.018663164575462524,
+   "upper_limit": 0.11823394309526392
+  },
+  "worst_window_dispersion_m": {
+   "median": 0.0216885992647066,
+   "median_absolute_deviation": 0.0023851445948152254,
+   "upper_limit": 0.028844033049152278
+  }
+ },
+ "information_25th_percentile": 40.3395100538916,
+ "order_after_screen": [
+  "calibration_1",
+  "calibration_5",
+  "calibration_6",
+  "calibration_2"
+ ],
+ "selected": "calibration_1",
+ "mechanical_check_solver": "sparse LU",
+ "calibrations": [
+  {
+   "name": "calibration_1",
+   "excitation": "symmetric heave",
+   "valid": true,
+   "passes_quality_screen": true,
+   "removed_because": [],
+   "metrics": {
+    "worst_calibration_cost_per_sample": 8.62837229422342,
+    "left_right_hardpoint_rms_m": 0.05186929587033461,
+    "worst_window_dispersion_m": 0.01950452811021681,
+    "loop_closure_rms_m": 0.0456576120316323,
+    "smallest_information_of_joint_positions_per_sample": 56.263921967920986
+   },
+   "rank_by_window_dispersion": 1,
+   "mechanical_checks": {
+    "driving": true,
+    "joint": true,
+    "alignment": true,
+    "largest_joint_residual_m": 0.0005126394532847731,
+    "largest_settled_toe_deg": 1.39142604110214,
+    "largest_settled_camber_deg": 1.963186982666112
+   },
+   "selected": true
+  },
+  {
+   "name": "calibration_2",
+   "excitation": "short-wave pitch",
+   "valid": true,
+   "passes_quality_screen": true,
+   "removed_because": [],
+   "metrics": {
+    "worst_calibration_cost_per_sample": 9.336390443458894,
+    "left_right_hardpoint_rms_m": 0.03529327371649303,
+    "worst_window_dispersion_m": 0.024274817299847262,
+    "loop_closure_rms_m": 0.0512485937156276,
+    "smallest_information_of_joint_positions_per_sample": 72.76120786382562
+   },
+   "rank_by_window_dispersion": 4,
+   "mechanical_checks": {
+    "driving": true,
+    "joint": true,
+    "alignment": true,
+    "largest_joint_residual_m": 0.0004901927544865292,
+    "largest_settled_toe_deg": 0.8055081893169426,
+    "largest_settled_camber_deg": 2.7271045808075796
+   },
+   "selected": false
+  },
+  {
+   "name": "calibration_3",
+   "excitation": "brake-release pitch",
+   "valid": true,
+   "passes_quality_screen": false,
+   "removed_because": [
+    "left-right hardpoint difference above the median plus three median absolute deviations",
+    "smallest information of the joint positions below the 25th percentile"
+   ],
+   "metrics": {
+    "worst_calibration_cost_per_sample": 9.003696058476446,
+    "left_right_hardpoint_rms_m": 0.15099900050157267,
+    "worst_window_dispersion_m": 0.016361892228634427,
+    "loop_closure_rms_m": 0.06281511084057066,
+    "smallest_information_of_joint_positions_per_sample": 32.00937884031755
+   },
+   "rank_by_window_dispersion": null,
+   "mechanical_checks": {
+    "driving": true,
+    "joint": true,
+    "alignment": true,
+    "largest_joint_residual_m": 0.00048066266270901936,
+    "largest_settled_toe_deg": 1.6982092234098862,
+    "largest_settled_camber_deg": 2.443191583012174
+   },
+   "selected": false
+  },
+  {
+   "name": "calibration_4",
+   "excitation": "split roll",
+   "valid": true,
+   "passes_quality_screen": false,
+   "removed_because": [
+    "smallest information of the joint positions below the 25th percentile"
+   ],
+   "metrics": {
+    "worst_calibration_cost_per_sample": 8.15977304107692,
+    "left_right_hardpoint_rms_m": 0.059849121664435734,
+    "worst_window_dispersion_m": 0.0272760839781278,
+    "loop_closure_rms_m": 0.0565992247148703,
+    "smallest_information_of_joint_positions_per_sample": 35.03137274921514
+   },
+   "rank_by_window_dispersion": null,
+   "mechanical_checks": {
+    "driving": true,
+    "joint": true,
+    "alignment": true,
+    "largest_joint_residual_m": 0.0005244167403612929,
+    "largest_settled_toe_deg": 1.7170471829893845,
+    "largest_settled_camber_deg": 3.1140327650115154
+   },
+   "selected": false
+  },
+  {
+   "name": "calibration_5",
+   "excitation": "steering and suspension coupling",
+   "valid": true,
+   "passes_quality_screen": true,
+   "removed_because": [],
+   "metrics": {
+    "worst_calibration_cost_per_sample": 7.747369369546371,
+    "left_right_hardpoint_rms_m": 0.10645891203539282,
+    "worst_window_dispersion_m": 0.02109750940838274,
+    "loop_closure_rms_m": 0.06429873098199754,
+    "smallest_information_of_joint_positions_per_sample": 118.44805084545638
+   },
+   "rank_by_window_dispersion": 2,
+   "mechanical_checks": {
+    "driving": true,
+    "joint": true,
+    "alignment": true,
+    "largest_joint_residual_m": 0.0005112651221422654,
+    "largest_settled_toe_deg": 1.7997782347926037,
+    "largest_settled_camber_deg": 2.7197351094843456
+   },
+   "selected": false
+  },
+  {
+   "name": "calibration_6",
+   "excitation": "broadband three-dimensional road",
+   "valid": true,
+   "passes_quality_screen": true,
+   "removed_because": [],
+   "metrics": {
+    "worst_calibration_cost_per_sample": 7.762511361790063,
+    "left_right_hardpoint_rms_m": 0.06463977707331696,
+    "worst_window_dispersion_m": 0.02227968912103046,
+    "loop_closure_rms_m": 0.05405524992672303,
+    "smallest_information_of_joint_positions_per_sample": 103.97460797144478
+   },
+   "rank_by_window_dispersion": 3,
+   "mechanical_checks": {
+    "driving": true,
+    "joint": true,
+    "alignment": true,
+    "largest_joint_residual_m": 0.000503596364668929,
+    "largest_settled_toe_deg": 1.09670971340743,
+    "largest_settled_camber_deg": 2.690771148989349
+   },
+   "selected": false
+  }
+ ]
+}

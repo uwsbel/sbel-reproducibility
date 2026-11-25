@@ -1,0 +1,150 @@
+{
+ "note": "Cost of the noise alone. 'simulated': 2000 noise realizations scored against zero error, per motion set. 'of_the_data': the noise-free teacher output scored against the noisy records of each teacher and setting (training, validation and test set). The Delta V column of the seed table is (validation cost - of_the_data validation) / simulated validation sd.",
+ "realizations": 2000,
+ "near_noise_threshold": 1.1196,
+ "simulated": {
+  "training": {
+   "motions": 5,
+   "scored_samples_per_motion": 225,
+   "mean": 0.9329005809238065,
+   "sd": 0.009072064148526519,
+   "minimum": 0.8979576113052552,
+   "maximum": 0.9638432038760809,
+   "sd_of_one_motion": 0.019928928378400938,
+   "group_mean": {
+    "p": 0.9331638723821356,
+    "q": 0.9328926081061939,
+    "v": 0.9331017063547902,
+    "speed": 0.9331613183845683,
+    "wheel_omega": 0.9325830965043708,
+    "delta": 0.9322517885313756,
+    "gyro": 0.9327836096814285,
+    "upright_rel": 0.9332666474455887
+   },
+   "group_sd": {
+    "p": 0.02086996122582641,
+    "q": 0.021190570473579723,
+    "v": 0.02124330180194306,
+    "speed": 0.0373598193236786,
+    "wheel_omega": 0.018410101640118373,
+    "delta": 0.03801348548921986,
+    "gyro": 0.02035119629761073,
+    "upright_rel": 0.010628275548133987
+   }
+  },
+  "validation": {
+   "motions": 18,
+   "scored_samples_per_motion": 275,
+   "mean": 0.9329231674103899,
+   "sd": 0.004223146679094852,
+   "minimum": 0.9147741102684017,
+   "maximum": 0.9485938201680142,
+   "sd_of_one_motion": 0.017983611107154168,
+   "group_mean": {
+    "p": 0.932964170436318,
+    "q": 0.9332222540345767,
+    "v": 0.9325485515460724,
+    "speed": 0.933299330134366,
+    "wheel_omega": 0.9327960425709658,
+    "delta": 0.932680964956971,
+    "gyro": 0.9331106545696763,
+    "upright_rel": 0.9327633710341734
+   },
+   "group_sd": {
+    "p": 0.01018747202768591,
+    "q": 0.010282647885599528,
+    "v": 0.010177497813909095,
+    "speed": 0.01754597665766432,
+    "wheel_omega": 0.008840139450858216,
+    "delta": 0.017834860643061532,
+    "gyro": 0.010320545511411962,
+    "upright_rel": 0.0050029530462689775
+   }
+  },
+  "test": {
+   "motions": 18,
+   "scored_samples_per_motion": 275,
+   "mean": 0.9329398341326984,
+   "sd": 0.00415310824483273,
+   "minimum": 0.9205071922551085,
+   "maximum": 0.9462155493502791,
+   "sd_of_one_motion": 0.017873003441223563,
+   "group_mean": {
+    "p": 0.933072120244543,
+    "q": 0.9328539543463419,
+    "v": 0.9328219193165593,
+    "speed": 0.9328538825762027,
+    "wheel_omega": 0.9327960268085078,
+    "delta": 0.9328947026301627,
+    "gyro": 0.9332950285913254,
+    "upright_rel": 0.9329310385479448
+   },
+   "group_sd": {
+    "p": 0.010173577425398454,
+    "q": 0.010108903747543613,
+    "v": 0.010343743926800882,
+    "speed": 0.01822874410611253,
+    "wheel_omega": 0.0087832857958441,
+    "delta": 0.017545601225166126,
+    "gyro": 0.010261621613080552,
+    "upright_rel": 0.005088303359984857
+   }
+  }
+ },
+ "analytic": {
+  "mean_per_component": 0.9328808394245567,
+  "variance_per_component": 1.5460231201505032,
+  "sd_validation_or_test": 0.004230104740175242,
+  "sd_training": 0.008873142560364587
+ },
+ "of_the_data": {
+  "teacher0": {
+   "different_geometry": {
+    "training": 0.925890924529985,
+    "validation": 0.9332581286048189,
+    "test": 0.9402670787280838
+   },
+   "same_geometry": {
+    "training": 0.9258841981831346,
+    "validation": 0.933260197948388,
+    "test": 0.940268470457471
+   }
+  },
+  "teacher1": {
+   "different_geometry": {
+    "training": 0.9401874370126388,
+    "validation": 0.9282392559675384,
+    "test": 0.9304498162883099
+   },
+   "same_geometry": {
+    "training": 0.9401801439405209,
+    "validation": 0.9282521109359452,
+    "test": 0.9304433412430877
+   }
+  },
+  "teacher2": {
+   "different_geometry": {
+    "training": 0.9203830393069804,
+    "validation": 0.9294066720760238,
+    "test": 0.9426108905828658
+   },
+   "same_geometry": {
+    "training": 0.9203798123616973,
+    "validation": 0.9293977316698613,
+    "test": 0.9426094714110819
+   }
+  },
+  "teacher3": {
+   "different_geometry": {
+    "training": 0.9313205428939684,
+    "validation": 0.9383493224808842,
+    "test": 0.9368463078018108
+   },
+   "same_geometry": {
+    "training": 0.931331663181407,
+    "validation": 0.9383485996883795,
+    "test": 0.9368493770999966
+   }
+  }
+ }
+}

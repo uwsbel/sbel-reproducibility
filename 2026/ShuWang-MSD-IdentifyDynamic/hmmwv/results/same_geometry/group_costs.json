@@ -1,0 +1,127 @@
+{
+ "groups": [
+  "position",
+  "attitude",
+  "velocity",
+  "speed",
+  "wheel_angular_speed",
+  "steering_proxy",
+  "angular_velocity",
+  "upright_relative_position"
+ ],
+ "note": "Stored values of the four endpoints: mean cost of each output group over the 18 test motions, test cost, and statistics of the 144 values of r.",
+ "endpoints": [
+  {
+   "seed": 1,
+   "test_cost": 1.7620413616737456,
+   "group_costs": {
+    "position": 1.4106525062955333,
+    "attitude": 1.0581785850723149,
+    "velocity": 1.2411242232852193,
+    "speed": 1.675387908687414,
+    "wheel_angular_speed": 5.402464951759315,
+    "steering_proxy": 0.9126613624547512,
+    "angular_velocity": 1.4601303935664438,
+    "upright_relative_position": 0.9357309622689728
+   },
+   "r_median": 1.0210757475433154,
+   "r_min": 0.9047948614563638,
+   "r_max": 31.114769359900986,
+   "outside_band": 33,
+   "largest_r_by_group": {
+    "position": 6.000919390818498,
+    "attitude": 2.261246156821232,
+    "velocity": 3.9999109932337498,
+    "speed": 6.65673872927818,
+    "wheel_angular_speed": 31.114769359900986,
+    "steering_proxy": 1.0745051111252129,
+    "angular_velocity": 4.4892530165651126,
+    "upright_relative_position": 1.0679584582393822
+   }
+  },
+  {
+   "seed": 2,
+   "test_cost": 1.26546098662811,
+   "group_costs": {
+    "position": 1.0812537290288509,
+    "attitude": 0.9529349195926599,
+    "velocity": 0.9543196775647595,
+    "speed": 0.9279805109299257,
+    "wheel_angular_speed": 3.398395470564326,
+    "steering_proxy": 0.9114774883935871,
+    "angular_velocity": 0.9685568786886728,
+    "upright_relative_position": 0.9287692182620968
+   },
+   "r_median": 1.0127343046529256,
+   "r_min": 0.8899424438133475,
+   "r_max": 4.053628755936649,
+   "outside_band": 23,
+   "largest_r_by_group": {
+    "position": 1.3474217118729366,
+    "attitude": 1.0524200456571158,
+    "velocity": 1.0496728283507926,
+    "speed": 1.0978861045310713,
+    "wheel_angular_speed": 4.053628755936649,
+    "steering_proxy": 1.074053886319672,
+    "angular_velocity": 1.077041787351853,
+    "upright_relative_position": 1.0272132731153436
+   }
+  },
+  {
+   "seed": 3,
+   "test_cost": 2.1700222621178096,
+   "group_costs": {
+    "position": 2.5332169011483585,
+    "attitude": 1.1389439553458738,
+    "velocity": 1.2810738905772376,
+    "speed": 1.74871865331479,
+    "wheel_angular_speed": 7.186313834298073,
+    "steering_proxy": 0.9125778816869976,
+    "angular_velocity": 1.6223267210216434,
+    "upright_relative_position": 0.9370062595495043
+   },
+   "r_median": 1.0515062597660083,
+   "r_min": 0.895182954365056,
+   "r_max": 37.571568224682046,
+   "outside_band": 62,
+   "largest_r_by_group": {
+    "position": 6.764392347113205,
+    "attitude": 2.567917718558345,
+    "velocity": 3.910367107180948,
+    "speed": 6.492154925789535,
+    "wheel_angular_speed": 37.571568224682046,
+    "steering_proxy": 1.07430472818478,
+    "angular_velocity": 4.891503711294582,
+    "upright_relative_position": 1.0721770185280504
+   }
+  },
+  {
+   "seed": 4,
+   "test_cost": 0.9752653621539132,
+   "group_costs": {
+    "position": 0.9599578647020454,
+    "attitude": 0.9524057468769538,
+    "velocity": 0.9506559031267654,
+    "speed": 0.9119671833356988,
+    "wheel_angular_speed": 1.2315708099041258,
+    "steering_proxy": 0.9113992030468574,
+    "angular_velocity": 0.9560522097406476,
+    "upright_relative_position": 0.9281139764982116
+   },
+   "r_median": 1.0107414767768144,
+   "r_min": 0.8996026044723139,
+   "r_max": 1.4007709373129698,
+   "outside_band": 15,
+   "largest_r_by_group": {
+    "position": 1.037349849173132,
+    "attitude": 1.0499156653832407,
+    "velocity": 1.0452584086175642,
+    "speed": 1.0671799711322634,
+    "wheel_angular_speed": 1.4007709373129698,
+    "steering_proxy": 1.0738660442395864,
+    "angular_velocity": 1.0712760073885572,
+    "upright_relative_position": 1.026545408802471
+   }
+  }
+ ]
+}

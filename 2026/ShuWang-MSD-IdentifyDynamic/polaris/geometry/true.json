@@ -1,0 +1,50 @@
+{
+ "note": "The true geometry is the geometry of the public Chrono Polaris RZR model (Project Chrono, vehicle data folder Polaris, BSD 3-Clause license). The files are not copied here. They are identified by name and sha256. The hardpoint differences between the calibrated and the true geometry are in geometry/geometry_error.csv.",
+ "files": [
+  {
+   "file": "Polaris.json",
+   "role": "vehicle assembly and suspension locations",
+   "sha256": "ccd6787027242bef2b03bcea03f185c62e1fad2f7180dc0a932e6b7a157119f1"
+  },
+  {
+   "file": "Polaris_Front_DoubleWishbone.json",
+   "role": "front suspension geometry",
+   "sha256": "9409e04e08416660a3aa5332954a7175ce8e0c4ea641dd52de68fbe7b421a4c1"
+  },
+  {
+   "file": "Polaris_Rear_TrailingArm.json",
+   "role": "rear suspension geometry",
+   "sha256": "d1a58d4e35b93b59cb369bcecd361606b243e657b7827a64844949457007ebc1"
+  },
+  {
+   "file": "Polaris_Chassis.json",
+   "role": "chassis",
+   "sha256": "5d2f47117f553f8cb272fb0d25ad8e5294f75daf6701fa44c18106cfa02ff6e0"
+  },
+  {
+   "file": "Polaris_PitmanArm.json",
+   "role": "steering",
+   "sha256": "48f557800d9ae0efc44fa3ec0c8baf89cc29feaf6ecc8315837e216ad6beb500"
+  },
+  {
+   "file": "Polaris_4WD.json",
+   "role": "driveline",
+   "sha256": "b153e4c3ebf79ef6eb8aac56517cabbe0ee8cdd0078c93fe872d12e2b472ccfe"
+  },
+  {
+   "file": "Polaris_Antirollbar.json",
+   "role": "rear anti-roll bar",
+   "sha256": "15433f240b37a26144e4f3a90416f5d02c7d977cad91c92e61e30cde4e0173a2"
+  },
+  {
+   "file": "Polaris_Wheel.json",
+   "role": "wheel",
+   "sha256": "8c7323a25c5afed6f212cc0ea2728fb19879625005bf5b3ba991f04b44b8f619"
+  },
+  {
+   "file": "Polaris_TMeasyTire.json",
+   "role": "tire (the model uses these values; the rolling-resistance entry is rewritten for the file reader)",
+   "sha256": "454026b51b6a413956591d3de37adcabc286305711a3ff51728324a441cacb72"
+  }
+ ]
+}

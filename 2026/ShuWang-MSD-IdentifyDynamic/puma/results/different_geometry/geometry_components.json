@@ -1,0 +1,209 @@
+{
+ "description": "Test cost of forward simulations with the teacher parameters and a geometry that holds single components of the calibration error; 18 test motions, different-geometry test records. Stored results of simulations; they are not recomputed here.",
+ "geometries": [
+  {
+   "name": "true_geometry",
+   "label": "True geometry",
+   "test_cost": 0.934133101844395,
+   "group_cost": {
+    "joint_angle": 0.9354468255729184,
+    "joint_rate": 0.9431977354024935,
+    "specific_force": 0.9359647978126558,
+    "angular_rate": 0.9312870303480962,
+    "torque": 0.9247691200858116
+   },
+   "largest_output_change_noise_sd": 0.0,
+   "motion_cost": {
+    "HG4": 0.9253693213038877,
+    "HG5": 0.935488720927521,
+    "HG6": 0.9326793199743445,
+    "HF4": 0.9315926251848591,
+    "HF5": 0.9286184679322643,
+    "HF6": 0.9344558344553924,
+    "HI4": 0.9305474721708377,
+    "HI5": 0.9340027894171097,
+    "HI6": 0.9429082323783998,
+    "HC4": 0.9358235161358133,
+    "HC5": 0.9320148792270577,
+    "HC6": 0.9386339320118446,
+    "CS4": 0.9478502535672064,
+    "CS5": 0.938095323461468,
+    "CS6": 0.9296207538257356,
+    "CH4": 0.9285252495177085,
+    "CH5": 0.9356618660399996,
+    "CH6": 0.9325072756676619
+   }
+  },
+  {
+   "name": "along_axis_equal_on_both_sides",
+   "label": "True geometry with the along-axis components that do not differ between the sides",
+   "test_cost": 0.9341331018391433,
+   "group_cost": {
+    "joint_angle": 0.9354468255727527,
+    "joint_rate": 0.9431977353856504,
+    "specific_force": 0.9359647978015919,
+    "angular_rate": 0.9312870303479472,
+    "torque": 0.9247691200877743
+   },
+   "largest_output_change_noise_sd": 3.4922376102031194e-08,
+   "motion_cost": {
+    "HG4": 0.9253693212695169,
+    "HG5": 0.9354887209234468,
+    "HG6": 0.932679319988608,
+    "HF4": 0.9315926251626122,
+    "HF5": 0.9286184679340683,
+    "HF6": 0.9344558344605479,
+    "HI4": 0.9305474721939117,
+    "HI5": 0.934002789406259,
+    "HI6": 0.942908232400115,
+    "HC4": 0.9358235161321954,
+    "HC5": 0.9320148792054599,
+    "HC6": 0.9386339320125267,
+    "CS4": 0.9478502535616162,
+    "CS5": 0.9380953234654236,
+    "CS6": 0.92962075379314,
+    "CH4": 0.9285252495182259,
+    "CH5": 0.9356618660135962,
+    "CH6": 0.9325072756633105
+   }
+  },
+  {
+   "name": "axis_tilts",
+   "label": "True geometry with the axis tilts",
+   "test_cost": 1.164244055875548,
+   "group_cost": {
+    "joint_angle": 1.9215790766777379,
+    "joint_rate": 1.0220837800818137,
+    "specific_force": 0.9373163717150776,
+    "angular_rate": 0.9405637331631205,
+    "torque": 0.9996773177399909
+   },
+   "largest_output_change_noise_sd": 4.972926575845804,
+   "motion_cost": {
+    "HG4": 1.1735417614952566,
+    "HG5": 1.2409000492225253,
+    "HG6": 1.2415790717863242,
+    "HF4": 1.0172338395805371,
+    "HF5": 1.0226805991612875,
+    "HF6": 1.1248416674892403,
+    "HI4": 1.308736515480863,
+    "HI5": 1.0320569060377118,
+    "HI6": 1.44931517746909,
+    "HC4": 1.2326423056261209,
+    "HC5": 1.1178199935559117,
+    "HC6": 1.113711158124621,
+    "CS4": 1.1169611073701748,
+    "CS5": 1.1484018047228184,
+    "CS6": 1.1415544889633318,
+    "CH4": 1.2838486939558005,
+    "CH5": 1.0155280627081373,
+    "CH6": 1.1750398030101115
+   }
+  },
+  {
+   "name": "along_axis_different_between_sides",
+   "label": "True geometry with the along-axis components that differ between the sides",
+   "test_cost": 2.2855827247007294,
+   "group_cost": {
+    "joint_angle": 4.94090764206264,
+    "joint_rate": 2.791990571132962,
+    "specific_force": 0.9479943687235104,
+    "angular_rate": 1.027303825616261,
+    "torque": 1.7197172159682774
+   },
+   "largest_output_change_noise_sd": 21.118485533379026,
+   "motion_cost": {
+    "HG4": 2.346708049114456,
+    "HG5": 3.4410729877685844,
+    "HG6": 3.3920659855179247,
+    "HF4": 1.4013501215821855,
+    "HF5": 1.2866876608561515,
+    "HF6": 1.362150236465403,
+    "HI4": 1.4320469250558083,
+    "HI5": 3.53762631049918,
+    "HI6": 1.219979114720564,
+    "HC4": 2.7908580544585115,
+    "HC5": 2.682095756589531,
+    "HC6": 2.1159068354908332,
+    "CS4": 1.8632133436370961,
+    "CS5": 3.21519582872346,
+    "CS6": 1.5818119040422496,
+    "CH4": 2.080624324926278,
+    "CH5": 3.054824427021361,
+    "CH6": 2.3362711781435612
+   }
+  },
+  {
+   "name": "perpendicular_offsets",
+   "label": "True geometry with the perpendicular offsets",
+   "test_cost": 3.9711095939127663,
+   "group_cost": {
+    "joint_angle": 11.86334674435615,
+    "joint_rate": 1.748778443321892,
+    "specific_force": 0.9477059116655102,
+    "angular_rate": 0.96605198910522,
+    "torque": 4.329664881115057
+   },
+   "largest_output_change_noise_sd": 17.788105086419037,
+   "motion_cost": {
+    "HG4": 4.149235916860834,
+    "HG5": 4.159950534276535,
+    "HG6": 4.100830728038575,
+    "HF4": 3.882059517861779,
+    "HF5": 4.04168318571687,
+    "HF6": 3.6423470544957857,
+    "HI4": 3.0354700935317203,
+    "HI5": 4.531180859443698,
+    "HI6": 2.3433239276943123,
+    "HC4": 4.11757360589842,
+    "HC5": 4.395537515042594,
+    "HC6": 4.565303384008642,
+    "CS4": 4.03352080415373,
+    "CS5": 3.981890405442222,
+    "CS6": 3.8332214144210015,
+    "CH4": 4.301816716183806,
+    "CH5": 4.840542761788946,
+    "CH6": 3.524484265570313
+   }
+  },
+  {
+   "name": "calibrated_geometry",
+   "label": "Calibrated geometry (all components)",
+   "test_cost": 4.446761321250778,
+   "group_cost": {
+    "joint_angle": 13.666483512296278,
+    "joint_rate": 2.1005115978852595,
+    "specific_force": 0.9503290345884543,
+    "angular_rate": 0.9976563724626664,
+    "torque": 4.518826089021231
+   },
+   "largest_output_change_noise_sd": 18.96809367088581,
+   "motion_cost": {
+    "HG4": 4.316508756112748,
+    "HG5": 5.142046191756239,
+    "HG6": 5.207238609004188,
+    "HF4": 3.9126681978663087,
+    "HF5": 3.859096200911819,
+    "HF6": 3.9040465381591973,
+    "HI4": 3.4280443407624133,
+    "HI5": 5.2900094480682665,
+    "HI6": 2.7758551456622604,
+    "HC4": 4.902468658547827,
+    "HC5": 4.287213718095627,
+    "HC6": 4.23071243390666,
+    "CS4": 4.6907614133063,
+    "CS5": 5.568335546275452,
+    "CS6": 4.394674351057942,
+    "CH4": 4.572743631036497,
+    "CH5": 5.1980130022635525,
+    "CH6": 4.361267599720703
+   }
+  }
+ ],
+ "fields": {
+  "test_cost": "mean over the 18 motions",
+  "group_cost": "cost of each output group",
+  "largest_output_change_noise_sd": "largest difference to the output with the true geometry, in noise standard deviations",
+  "motion_cost": "cost of each test motion"
+ }
+}
