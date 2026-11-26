@@ -353,7 +353,8 @@ def _remove_inplane_tire_force(sim, terrain):
     """
     for w in sim.wheels:
         tire = w.GetTire()
-        F = _vec(tire.ReportTireForce(terrain).force)
+        reported_force = tire.ReportTireForce(terrain)  # keep the owner alive while the vector is read
+        F = _vec(reported_force.force)
         st = w.GetState()
         c = _vec(st.pos)
         d = _vec(chrono.ChMatrix33D(st.rot).Get_A_Yaxis())
