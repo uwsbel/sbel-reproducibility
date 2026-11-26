@@ -26,7 +26,7 @@ and `settings/front_suspension_inertia.json` (inertia of the six front suspensio
 
 ## Setup
 
-1. Python 3.9 with numpy, scipy and pychrono. pychrono must be a Chrono 8.0 build with the old powertrain interface
+1. Python 3.9 with numpy, scipy and pychrono. pychrono must be built from Chrono commit f022f9b (see `../../ENVIRONMENT.md`), which has the old powertrain interface
    (`WheeledVehicle.InitializePowertrain`, `ChPowertrain.DriveMode_*`, `Gator_SimpleMapPowertrain`).
 2. Build the terrain helper (`terrain/BUILD.md`) if you run the uneven road.
 3. Edit `config.py`: `WORK_DIR` (output), `TERRAIN_LIBRARY`, and `CHRONO_DATA` if you keep the vehicle files elsewhere.

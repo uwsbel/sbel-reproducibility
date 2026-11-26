@@ -59,7 +59,7 @@ One LM iteration needs at least 37 evaluations of J. The code runs in one proces
 
 ## Chrono interface
 
-The code uses the Python interface of Chrono 8.0, compiled from the Chrono sources:
+The code uses the Python interface of Chrono commit f022f9b (see `../../ENVIRONMENT.md`):
 
 - bodies and joints: `ChSystemNSC`, `ChBodyEasyBox`, `ChBodyAuxRef` (`SetFrame_REF_to_abs`,
   `SetFrame_COG_to_REF`), `ChLinkMotorRotationTorque` with a Python subclass of `ChFunction`

@@ -52,7 +52,7 @@ One rollout takes about 4 s on one idle core; set the number of BLAS threads to 
 
 ## Chrono interface
 
-The code uses the Chrono 8.0 Python interface with the single powertrain class: `veh.WheeledVehicle`, `vehicle.InitializePowertrain(veh.HMMWV_SimpleMapPowertrain(...))`, `veh.ChPowertrain.DriveMode_NEUTRAL` and `DriveMode_FORWARD`, `veh.ReadTireJSON`, `vehicle.InitializeTire`, `veh.RigidTerrain`, `veh.FlatTerrain`, `veh.ChTerrain`, `chrono.ChMaterialSurfaceSMC`, `chrono.ChVectorD`, `ChQuaternionD`, `ChFrameD`, `ChLinkMateGeneric`, `ChSolverSparseLU`, `CastToChShaftsClutch`, `CastToChTriangleMeshShape`. Later Chrono versions renamed several of these. The results of the paper were computed with a Chrono build compiled from the 8.0 source tree.
+The code uses the Python interface of the Chrono version in `../../ENVIRONMENT.md`, which has the single powertrain class: `veh.WheeledVehicle`, `vehicle.InitializePowertrain(veh.HMMWV_SimpleMapPowertrain(...))`, `veh.ChPowertrain.DriveMode_NEUTRAL` and `DriveMode_FORWARD`, `veh.ReadTireJSON`, `vehicle.InitializeTire`, `veh.RigidTerrain`, `veh.FlatTerrain`, `veh.ChTerrain`, `chrono.ChMaterialSurfaceSMC`, `chrono.ChVectorD`, `ChQuaternionD`, `ChFrameD`, `ChLinkMateGeneric`, `ChSolverSparseLU`, `CastToChShaftsClutch`, `CastToChTriangleMeshShape`. Later Chrono versions renamed several of these. The results of the paper were computed with Chrono commit f022f9b (see `../../ENVIRONMENT.md`).
 
 ## What to edit in config.py
 

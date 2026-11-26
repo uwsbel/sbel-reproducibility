@@ -1,4 +1,4 @@
-"""Forward model of the Polaris RZR in Project Chrono (old ChPowertrain interface of Chrono 8.0).
+"""Forward model of the Polaris RZR in Project Chrono (old ChPowertrain interface of the Chrono version in ENVIRONMENT.md).
 
 Sim() builds the vehicle from a geometry and the seven parameters. settle() gives the start state of one
 parameter vector. simulate() drives one motion from that state and returns the eight output groups.
