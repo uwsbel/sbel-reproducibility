@@ -17,8 +17,19 @@ cl /nologo /O2 /EHsc /MD /std:c++17 /LD exact_query.cpp /I <chrono include folde
    /link <chrono lib folder>\ChronoEngine.lib <chrono lib folder>\ChronoEngine_vehicle.lib /OUT:exact_query.dll
 ```
 
+- On macOS, for example (the flag `-D'__declspec(x)='` removes the Windows export attribute; the functions are then exported by default):
+
+```
+clang++ -O2 -std=c++17 -shared -fPIC -DNDEBUG '-D__declspec(x)=' exact_query.cpp \
+   -I<chrono>/src -I<chrono build> -I<eigen3> \
+   -L<chrono build>/lib -lChronoEngine_vehicle -lChronoEngine -Wl,-rpath,<chrono build>/lib \
+   -o exact_query.dylib
+```
+
+- On Linux, use `g++` and the output name `exact_query.so`.
+
 - The DLL exports three C functions: `install_exact`, `exact_error` and `exact_counts`.
-- Put the path of the DLL into `TERRAIN_LIBRARY` in `config.py`. The Chrono DLLs must be on the search path (importing pychrono first is enough).
+- Put the path of the library into `TERRAIN_LIBRARY` in `config.py`. The Chrono DLLs must be on the search path (importing pychrono first is enough).
 
 ## How the model uses it
 

@@ -17,4 +17,18 @@ cl /nologo /O2 /MD /EHsc /std:c++14 /DNDEBUG /LD /I"<chrono>/src" /I"<chrono bui
 
 `<chrono>` is the Chrono source tree, `<chrono build>` its build folder (it holds the generated configuration headers), `<eigen3>` the Eigen headers. Set `TERRAIN_LIBRARY` in `../config.py` to the built library.
 
-The results of the paper used these compiler options. The source marks its three exported functions with `__declspec(dllexport)`; other platforms need the matching export attribute.
+The results of the paper used these compiler options.
+
+## Build (macOS and Linux)
+
+The source marks its three exported functions with `__declspec(dllexport)`. The flag `-D'__declspec(x)='` removes this Windows attribute; the functions are then exported by default. In this folder:
+
+```
+mkdir -p build
+clang++ -O2 -std=c++14 -shared -fPIC -DNDEBUG '-D__declspec(x)=' \
+   -I<chrono>/src -I<chrono build> -I<eigen3> terrain_query.cpp \
+   -L<chrono build>/lib -lChronoEngine_vehicle -lChronoEngine -Wl,-rpath,<chrono build>/lib \
+   -o build/terrain_query.dylib
+```
+
+On Linux, use `g++` and the output name `build/terrain_query.so`. Set `TERRAIN_LIBRARY` in `../config.py` to the built library.
